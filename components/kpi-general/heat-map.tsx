@@ -5,8 +5,6 @@ import { GoogleMap, useJsApiLoader, Circle, InfoWindow } from "@react-google-map
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-const GOOGLE_MAPS_API_KEY = "AIzaSyA5BwZEi2j1oO5hwx-pKy8SRpn4LBmbDFQ"
-
 const containerStyle = {
   width: "100%",
   height: "400px",
@@ -140,10 +138,8 @@ export function HeatMap() {
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
   })
-
-  const [map, setMap] = useState(null)
 
   const averageSales = useMemo(() => {
     const total = locationData.reduce((sum, location) => sum + location.sales, 0)
@@ -159,14 +155,6 @@ export function HeatMap() {
     radius: activations * 1000,
     zIndex: 1,
   })
-
-  const onLoad = useCallback(function callback(map) {
-    setMap(map)
-  }, [])
-
-  const onUnmount = useCallback(function callback(map) {
-    setMap(null)
-  }, [])
 
   if (loadError) {
     return <div>Error al cargar el mapa</div>
@@ -194,8 +182,6 @@ export function HeatMap() {
             mapContainerStyle={containerStyle}
             center={center}
             zoom={9}
-            onLoad={onLoad}
-            onUnmount={onUnmount}
             options={{
               styles: darkMapStyles,
               disableDefaultUI: true,

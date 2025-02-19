@@ -4,8 +4,6 @@ import { useState } from "react"
 import { GoogleMap, useJsApiLoader, Circle, InfoWindow } from "@react-google-maps/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-const GOOGLE_MAPS_API_KEY = "AIzaSyA5BwZEi2j1oO5hwx-pKy8SRpn4LBmbDFQ"
-
 const center = {
   lat: 40.7128,
   lng: -74.006,
@@ -83,7 +81,7 @@ export function AmbassadorDistributionMap() {
   const [selectedAmbassador, setSelectedAmbassador] = useState(null)
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
   })
 
   const getCircleOptions = (sales: number) => ({
