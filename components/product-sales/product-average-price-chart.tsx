@@ -72,7 +72,7 @@ export function ProductAveragePriceChart() {
                   )
                 }}
               />
-              <Tooltip formatter={(value) => [`$${value.toFixed(2)}`, "Precio promedio"]} />
+              <Tooltip formatter={(value) => [`$${Number(value).toFixed(2)}`, "Precio promedio"]} />
               <Bar dataKey="precio" fill="#82ca9d" />
             </BarChart>
           </ResponsiveContainer>

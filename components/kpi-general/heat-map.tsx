@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { GoogleMap, useJsApiLoader, Circle, InfoWindow } from "@react-google-maps/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -134,7 +134,15 @@ const locationData = [
 
 export function HeatMap() {
   const [mapType, setMapType] = useState("city")
-  const [selectedLocation, setSelectedLocation] = useState(null)
+  const [selectedLocation, setSelectedLocation] = useState<{
+    name: string;
+    city: string;
+    state: string;
+    lat: number;
+    lng: number;
+    activations: number;
+    sales: number;
+  } | null>(null)
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
