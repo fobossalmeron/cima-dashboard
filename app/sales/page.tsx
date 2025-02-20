@@ -5,16 +5,17 @@ import { SalesByDayChart } from "@/components/sales-indicators/sales-by-day-char
 import { SalesByHourChart } from "@/components/sales-indicators/sales-by-hour-chart"
 import { SalesVsTargetChart } from "@/components/sales-indicators/sales-vs-target-chart"
 import { Header } from "@/components/header"
+import { Content } from "@/components/content"
 
 export default function SalesIndicators() {
   return (
     <div className="space-y-6">
 
       <Header title="Ventas" />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="md:col-span-2">
-          <TotalSalesChart />
+      <Content>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="md:col-span-2">
+            <TotalSalesChart />
         </div>
         <SalesByStoreTypeChart />
         <TopStoresChart />
@@ -24,6 +25,7 @@ export default function SalesIndicators() {
           <SalesVsTargetChart />
         </div>
       </div>
+      </Content>
     </div>
   )
 }
