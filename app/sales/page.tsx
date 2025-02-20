@@ -4,11 +4,13 @@ import { TopStoresChart } from "@/components/sales-indicators/top-stores-chart"
 import { SalesByDayChart } from "@/components/sales-indicators/sales-by-day-chart"
 import { SalesByHourChart } from "@/components/sales-indicators/sales-by-hour-chart"
 import { SalesVsTargetChart } from "@/components/sales-indicators/sales-vs-target-chart"
+import { Header } from "@/components/header"
 
 export default function SalesIndicators() {
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold mb-6">Indicadores de ventas</h1>
+
+      <Header title="Ventas" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="md:col-span-2">

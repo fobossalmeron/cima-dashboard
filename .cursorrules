@@ -1,0 +1,116 @@
+You are an expert in TypeScript, Node.js, Next.js, Next.js App Router, React, Serverless, Shadcn, Vercel Postgres and Tailwind.
+
+Database and Types:
+
+- Use Vercel Postgres with Prisma ORM
+- Follow prisma/schema.prisma as source of truth for all data models
+- Use Create/Update prefix for DTOs
+- Use prisma/seed.ts as source of truth for all seed data
+- Use connection pooling for regular queries
+- Use direct connection for migrations and schema changes
+- Follow Vercel's database best practices
+- Always use and reference the Prisma client from /prisma/prisma.ts - never create new instances
+
+Data Layer Best Practices:
+
+- Use Prisma transactions for multi-table operations
+- Handle DB constraints with proper error management
+
+Type Conventions:
+
+- Import types from @/types/*.ts
+- Use optional chaining for relationships
+- Maintain nullable consistency (field?: type | null)
+- Use strict number types for stock quantities
+- Match DTO types with Prisma schema constraints
+
+Code Style and Structure
+
+- Write concise, technical TypeScript code with accurate examples.
+- Use functional and declarative programming patterns; avoid classes.
+- Prefer iteration and modularization over code duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+- Structure files: exported component, subcomponents, helpers, static content, types.
+- Use the new-york styling of shadcn components when creating new ones
+
+Naming Conventions
+
+- Use lowercase with dashes for directories (e.g., components/auth-wizard).
+- Favor named exports for components.
+
+TypeScript Usage
+
+- Use TypeScript for all code; prefer interfaces over types.
+- Use functional components with TypeScript interfaces.
+- If a function has less than four types, declare them inline.
+
+Syntax and Formatting
+
+- Use the "function" keyword for pure functions.
+- Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements.
+- Use declarative JSX.
+- Comment the code using concise comments.
+- Reorder the imports to the top of the file so that they are grouped by type.
+- Remove unused imports.
+
+UI and Styling
+
+- Use Tailwind for components and styling.
+- Implement responsive design with Tailwind CSS; use a mobile-first approach.
+
+Performance Optimization
+
+- Minimize 'use client', 'useEffect', and 'setState'; favor React Server Components (RSC).
+- Wrap client components in Suspense with fallback.
+- Use dynamic loading for non-critical components.
+- Optimize images: use WebP format, include size data, implement lazy loading.
+
+Key Conventions
+
+- Never downgrade package versions in package.json even if they appear to not exist yet
+- Always use yarn as the package manager.
+- Always use app router configurations, not pages router.
+- Use 'nuqs' for URL search parameter state management.
+- Optimize Web Vitals (LCP, CLS, FID).
+- Limit 'use client':
+- Favor server components and Next.js SSR.
+- Use only for Web API access in small components.
+- Avoid for data fetching or state management.
+- Protect routes always using layouts (app/*/layout.tsx) and never using middleware
+
+Next Conventions:
+Params and searchParams are dynamic APIs and must be treated as asynchronous. You must await params when:
+- Directly accessing its properties
+- Spreading it ({...params})
+- Using Object.keys(params)
+- Iterating over it
+
+Server Components: Use 'await params'
+Client Components: Use 'React.use(params)'
+
+Backend Architecture and API Design:
+
+- Adopt Clean Architecture principles for all backend logic and API design.
+- Ensure that the core business logic is independent of frameworks and technologies.
+- Use dependency inversion to abstract database access and framework-specific implementations.
+- Organize code in layers: domain, application, infrastructure, and presentation.
+- Use interfaces to define contracts between layers to ensure flexibility for future migrations.
+- Avoid direct framework or library calls in the business logic layer; use service abstractions.
+- Write testable code by designing loosely coupled modules and leveraging dependency injection.
+- Follow SOLID principles to ensure scalability and maintainability.
+- Use DTOs (Data Transfer Objects) to separate internal data models from external API contracts.
+- Structure the code to allow easy migration to frameworks like NestJS in the future.
+
+General Development Best Practices:
+
+- Apply Clean Code principles throughout the project.
+- Maintain consistent naming conventions and code organization.
+- Document key architectural decisions and their rationale for future reference.
+- Implement proper error handling and logging strategies to ensure robust and maintainable code.
+
+Follow Next.js docs for Data Fetching, Rendering, and Routing: https://nextjs.org/docs
+Follow Prisma docs for Database Access: https://www.prisma.io/docs
+Follow Vercel Postgres docs: https://vercel.com/docs/storage/vercel-postgres
+Follow Tailwind docs for Styling: https://tailwindcss.com/docs/guides/nextjs
+Follow Shadcn docs for Styling: https://ui.shadcn.com/docs/installation/next
+Follow React docs for React: https://react.dev/learn

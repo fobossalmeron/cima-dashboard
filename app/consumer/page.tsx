@@ -5,11 +5,12 @@ import { PurchaseFactorsChart } from "@/components/consumer-profile/purchase-fac
 import { ConsumptionMomentsChart } from "@/components/consumer-profile/consumption-moments-chart"
 import { ConsumerImages } from "@/components/consumer-profile/consumer-images"
 import { ConsumerFeedback } from "@/components/consumer-profile/consumer-feedback"
+import { Header } from "@/components/header"
 
 export default function ConsumerProfile() {
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold mb-6">Perfil del consumidor</h1>
+      <Header title="Perfil del consumidor" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <AgeDistributionChart />

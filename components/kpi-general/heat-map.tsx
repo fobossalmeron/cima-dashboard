@@ -17,44 +17,50 @@ const center = {
 
 // Estilos actualizados para un mapa minimalista oscuro
 const darkMapStyles = [
+  // {
+  //   featureType: "all",
+  //   elementType: "labels",
+  //   stylers: [{ visibility: "off" }],
+  // },
+  // {
+  //   featureType: "administrative",
+  //   elementType: "geometry",
+  //   stylers: [{ visibility: "off" }],
+  // },
+  // {
+  //   featureType: "landscape",
+  //   elementType: "geometry",
+  //   stylers: [{ color: "#242f3e" }],
+  // },
   {
-    featureType: "all",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }],
-  },
-  {
-    featureType: "administrative",
+    featureType: "landscape.natural",
     elementType: "geometry",
-    stylers: [{ visibility: "off" }],
-  },
-  {
-    featureType: "landscape",
-    elementType: "geometry",
-    stylers: [{ color: "#242f3e" }],
+    stylers: [{ color: "#ffffff" }],  // Bosques en blanco
   },
   {
     featureType: "poi",
     stylers: [{ visibility: "off" }],
+    //Este quita todos los puntos de interés
   },
   {
     featureType: "road",
     elementType: "geometry",
-    stylers: [{ color: "#38414e" }, { lightness: -20 }],
+    stylers: [{ color: "#ffffff" }, { lightness: -10 }],
   },
   {
     featureType: "road",
-    elementType: "labels",
-    stylers: [{ visibility: "off" }],
+    elementType: "labels.icon",
+    stylers: [{ visibility: "off" }],  // Esto quita los iconos de las carreteras
   },
   {
     featureType: "transit",
     stylers: [{ visibility: "off" }],
   },
-  {
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ color: "#17263c" }],
-  },
+  // {
+  //   featureType: "water",
+  //   elementType: "geometry",
+  //   stylers: [{ color: "#17263c" }],
+  // },
 ]
 
 const locationData = [
