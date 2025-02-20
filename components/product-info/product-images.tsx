@@ -6,23 +6,23 @@ import Image from "next/image"
 const images = [
   {
     src: "/placeholder.svg",
-    alt: "Producto en Supermercado A",
-    location: "Supermercado A - Pasillo 5",
+    alt: "Producto en Food Star - Leesburg Pike",
+    location: "Food Star - Leesburg Pike, 5521 Leesburg Pike, 22041, Bailey's Crossroads, Virginia",
   },
   {
     src: "/placeholder.svg",
-    alt: "Producto en Tienda B",
-    location: "Tienda B - Entrada principal",
+    alt: "Producto en Stamford Market - Broad St",
+    location: "Stamford Market - Broad St, 123 Broad St, 06901, Stamford, Connecticut",
   },
   {
     src: "/placeholder.svg",
-    alt: "Producto en Gasolinera C",
-    location: "Gasolinera C - Área de snacks",
+    alt: "Producto en Greenwich Grocer - E Putnam Ave",
+    location: "Greenwich Grocer - E Putnam Ave, 456 E Putnam Ave, 06830, Greenwich, Connecticut",
   },
   {
     src: "/placeholder.svg",
-    alt: "Producto en Tienda D",
-    location: "Tienda D - Nevera principal",
+    alt: "Producto en Norwalk Mart - Main Ave",
+    location: "Norwalk Mart - Main Ave, 789 Main Ave, 06851, Norwalk, Connecticut",
   },
 ]
 

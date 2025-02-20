@@ -13,7 +13,7 @@ import { Download } from "lucide-react"
 import { MultiSelect } from "@/components/ui/multi-select"
 import React from "react"
 
-export function Filters() {
+export function Filters({className}: {className?: string}) {
   const [selectedBrands, setSelectedBrands] = React.useState<string[]>([])
 
   const brandOptions = [
@@ -24,7 +24,7 @@ export function Filters() {
   ]
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={`flex items-center gap-2 ${className}`}>
       <DatePicker />
       <MultiSelect
         options={brandOptions}

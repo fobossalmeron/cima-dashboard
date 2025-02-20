@@ -14,7 +14,7 @@ export function ProductStatusChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Estado del producto en promoción</CardTitle>
+        <CardTitle>¿Producto en promoción?</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>

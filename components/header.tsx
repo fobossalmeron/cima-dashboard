@@ -1,8 +1,11 @@
-import { Menu } from "@/components/menu";
+import { Nav } from "@/components/nav";
 import { Filters } from "@/components/filters";
 import { Separator } from "@/components/ui/separator";
 import CimaLogo from "@/public/cima.png";
 import Image from "next/image";
+import { MobileNav } from "@/components/mobile-nav";
+import { MobileFilters } from "@/components/mobile-filters";
+
 export const Header = ({ title }: { title: string }) => {
   return (
     <div className="flex flex-col justify-between items-start w-full gap-8">
@@ -15,10 +18,20 @@ export const Header = ({ title }: { title: string }) => {
       </header>
       <div className="w-full flex items-center gap-2 justify-between px-6">
         <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
-        <Menu />
+        <div className="container lg:hidden w-auto">
+          <MobileNav />
+        </div>
+        <nav className="hidden lg:flex">
+          <Nav />
+        </nav>
       </div>
       <div className="w-full flex items-center gap-2 justify-between px-6">
-        <Filters />
+        <div className="container lg:hidden w-auto">
+          <MobileFilters />
+        </div>
+        <div className="hidden lg:block w-full">
+          <Filters />
+        </div>
       </div>
     </div>
   );

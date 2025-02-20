@@ -11,7 +11,7 @@ import { Content } from "@/components/content"
 export default function ProductSales() {
   return (
     <div className="space-y-6">
-      <Header title="Ventas por Producto" />
+      <Header title="Ventas por producto" />
       <Content>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">

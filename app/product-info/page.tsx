@@ -10,9 +10,9 @@ import { Content } from "@/components/content"
 export default function ProductInfo() {
   return (
     <div className="space-y-6">
-      <Header title="Información del Producto" />
+      <Header title="Información del producto" />
       <Content>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <StoreTypePieChart />
           <ProductLocationChart />
           <ProductStatusChart />
