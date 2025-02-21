@@ -1,30 +1,25 @@
-import { TotalSalesChart } from "@/components/sales-indicators/total-sales-chart"
-import { SalesByStoreTypeChart } from "@/components/sales-indicators/sales-by-store-type-chart"
-import { TopStoresChart } from "@/components/sales-indicators/top-stores-chart"
-import { SalesByDayChart } from "@/components/sales-indicators/sales-by-day-chart"
-import { SalesByHourChart } from "@/components/sales-indicators/sales-by-hour-chart"
-import { SalesVsTargetChart } from "@/components/sales-indicators/sales-vs-target-chart"
+"use client"
+
+import { ProductSalesChart } from "@/components/product-sales/product-sales-chart"
 import { Header } from "@/components/header"
 import { Content } from "@/components/content"
-
-export default function SalesIndicators() {
+import { delFrutalLatas, delFrutalAguasFrescas } from "@/data/brands"
+import { TotalSalesByBrand } from "@/components/sales/total-sales-by-brand-chart"
+export default function ProductSales() {
   return (
     <div className="space-y-6">
-
-      <Header title="Ventas" />
+      <Header title="Ventas por producto" />
       <Content>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="md:col-span-2">
-            <TotalSalesChart />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="md:col-span-3">
+          <TotalSalesByBrand />
         </div>
-        <SalesByStoreTypeChart />
-        <TopStoresChart />
-        <SalesByDayChart />
-        <SalesByHourChart />
-        <div className="md:col-span-2">
-          <SalesVsTargetChart />
+            <ProductSalesChart title="Del Frutal Nectar" data={delFrutalLatas} />
+            <ProductSalesChart title="Del Frutal Aguas Frescas" data={delFrutalAguasFrescas} />
+
+            <ProductSalesChart title="Del Frutal Nectar" data={delFrutalLatas} />
+          
         </div>
-      </div>
       </Content>
     </div>
   )

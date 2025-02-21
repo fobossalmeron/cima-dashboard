@@ -1,34 +1,20 @@
-"use client";
-
-import { AmbassadorKPIs } from "@/components/brand-ambassadors/ambassador-kpis";
-import { AmbassadorDistributionMap } from "@/components/brand-ambassadors/ambassador-distribution-map";
-import { AmbassadorSalesRanking } from "@/components/brand-ambassadors/ambassador-sales-ranking";
-import { AmbassadorActivations } from "@/components/brand-ambassadors/ambassador-activations";
-import { AmbassadorSalesEvolution } from "@/components/brand-ambassadors/ambassador-sales-evolution";
-import { AmbassadorGallery } from "@/components/brand-ambassadors/ambassador-gallery";
 import { Header } from "@/components/header";
 import { Content } from "@/components/content";
+import { SalesByAmbassadorChart } from "@/components/ambassadors/sales-by-ambassador-chart";
+import { AmbassadorsTable } from "@/components/ambassadors/ambassadors-table";
+import { ActivationsVsSalesChart } from "@/components/ambassadors/activations-vs-sales-chart";
+
 export default function BrandAmbassadors() {
   return (
     <div>
       <Header title="Embajadoras de marca" />
       <Content>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <AmbassadorKPIs />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="md:col-span-2">
-            <AmbassadorDistributionMap />
+        <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <SalesByAmbassadorChart />
+            <AmbassadorsTable />
           </div>
-          <AmbassadorSalesRanking />
-          <AmbassadorActivations />
-          <div className="md:col-span-2">
-            <AmbassadorSalesEvolution />
-          </div>
-          <div className="md:col-span-2">
-            <AmbassadorGallery />
-          </div>
+          <ActivationsVsSalesChart />
         </div>
       </Content>
     </div>
