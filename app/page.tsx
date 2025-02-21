@@ -1,6 +1,6 @@
 import { KPICard } from "@/components/kpi-general/kpi-card";
 import { ActivationSalesChart } from "@/components/kpi-general/activation-sales-chart";
-import { HeatMap } from "@/components/kpi-general/heat-map";
+import { Maps } from "@/components/kpi-general/maps";
 import { Header } from "@/components/header";
 import { Content } from "@/components/content";
 import {
@@ -23,7 +23,7 @@ export default function Home() {
         {/* Mapa de calor */}
         <div className="w-full grid grid-cols-1 lg:grid-cols-[67%_31%] gap-8">
           {/* Mapa de calor */}
-          <HeatMap />
+          <Maps />
           {/* Indicadores KPI */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <KPICard title="Activaciones" value="120" icon={Zap} />

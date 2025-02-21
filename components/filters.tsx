@@ -20,7 +20,17 @@ export function Filters({className}: {className?: string}) {
     { value: "raptor", label: "Raptor" },
     { value: "del-frutal", label: "Del Frutal" },
     { value: "naturas", label: "Naturas" },
-    { value: "senorial", label: "Señorial" }
+  ]
+
+  const cityOptions = [
+    { value: "stamford", label: "Stamford, CT" },
+    { value: "bridgeport", label: "Bridgeport, CT" },
+    { value: "new-haven", label: "New Haven, CT" },
+  ]
+
+  const directionOptions = [
+    { value: "stamford-1", label: "Stamford - 1 Atlantic St" },
+    { value: "stamford-2", label: "Stamford - 300 Tresser Blvd" },
   ]
 
   return (
@@ -37,8 +47,11 @@ export function Filters({className}: {className?: string}) {
           <SelectValue placeholder="Ciudad" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="ciudad1">Ciudad 1</SelectItem>
-          <SelectItem value="ciudad2">Ciudad 2</SelectItem>
+          {cityOptions.map((city) => (
+            <SelectItem key={city.value} value={city.value}>
+              {city.label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
       <Select>
@@ -46,8 +59,11 @@ export function Filters({className}: {className?: string}) {
           <SelectValue placeholder="Dirección" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="direccion1">Dirección 1</SelectItem>
-          <SelectItem value="direccion2">Dirección 2</SelectItem>
+          {directionOptions.map((direction) => (
+            <SelectItem key={direction.value} value={direction.value}>
+              {direction.label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
       <Button>

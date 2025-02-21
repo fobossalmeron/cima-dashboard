@@ -38,16 +38,18 @@ export function MultiSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("w-[200px] justify-between font-normal", {
+          className={cn("min-w-[100px] justify-between font-normal", {
             "text-muted-foreground": safeSelected.length === 0
           }, className)}
         >
-          {safeSelected.length > 0
-            ? options
-                .filter(option => safeSelected.includes(option.value))
-                .map(option => option.label)
-                .join(", ")
-            : placeholder}
+          <span className="truncate">
+            {safeSelected.length > 0
+              ? options
+                  .filter(option => safeSelected.includes(option.value))
+                  .map(option => option.label)
+                  .join(", ")
+              : placeholder}
+          </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
