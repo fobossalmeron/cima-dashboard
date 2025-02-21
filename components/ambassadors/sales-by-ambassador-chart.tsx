@@ -1,6 +1,6 @@
 'use client';
 
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface SalesByAmbassadorData {
@@ -55,7 +55,7 @@ export function SalesByAmbassadorChart() {
               </Pie>
               <Tooltip 
                 contentStyle={{ fontSize: '14px' }}
-                formatter={(value: number, name: string, props: any) => {
+                formatter={(value: number, name: string) => {
                   const total = data.reduce((sum, item) => sum + item.value, 0);
                   const percent = ((value / total) * 100).toFixed(1);
                   return [`${value} (${percent}%)`, name];
