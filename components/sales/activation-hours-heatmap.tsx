@@ -61,7 +61,7 @@ export function ActivationHoursHeatmap() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Velocity promedio por hora</CardTitle>
+        <CardTitle>Velocity promedio por hora.</CardTitle>
         <CardDescription>
           Intensidad de compra por hora y día de la semana
         </CardDescription>
@@ -126,20 +126,6 @@ export function ActivationHoursHeatmap() {
                     )
                   }),
                 )}
-              </div>
-            </div>
-
-            {/* Leyenda */}
-            <div className="flex flex-col justify-center gap-2 pl-4">
-              <div
-                className="h-32 w-4 rounded-sm"
-                style={{
-                  background: "linear-gradient(to bottom, hsl(0, 75%, 50%), hsl(0, 75%, 95%))",
-                }}
-              />
-              <div className="flex flex-col justify-between text-xs text-muted-foreground">
-                <span>100</span>
-                <span>0</span>
               </div>
             </div>
           </div>

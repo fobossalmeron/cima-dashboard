@@ -164,11 +164,13 @@ export function Maps() {
         <div className="flex items-center gap-6 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <span>No. Activaciones</span>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <span>1</span>
-              <div className="w-2 h-2 rounded-full border border-white/50"></div>
-              <div className="w-3 h-3 rounded-full border border-white/50"></div>
-              <div className="w-4 h-4 rounded-full border border-white/50"></div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full border border-gray-400 bg-gray-300/50"></div>
+                <div className="w-4 h-4 rounded-full border border-gray-400 bg-gray-300/50"></div>
+                <div className="w-5 h-5 rounded-full border border-gray-400 bg-gray-300/50"></div>
+              </div>
               <span>{maxActivations}</span>
             </div>
           </div>

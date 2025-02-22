@@ -28,7 +28,7 @@ const data = [
 export function PurchaseFactorsChart() {
   return (
     <Card>
-      <CardHeader className="p-4">
+      <CardHeader className="p-6">
         <CardTitle>Factores de decisión de compra</CardTitle>
         <CardDescription>
           Distribución porcentual de factores de compra

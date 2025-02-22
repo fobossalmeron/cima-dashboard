@@ -1,7 +1,7 @@
 'use client';
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 interface SalesByAmbassadorData {
   name: string;
@@ -15,8 +15,8 @@ const data: SalesByAmbassadorData[] = [
   { name: 'Maria Gabriela Arteaga', value: 1  },
   { name: 'Angelica Kurbaje', value: 4 },
   { name: 'Marcela Arias', value: 12 },
-  { name: 'Cristal Urbaez', value: 4 },
-  { name: 'Maria Camila Gutierrez', value: 4 },
+  { name: 'Cristal Urbaez', value: 7 },
+  { name: 'Maria Camila Gutierrez', value: 1 },
   { name: 'Cristina Espejo', value: 10 },
   { name: 'Astrid Suarez', value: 5 },
   { name: 'Natalia Escarraga', value: 5 },
@@ -28,11 +28,20 @@ const COLORS = [
   '#8E44AD', '#C39BD3'
 ];
 
+function formatShortName(fullName: string) {
+  const firstName = fullName.split(' ')[0];
+  const lastName = fullName.split(' ').slice(-1)[0];
+  return `${firstName[0]}. ${lastName}`;
+}
+
 export function SalesByAmbassadorChart() {
   return (
     <Card className="w-full">
       <CardHeader>
         <CardTitle>Distribución de ventas por embajadora</CardTitle>
+        <CardDescription>
+          Porcentaje de ventas por cada embajadora.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-[400px]">
@@ -43,7 +52,9 @@ export function SalesByAmbassadorChart() {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                label={({ name, percent }) => 
+                  `${formatShortName(name)} (${(percent * 100).toFixed(0)}%)`
+                }
                 outerRadius={150}
                 fill="#8884d8"
                 dataKey="value"
@@ -58,7 +69,7 @@ export function SalesByAmbassadorChart() {
                 formatter={(value: number, name: string) => {
                   const total = data.reduce((sum, item) => sum + item.value, 0);
                   const percent = ((value / total) * 100).toFixed(1);
-                  return [`${value} (${percent}%)`, name];
+                  return [`${value} (${percent}%)`, formatShortName(name)];
                 }}
               />
             </PieChart>
