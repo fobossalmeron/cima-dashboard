@@ -3,4 +3,4 @@ General:
 - El selector de fechas está fallando
 
 Consumidor:
-⚠️ Imágenes de consumidores y producto debe ser scrolleable
+Comentarios de consumidores y Imágenes de consumidores y producto tienen distintos estilos en los paginadores.
