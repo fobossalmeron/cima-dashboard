@@ -10,15 +10,17 @@ const COLORS = [
 ]
 
 const data = [
-  { name: "Aguas Frescas", precio: 1.99 },
-  { name: "Incaparina", precio: 2.49 },
-  { name: "Señorial Snacks", precio: 1.79 },
+  { name: "Del Frutal Aguas Frescas", precio: 1.99 },
+  { name: "Del Frutal Pulpa 1L", precio: 2.99 },
+  { name: "Del Frutal Lata", precio: 2.79 },
+  { name: "Del Frutal Tetrapack", precio: 2.79 },
+  { name: "Del Frutal 3 Pack", precio: 2.79 },
   { name: "Raptor Lata", precio: 0.99 },
   { name: "Raptor Botella", precio: 1.49 },
-  { name: "Del Frutal Orange with Pulp", precio: 2.99 },
-  { name: "Del Frutal Néctares", precio: 2.79 },
-  { name: "Naturas Néctares", precio: 2.59 },
-  { name: "Del Frutal Orange Tetratop", precio: 3.49 }
+  { name: "Naturas Lata", precio: 2.59 },
+  { name: "Naturas Tetrapack", precio: 2.59 },
+  { name: "Naturas 3 Pack", precio: 2.59 },
+  { name: "Naturas Pulpa 1L", precio: 2.59 },
 ].sort((a, b) => b.precio - a.precio) // Ordenar por precio descendente
 
 export function AveragePriceChart() {

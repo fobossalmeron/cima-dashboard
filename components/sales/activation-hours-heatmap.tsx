@@ -61,7 +61,7 @@ export function ActivationHoursHeatmap() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Velocity promedio por hora.</CardTitle>
+        <CardTitle>Velocity promedio por hora</CardTitle>
         <CardDescription>
           Intensidad de compra por hora y día de la semana
         </CardDescription>

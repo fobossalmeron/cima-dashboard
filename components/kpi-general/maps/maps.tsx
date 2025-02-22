@@ -38,7 +38,7 @@ const cityLocationData: CityLocation[] = cityData.map(loc => ({
 }))
 
 export function Maps() {
-  const [mapType, setMapType] = useState("city")
+  const [mapType, setMapType] = useState("pointOfSale")
   const [selectedLocation, setSelectedLocation] = useState<BaseLocation | null>(null)
 
   const { isLoaded, loadError } = useJsApiLoader({
@@ -47,11 +47,6 @@ export function Maps() {
   })
 
   const currentData = mapType === "city" ? cityLocationData : storeData
-
-  const averageSales = useMemo(() => {
-    const total = currentData.reduce((sum, location) => sum + location.sales, 0)
-    return total / currentData.length
-  }, [currentData])
 
   const maxSales = useMemo(() => {
     return Math.max(...currentData.map(location => location.sales))
@@ -66,17 +61,27 @@ export function Maps() {
   }, [currentData])
 
   const getCircleOptions = (location: BaseLocation) => {
-    const baseOptions = {
-      strokeColor: location.sales > averageSales ? "#32CD32" : "#FFD700",
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: location.sales > averageSales ? "#32CD32" : "#FFD700",
-      fillOpacity: 0.35,
-      zIndex: 1,
+    // Calculamos el percentil de ventas para determinar el color
+    const salesPercentage = (location.sales - minSales) / (maxSales - minSales)
+    
+    let color: string;
+    if (salesPercentage <= 0.25) {
+      color = "#FF4D4D" // Rojo para ventas bajas
+    } else if (salesPercentage <= 0.4) {
+      color = "#FFA500" // Naranja para ventas medio-bajas
+    } else if (salesPercentage <= 0.65) {
+      color = "#FFD700" // Amarillo para ventas medio-altas
+    } else {
+      color = "#32CD32" // Verde para ventas altas
     }
 
     return {
-      ...baseOptions,
+      strokeColor: color,
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: color,
+      fillOpacity: 0.35,
+      zIndex: 1,
       radius: mapType === "city" 
         ? location.activations * 400 
         : location.activations * 3000
@@ -163,7 +168,7 @@ export function Maps() {
         </GoogleMap>
         <div className="flex items-center gap-6 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
-            <span>No. Activaciones</span>
+            <span>No. activaciones</span>
             <div className="flex items-center gap-2">
               <span>1</span>
               <div className="flex items-center gap-1">
@@ -176,10 +181,10 @@ export function Maps() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span>Promedio de Ventas</span>
+            <span>Promedio de ventas</span>
             <div className="flex items-center gap-1">
               <span>{minSales}</span>
-              <div className="w-16 h-2 bg-gradient-to-r from-[#FFD700] to-[#32CD32]"></div>
+              <div className="w-16 h-2 bg-gradient-to-r from-[#FF4D4D] via-[#FFA500] via-[#FFD700] to-[#32CD32]"></div>
               <span>{maxSales}</span>
             </div>
           </div>

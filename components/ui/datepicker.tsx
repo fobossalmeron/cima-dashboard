@@ -2,13 +2,29 @@
 
 import * as React from "react"
 import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { format, addDays } from "date-fns"
+import { format, subDays, subMonths, startOfYear } from "date-fns"
 import { es } from "date-fns/locale"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+type DateRange = {
+  from: Date
+  to: Date
+}
+
+type PresetRange = {
+  label: string
+  value: DateRange
+}
 
 function DatePicker({
   className,
@@ -16,35 +32,53 @@ function DatePicker({
   onChange,
 }: {
   className?: string
-  value?: { from: Date; to: Date }
-  onChange?: (range?: { from: Date; to: Date }) => void
+  value?: DateRange
+  onChange?: (range: DateRange) => void
 }) {
-  const currentDate = new Date()
-  const defaultRange = {
-    from: new Date(2025, 0, 1), // 1 de enero de 2025
-    to: currentDate
-  }
+  const today = new Date()
 
-  const [dateRange, setDateRange] = React.useState<{ from: Date; to: Date }>(value || defaultRange)
-  const [weekNumber, setWeekNumber] = React.useState<string>('')
-  const [month, setMonth] = React.useState<Date>(dateRange?.from || new Date())
+  const presets: PresetRange[] = [
+    {
+      label: "Últimos 7 días",
+      value: {
+        from: subDays(today, 7),
+        to: today,
+      },
+    },
+    {
+      label: "Último mes",
+      value: {
+        from: subMonths(today, 1),
+        to: today,
+      },
+    },
+    {
+      label: "Últimos 3 meses",
+      value: {
+        from: subMonths(today, 3),
+        to: today,
+      },
+    },
+    {
+      label: "Lo que va del año",
+      value: {
+        from: startOfYear(today),
+        to: today,
+      },
+    },
+  ]
 
-  const handleWeekSelection = (value: string) => {
-    const week = parseInt(value)
-    if (isNaN(week) || week < 1 || week > 52) return
-    
-    const year = new Date().getFullYear()
-    const firstDayOfYear = new Date(year, 0, 1)
-    const firstWeekDay = firstDayOfYear.getDay()
-    const daysOffset = firstWeekDay > 0 ? 7 - firstWeekDay : 0
-    const startOfWeek = new Date(year, 0, 1 + daysOffset + (week - 1) * 7)
-    const endOfWeek = addDays(startOfWeek, 6)
-    
-    const newRange = { from: startOfWeek, to: endOfWeek }
-    setDateRange(newRange)
-    setMonth(startOfWeek)
-    setWeekNumber(value)
-    onChange?.(newRange)
+  const [selectedRange, setSelectedRange] = React.useState<DateRange>(
+    value || presets[0].value
+  )
+  const [month, setMonth] = React.useState<Date>(selectedRange.from)
+
+  const handleSelectPreset = (presetLabel: string) => {
+    const preset = presets.find((p) => p.label === presetLabel)
+    if (preset) {
+      setSelectedRange(preset.value)
+      onChange?.(preset.value)
+    }
   }
 
   return (
@@ -54,49 +88,51 @@ function DatePicker({
           variant="outline"
           className={cn(
             "w-[240px] justify-start text-left font-normal",
-            !dateRange && "text-muted-foreground",
+            !selectedRange && "text-muted-foreground",
             className
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {dateRange ? (
+          {selectedRange ? (
             <>
-              {format(dateRange.from, "LLL dd, y", { locale: es })} -{" "}
-              {format(dateRange.to, "LLL dd, y", { locale: es })}
+              {format(selectedRange.from, "dd MMM yyyy", { locale: es })} -{" "}
+              {format(selectedRange.to, "dd MMM yyyy", { locale: es })}
             </>
           ) : (
             <span>Selecciona un rango</span>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-4" align="start">
-        <div className="flex items-center gap-2 mb-4 justify-center">
-            Semana
-          <Input
-            type="number"
-            min="1"
-            max="52"
-            value={weekNumber}
-            onChange={(e) => handleWeekSelection(e.target.value)}
-            placeholder="(1-52)"
-            className="w-20"
+      <PopoverContent className="w-auto p-3" align="start">
+        <div className="space-y-3">
+          <Select onValueChange={handleSelectPreset}>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecciona un rango" />
+            </SelectTrigger>
+            <SelectContent>
+              {presets.map((preset) => (
+                <SelectItem key={preset.label} value={preset.label}>
+                  {preset.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Calendar
+            mode="range"
+            selected={selectedRange}
+            month={month}
+            onMonthChange={setMonth}
+            onSelect={(range) => {
+              if (range?.from && range?.to) {
+                const newRange = { from: range.from, to: range.to }
+                setSelectedRange(newRange)
+                onChange?.(newRange)
+              }
+            }}
+            initialFocus
+            locale={es}
           />
         </div>
-        <Calendar
-          mode="range"
-          selected={dateRange}
-          month={month}
-          onMonthChange={setMonth}
-          onSelect={(range) => {
-            if (range?.from && range?.to) {
-              setDateRange({ from: range.from, to: range.to })
-              onChange?.({ from: range.from, to: range.to })
-              setWeekNumber('')
-            }
-          }}
-          initialFocus
-          locale={es}
-        />
       </PopoverContent>
     </Popover>
   )

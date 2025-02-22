@@ -19,13 +19,20 @@ import Image from "next/image";
 
 interface ProductSalesData {
   id: number;
-  producto: string;
-  ventas: number;
-  imagen: string;
+  presentation: string;
+  flavor: string;
+  sales: number;
+  image: string;
 }
 
-export function ProductSalesChart({ data, title }: { data: ProductSalesData[], title: string }) {
-  const totalVentas = data.reduce((sum, item) => sum + item.ventas, 0);
+export function ProductSalesChart({
+  data,
+  title,
+}: {
+  data: ProductSalesData[];
+  title: string;
+}) {
+  const totalVentas = data.reduce((sum, item) => sum + item.sales, 0);
 
   return (
     <div className="space-y-8">
@@ -38,7 +45,8 @@ export function ProductSalesChart({ data, title }: { data: ProductSalesData[], t
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Producto</TableHead>
+                <TableHead>Sabor</TableHead>
+                <TableHead className="text-center">Presentación</TableHead>
                 <TableHead className="text-center">Unidades</TableHead>
               </TableRow>
             </TableHeader>
@@ -47,21 +55,25 @@ export function ProductSalesChart({ data, title }: { data: ProductSalesData[], t
                 <TableRow key={item.id}>
                   <TableCell className="flex items-center gap-4">
                     <Image
-                      src={`/assets/products/${item.imagen}`}
-                      alt={item.producto}
+                      src={`/assets/products/${item.image}`}
+                      alt={item.flavor}
                       width={22}
                       height={22}
                       className="object-cover"
                     />
-                    {item.producto}
+                    {item.flavor}
                   </TableCell>
                   <TableCell className="text-center">
-                    {item.ventas.toLocaleString()}
+                    {item.presentation}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {item.sales.toLocaleString()}
                   </TableCell>
                 </TableRow>
               ))}
               <TableRow className="font-medium border-t">
                 <TableCell className="pt-4">Total</TableCell>
+                <TableCell className="pt-4"></TableCell>
                 <TableCell className="text-center pt-4">
                   {totalVentas.toLocaleString()}
                 </TableCell>

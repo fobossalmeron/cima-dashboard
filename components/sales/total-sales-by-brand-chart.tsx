@@ -9,6 +9,7 @@ const data = [
   { tipo: "Del Frutal Pulpa", ventas: 28000, unidades: 4300 },
   { tipo: "Raptor Energy Drink", ventas: 15000, unidades: 1000 },
   { tipo: "Naturas Néctares", ventas: 12000, unidades: 1000 }, 
+  { tipo: "Naturas Pulpa", ventas: 12000, unidades: 1000 }, 
 ]
 
 // Array de colores que podemos usar para cualquier marca
@@ -29,7 +30,7 @@ export function TotalSalesByBrand() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Ventas totales por marca</CardTitle>
+        <CardTitle>Ventas totales por submarca</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
