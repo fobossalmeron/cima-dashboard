@@ -17,7 +17,31 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Star, StarHalf } from "lucide-react";
 import { feedback } from "@/data/dummy-comments";
+
+function RatingStars({ rating }: { rating: number }) {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+  return (
+    <div className="flex items-center gap-0.5">
+      {[...Array(fullStars)].map((_, i) => (
+        <Star key={`full-${i}`} className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400 stroke-[1.5] stroke-yellow-500" />
+      ))}
+      {hasHalfStar && (
+        <div className="relative">
+          <Star className="w-3.5 h-3.5 text-yellow-400 stroke-[1.5] stroke-yellow-500" />
+          <StarHalf className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400 absolute top-0 left-0" />
+        </div>
+      )}
+      {[...Array(emptyStars)].map((_, i) => (
+        <Star key={`empty-${i}`} className="w-3.5 h-3.5 text-yellow-400 stroke-[1.5] stroke-yellow-500" />
+      ))}
+    </div>
+  );
+}
 
 export function ConsumerFeedback() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,7 +64,10 @@ export function ConsumerFeedback() {
           <div className="space-y-3">
             {currentFeedback.map((item, index) => (
               <div key={index} className="p-3 border rounded-lg">
-                <p className="text-sm text-muted-foreground">{item.comment}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm text-muted-foreground">{item.comment}</p>
+                  <RatingStars rating={item.rating} />
+                </div>
               </div>
             ))}
           </div>

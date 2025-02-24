@@ -29,8 +29,11 @@ export function Filters({className}: {className?: string}) {
   ]
 
   const directionOptions = [
-    { value: "stamford-1", label: "Stamford - 1 Atlantic St" },
-    { value: "stamford-2", label: "Stamford - 300 Tresser Blvd" },
+    { value: "new-haven-1", label: "New Haven Grocery - 240 NE 8th St, New Haven, FL 33030" },
+    { value: "stamford-1", label: "Stamford Market - 1 Atlantic St, Stamford, CT 06901" },
+    { value: "bridgeport-1", label: "Bridgeport Superstore - 500 Broad St, Bridgeport, CT 06604" },
+    { value: "new-haven-2", label: "New Haven Deli - 900 Chapel St, New Haven, CT 06510" },
+    { value: "stamford-2", label: "Stamford Groceries - 300 Tresser Blvd, Stamford, CT 06901" },
   ]
 
   return (
@@ -56,7 +59,7 @@ export function Filters({className}: {className?: string}) {
       </Select>
       <Select>
         <SelectTrigger className="w-auto min-w-[100px]">
-          <SelectValue placeholder="Dirección" />
+          <SelectValue placeholder="Punto de venta" />
         </SelectTrigger>
         <SelectContent>
           {directionOptions.map((direction) => (

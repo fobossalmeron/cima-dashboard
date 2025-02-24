@@ -15,6 +15,7 @@ import {
   useReactTable,
   SortingState,
   getSortedRowModel,
+  getPaginationRowModel,
 } from "@tanstack/react-table"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -25,6 +26,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+import { activations } from "@/data/dummy-activations"
 
 interface Activation {
   fecha: string
@@ -98,101 +108,12 @@ const columns: ColumnDef<Activation>[] = [
   },
 ]
 
-const data: Activation[] = [
-  {
-    fecha: "16 Feb 2025",
-    marca: "INCAPARINA",
-    pdv: "Presidente Supermarket 44",
-    direccion: "240 NE 8th St, Homestead, FL 33030",
-    ventasTotales: 28,
-    promedioVentas: 28,
-    velocity: 9.33,
-  },
-  {
-    fecha: "16 Feb 2025",
-    marca: "INCAPARINA",
-    pdv: "Bravo Supermarket 266",
-    direccion: "5011 Broadway, West Palm Beach, FL 33407",
-    ventasTotales: 31,
-    promedioVentas: 31,
-    velocity: 10.33,
-  },
-  {
-    fecha: "15 Feb 2025",
-    marca: "INCAPARINA",
-    pdv: "Presidente Supermarket 30",
-    direccion: "3322 NE 7th St, Homestead, FL 33033",
-    ventasTotales: 7,
-    promedioVentas: 7,
-    velocity: 2.33,
-  },
-  {
-    fecha: "15 Feb 2025",
-    marca: "RAPTOR ENERGY DRINK",
-    pdv: "Festival Supermarket",
-    direccion: "7208 Southgate Blvd, North Lauderdale, FL 33068",
-    ventasTotales: 22,
-    promedioVentas: 22,
-    velocity: 7.33,
-  },
-  {
-    fecha: "15 Feb 2025",
-    marca: "INCAPARINA",
-    pdv: "Presidente Supermarket 28",
-    direccion: "2485 10th Ave N, Lake Worth, FL 33461",
-    ventasTotales: 8,
-    promedioVentas: 8,
-    velocity: 2.67,
-  },
-  {
-    fecha: "14 Feb 2025",
-    marca: "DEL FRUTAL AGUAS FRESCAS",
-    pdv: "Supermarket 55",
-    direccion: "123 Main St, Miami, FL 33101",
-    ventasTotales: 45,
-    promedioVentas: 45,
-    velocity: 15.0,
-  },
-  {
-    fecha: "14 Feb 2025",
-    marca: "NÉCTARES NATURAS",
-    pdv: "Market 77",
-    direccion: "456 Ocean Dr, Miami Beach, FL 33139",
-    ventasTotales: 18,
-    promedioVentas: 18,
-    velocity: 6.0,
-  },
-  {
-    fecha: "13 Feb 2025",
-    marca: "SEÑORIAL",
-    pdv: "Supermarket 99",
-    direccion: "789 Biscayne Blvd, Miami, FL 33132",
-    ventasTotales: 12,
-    promedioVentas: 12,
-    velocity: 4.0,
-  },
-  {
-    fecha: "13 Feb 2025",
-    marca: "DEL FRUTAL NÉCTARES",
-    pdv: "Market 22",
-    direccion: "321 Collins Ave, Miami Beach, FL 33140",
-    ventasTotales: 35,
-    promedioVentas: 35,
-    velocity: 11.67,
-  },
-  {
-    fecha: "12 Feb 2025",
-    marca: "DEL FRUTAL PULPA",
-    pdv: "Supermarket 33",
-    direccion: "654 Lincoln Rd, Miami Beach, FL 33139",
-    ventasTotales: 27,
-    promedioVentas: 27,
-    velocity: 9.0,
-  },
-]
+const data: Activation[] = activations
 
 export function ActivationsTable() {
   const [sorting, setSorting] = useState<SortingState>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 10
   
   const table = useReactTable({
     data,
@@ -200,10 +121,17 @@ export function ActivationsTable() {
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     state: {
       sorting,
+      pagination: {
+        pageIndex: currentPage - 1,
+        pageSize,
+      },
     },
   })
+
+  const totalPages = Math.ceil(data.length / pageSize)
 
   return (
     <Card className="w-full">
@@ -211,48 +139,96 @@ export function ActivationsTable() {
         <CardTitle>Historial de samplings</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+        <div className="space-y-4">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    )
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No hay resultados.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                    No hay resultados.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    if (currentPage > 1) {
+                      setCurrentPage((p) => p - 1)
+                      table.previousPage()
+                    }
+                  }}
+                  className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setCurrentPage(i + 1)
+                      table.setPageIndex(i)
+                    }}
+                    isActive={currentPage === i + 1}
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    if (currentPage < totalPages) {
+                      setCurrentPage((p) => p + 1)
+                      table.nextPage()
+                    }
+                  }}
+                  className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       </CardContent>
     </Card>
   )
