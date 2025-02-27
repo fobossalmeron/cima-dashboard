@@ -34,9 +34,27 @@ export default function Home() {
               value="2,500"
               icon={ShoppingCart}
             />
-            <KPICard title="Conversión" value="50%" icon={PercentCircle} />
-            <KPICard title="Velocity" value="12.5" icon={Timer} />
-            <KPICard title="NPS" value="8.6" icon={Star} />
+            <KPICard 
+              title="Conversión" 
+              value="90%" 
+              icon={PercentCircle}
+              colorRanges={{
+                green: [75, 100],
+                yellow: [50, 75],
+                red: [0, 50]
+              }}
+            />
+            <KPICard 
+              title="Velocity" 
+              value="10.5" 
+              icon={Timer}
+              colorRanges={{
+                green: [8, 11],
+                yellow: [5, 8],
+                red: [0, 5]
+              }}
+            />
+            <KPICard title="NPS" value="62" icon={Star} />
             <KPICard title="Followings en RRSS" value="32" icon={Users} />
           </div>
         </div>

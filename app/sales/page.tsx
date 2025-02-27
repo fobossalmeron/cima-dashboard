@@ -59,7 +59,7 @@ export default function ProductSales() {
 
   return (
     <div className="space-y-6">
-      <Header title="Ventas por producto" />
+      <Header title="Ventas" />
       <Content>
         <div className="w-full">
           <TotalSalesByBrand />

@@ -21,7 +21,7 @@ export function TrafficDuringActivationChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tráfico durante activaciones</CardTitle>
+        <CardTitle>Tráfico durante samplings</CardTitle>
         <CardDescription>
           Cantidad de personas en punto de venta
         </CardDescription>

@@ -4,12 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts"
 
 const data = [
-  { tipo: "Del Frutal Aguas Frescas", ventas: 45000, unidades: 5100 },
-  { tipo: "Del Frutal Néctares", ventas: 32000, unidades: 2600 },
-  { tipo: "Del Frutal Pulpa", ventas: 28000, unidades: 4300 },
-  { tipo: "Raptor Energy Drink", ventas: 15000, unidades: 1000 },
-  { tipo: "Naturas Néctares", ventas: 12000, unidades: 1000 }, 
-  { tipo: "Naturas Pulpa", ventas: 12000, unidades: 1000 }, 
+  { tipo: "Del Frutal Aguas Frescas", unidades: 5100 },
+  { tipo: "Del Frutal Néctares", unidades: 2600 },
+  { tipo: "Del Frutal Pulpa", unidades: 4300 },
+  { tipo: "Raptor Energy Drink", unidades: 1000 },
+  { tipo: "Naturas Néctares", unidades: 1000 }, 
+  { tipo: "Naturas Pulpa", unidades: 1000 }, 
 ]
 
 // Array de colores que podemos usar para cualquier marca
@@ -27,6 +27,9 @@ const chartColors = [
 ]
 
 export function TotalSalesByBrand() {
+  // Ordenar los datos por unidades de mayor a menor
+  const sortedData = [...data].sort((a, b) => b.unidades - a.unidades);
+
   return (
     <Card>
       <CardHeader>
@@ -34,7 +37,7 @@ export function TotalSalesByBrand() {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data}>
+          <BarChart data={sortedData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="tipo" fontSize={12} />
             <YAxis 
@@ -42,10 +45,10 @@ export function TotalSalesByBrand() {
               fontSize={12} 
             />
             <Tooltip 
-              formatter={(value: number) => [`${value} unidades`]}
+              formatter={(value: number) => [`${value} unidades vendidas`]}
             />
             <Bar dataKey="unidades" fill="#000">
-              {data.map((entry, index) => (
+              {sortedData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
               ))}
             </Bar>

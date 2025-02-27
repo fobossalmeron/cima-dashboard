@@ -43,7 +43,7 @@ const images = [
 
 export function ConsumerImages() {
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 3
+  const itemsPerPage = 2
   const totalPages = Math.ceil(images.length / itemsPerPage)
 
   const currentImages = images.slice(
@@ -57,7 +57,7 @@ export function ConsumerImages() {
         <CardTitle>Imágenes de consumidores y producto</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {currentImages.map((image, index) => (
             <div key={index} className="relative aspect-video group">
               <Image 
