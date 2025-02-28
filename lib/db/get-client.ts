@@ -9,23 +9,7 @@
 // }
 
 import { ClientData } from "@/types/ClientData";
-
-// Datos de clientes de ejemplo (temporal)
-const mockClients = {
-  "edt-drinks": {
-    id: "cl_01",
-    name: "EDT Bebidas",
-    slug: "edt-drinks",
-    formId: "FORM_123",
-  },
-  "cliente2": {
-    id: "cl_02",
-    name: "Cliente2",
-    slug: "cliente2",
-    formId: "FORM_456",
-  }
-};
-
+import { mockDashboards } from "@/data/dummy-dashboards";
 /**
  * Verifica si un cliente existe en el sistema
  * @param clientId - Slug del cliente a verificar
@@ -38,7 +22,7 @@ export async function getClientData(clientId: string): Promise<ClientData | null
     try {
       // NOTA: Esta implementación será reemplazada por Prisma con:
       // return await prisma.client.findUnique({ where: { slug: normalizedId } });
-      const client = mockClients[normalizedId as keyof typeof mockClients] || null;
+      const client = mockDashboards[normalizedId as keyof typeof mockDashboards] || null;
       
       return client;
     } catch (error) {
