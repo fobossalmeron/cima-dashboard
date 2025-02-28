@@ -11,7 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navItems } from "@/data/nav";
 
-export const Nav = ({ className }: { className?: string }) => {
+export const Nav = ({ className, clientName }: { className?: string; clientName: string }) => {
   const pathname = usePathname();
 
   return (
@@ -19,7 +19,7 @@ export const Nav = ({ className }: { className?: string }) => {
       <NavigationMenuList className={className}>
         {navItems.map((item) => (
           <NavigationMenuItem key={item.path}>
-            <Link href={item.path} legacyBehavior passHref>
+            <Link href={`/${clientName}/${item.path}`} legacyBehavior passHref>
               <NavigationMenuLink 
                 className={`${navigationMenuTriggerStyle()} ${
                   pathname === item.path ? "bg-accent text-accent-foreground" : ""

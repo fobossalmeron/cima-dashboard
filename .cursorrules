@@ -107,6 +107,7 @@ General Development Best Practices:
 - Maintain consistent naming conventions and code organization.
 - Document key architectural decisions and their rationale for future reference.
 - Implement proper error handling and logging strategies to ensure robust and maintainable code.
+- Always check package.json to confirm the versions of the packages we're using before answering
 
 Follow Next.js docs for Data Fetching, Rendering, and Routing: https://nextjs.org/docs
 Follow Prisma docs for Database Access: https://www.prisma.io/docs

@@ -5,9 +5,8 @@ interface NavItem {
 
 export const navItems: NavItem[] = [
     { path: "/", title: "General" },
-    { path: "/product", title: "Producto" },
-    { path: "/consumer", title: "Consumidor" },
-    { path: "/sampling", title: "Sampling" },
-    { path: "/sales", title: "Ventas" },
-    { path: "/ambassadors", title: "Embajadoras" },
+    { path: "product", title: "Producto" },
+    { path: "consumer", title: "Consumidor" },
+    { path: "sampling", title: "Sampling" },
+    { path: "sales", title: "Ventas" },
 ];

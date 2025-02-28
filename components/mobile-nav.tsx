@@ -15,7 +15,7 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuL
 import { navItems } from "@/data/nav";
 import Link from "next/link";
 
-export function MobileNav() {
+export function MobileNav({ clientName }: { clientName: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
@@ -39,7 +39,7 @@ export function MobileNav() {
           <NavigationMenuList className="flex flex-col gap-4 items-start justify-center w-full">
             {navItems.map((item) => (
               <NavigationMenuItem key={item.path}>
-                <Link href={item.path} legacyBehavior passHref>
+                <Link href={`/${clientName}${item.path}`} legacyBehavior passHref>
                   <NavigationMenuLink 
                     className={`${navigationMenuTriggerStyle()} ${
                       pathname === item.path ? "bg-accent text-accent-foreground" : ""
