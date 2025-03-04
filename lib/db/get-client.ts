@@ -16,17 +16,19 @@ import { mockDashboards } from "@/data/dummy-dashboards";
  * @returns ClientData si existe, null si no existe
  */
 export async function getClientData(clientId: string): Promise<ClientData | null> {
-    // Normalizar el ID (minúsculas, sin espacios, etc.)
-    const normalizedId = clientId.toLowerCase().trim();
-    
-    try {
-      // NOTA: Esta implementación será reemplazada por Prisma con:
-      // return await prisma.client.findUnique({ where: { slug: normalizedId } });
-      const client = mockDashboards[normalizedId as keyof typeof mockDashboards] || null;
-      
-      return client;
-    } catch (error) {
-      console.error("Error al verificar cliente:", error);
-      return null;
-    }
+  // Normalizar el ID (minúsculas, sin espacios, etc.)
+  const normalizedId = clientId.toLowerCase().trim();
+
+  try {
+    // NOTA: Esta implementación será reemplazada por Prisma con:
+    // return await prisma.client.findUnique({ where: { slug: normalizedId } });
+
+    // Buscar el cliente cuyo slug coincida con el normalizedId
+    const client = mockDashboards.find(client => client.slug === normalizedId) || null;
+
+    return client;
+  } catch (error) {
+    console.error("Error al verificar cliente:", error);
+    return null;
   }
+}

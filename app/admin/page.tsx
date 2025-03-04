@@ -1,55 +1,66 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { ClientData } from '@/types/ClientData'
-import Link from 'next/link'
-import { getClients } from '@/lib/db/get-clients'
-import { Button } from "@/components/ui/button"
-import { PlusCircle } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
+import { useState, useEffect } from "react";
+import { ClientData } from "@/types/ClientData";
+import Link from "next/link";
+import { getClients } from "@/lib/db/get-clients";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { DashboardForm } from '@/components/dashboard-form'
+} from "@/components/ui/dialog";
+import { DashboardForm } from "@/components/dashboard-form";
+import { RefreshCcw } from "lucide-react";
+import CimaLogo from "@/public/cima.png";
+import Image from "next/image";
+import { LogOut } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
 
 export default function AdminPage() {
-  const [clients, setClients] = useState<ClientData[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [clients, setClients] = useState<ClientData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newClient, setNewClient] = useState({
-    name: '',
-    slug: '',
-    formId: ''
-  })
+    name: "",
+    slug: "",
+    formId: "",
+  });
 
   useEffect(() => {
     const loadClients = async () => {
       try {
-        setIsLoading(true)
-        const data = await getClients()
-        setClients(data)
+        setIsLoading(true);
+        const data = await getClients();
+        setClients(data);
       } catch (err) {
-        setError('Error al cargar los clientes')
-        console.error('Error al cargar clientes:', err)
+        setError("Error al cargar los clientes");
+        console.error("Error al cargar clientes:", err);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-    loadClients()
-  }, [])
+    };
+    loadClients();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // Aquí iría la lógica para crear un nuevo dashboard
-    alert('Dashboard creado! (simulación)')
-    setIsDialogOpen(false)
-    setNewClient({ name: '', slug: '', formId: '' }) // Reset form
-  }
+    alert("Dashboard creado! (simulación)");
+    setIsDialogOpen(false);
+    setNewClient({ name: "", slug: "", formId: "" }); // Reset form
+  };
 
   const renderContent = () => {
     if (isLoading) {
@@ -57,7 +68,7 @@ export default function AdminPage() {
         <div className="flex items-center justify-center h-64">
           <p className="text-gray-500">Cargando clientes...</p>
         </div>
-      )
+      );
     }
 
     if (error) {
@@ -65,32 +76,11 @@ export default function AdminPage() {
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
-      )
+      );
     }
 
     return (
       <>
-        <div className="flex justify-between items-center mb-8">
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="default">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Crear nuevo dashboard
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Crear nuevo dashboard</DialogTitle>
-              </DialogHeader>
-              <DashboardForm 
-                onSubmit={handleSubmit}
-                newClient={newClient}
-                setNewClient={setNewClient}
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
-        
         {/* Lista de Dashboards Existentes */}
         <div className="mb-12">
           <div className="grid gap-4">
@@ -99,27 +89,96 @@ export default function AdminPage() {
                 <CardContent className="p-4 flex justify-between items-center">
                   <div>
                     <h3 className="font-medium">{client.name}</h3>
-                    <p className="text-sm text-gray-600">Slug: {client.slug}</p>
-                    <p className="text-sm text-gray-600">Form ID: {client.formId}</p>
+                    <p className="text-sm text-gray-600">
+                      Form: {client.formId}
+                    </p>
                   </div>
-                  <Button asChild variant="outline">
-                    <Link href={`/${client.slug}`}>
-                      Ir a dashboard
-                    </Link>
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="border-green-500 text-green-500 hover:bg-green-50 hover:text-green-600"
+                    >
+                      <div>
+                        <RefreshCcw className="mr-2 h-4 w-4" />
+                        <Link href={`/${client.slug}`}>Resync</Link>
+                      </div>
+                    </Button>
+                    <Button asChild variant="outline">
+                      <Link href={`/${client.slug}`}>Ir a dashboard</Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         </div>
       </>
-    )
-  }
+    );
+  };
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-8">Dashboards de Cima</h1>
-      {renderContent()}
+    <div>
+      <header className="flex w-full items-center border-b bg-background">
+        <div className="flex w-full items-center justify-between gap-2 px-6 py-4">
+          <Image src={CimaLogo} alt="Cima Logo" width={80} height={100} />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground hover:bg-transparent hover:text-foreground"
+              >
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem
+                onClick={() => {
+                  window.location.href = "/login";
+                }}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Cerrar sesión</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </header>
+      <div className="p-8">
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-3xl font-medium">
+              Administrador de dashboards
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Crea nuevos dashboards. Sincroniza si editaste un form submission
+              recientemente.
+            </p>
+          </div>
+          <div className="flex justify-between items-center mb-8">
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="default">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Crear nuevo dashboard
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Crear nuevo dashboard</DialogTitle>
+                </DialogHeader>
+                <DashboardForm
+                  onSubmit={handleSubmit}
+                  newClient={newClient}
+                  setNewClient={setNewClient}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+        {renderContent()}
+      </div>
     </div>
-  )
+  );
 }

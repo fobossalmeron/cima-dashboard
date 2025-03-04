@@ -1,6 +1,6 @@
 export interface ClientData {
-    id: string;
-    name: string;
-    slug: string;
-    formId: string;
-  }
+  id: number;
+  name: string;
+  slug: string;
+  formId: string;
+}

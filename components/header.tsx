@@ -18,7 +18,9 @@ export const Header = ({ title }: { title: string }) => {
         <div className="flex w-full items-center justify-between gap-2 px-6 py-4">
           <Image src={CimaLogo} alt="Cima Logo" width={80} height={100} />
           <Separator orientation="vertical" className="mr-2 h-4" />
-          <div className="text-xl font-medium">Tablero de {clientData.name}</div>
+          <div className="text-xl font-medium">
+            Dashboard de {clientData.name}
+          </div>
         </div>
       </header>
       <div className="w-full flex items-center gap-2 justify-between px-6">

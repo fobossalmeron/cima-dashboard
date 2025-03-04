@@ -1,19 +1,35 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Label } from "recharts"
+import * as React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  Label,
+} from "recharts";
 
-const data = [
-  { name: "Supermarket", value: 40, fill: "#0088FE" },
-  { name: "Midmarket", value: 30, fill: "#00C49F" },
-  { name: "Downtrade", value: 20, fill: "#FFBB28" },
-  { name: "Convenience", value: 10, fill: "#FF8042" },
-]
+interface StoreTypeChartData {
+  name: string;
+  events: number;
+}
 
-const TOTAL_PDV = 312
+const COLORS = [
+  "#0088FE",
+  "#00C49F",
+  "#FFBB28",
+  "#FF8042",
+  "#8884D8",
+  "#82ca9d",
+  "#ffc658",
+  "#8dd1e1",
+];
 
-export function StoreTypePieChart() {
+export function PDVTypeChart({ data }: { data: StoreTypeChartData[] }) {
+  const calculatedTotalPdv = data.reduce((sum, item) => sum + item.events, 0);
+
   return (
     <Card>
       <CardHeader>
@@ -29,10 +45,13 @@ export function StoreTypePieChart() {
                 cy="50%"
                 innerRadius={60}
                 outerRadius={80}
-                dataKey="value"
+                dataKey="events"
               >
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
                 <Label
                   content={({ viewBox }) => {
@@ -49,7 +68,7 @@ export function StoreTypePieChart() {
                             y={viewBox.cy}
                             className="fill-foreground text-3xl font-bold"
                           >
-                            {TOTAL_PDV}
+                            {calculatedTotalPdv}
                           </tspan>
                           <tspan
                             x={viewBox.cx}
@@ -59,7 +78,7 @@ export function StoreTypePieChart() {
                             PDV
                           </tspan>
                         </text>
-                      )
+                      );
                     }
                   }}
                 />
@@ -69,20 +88,19 @@ export function StoreTypePieChart() {
           </ResponsiveContainer>
         </div>
         <div className="w-1/2 items-center justify-center flex flex-col">
-          {data.map((entry) => (
+          {data.map((entry, index) => (
             <div key={entry.name} className="flex items-center mb-2">
-              <div 
-                className="w-3 h-3 mr-2 rounded-sm" 
-                style={{ backgroundColor: entry.fill }}
+              <div
+                className="w-3 h-3 mr-2 rounded-sm"
+                style={{ backgroundColor: COLORS[index % COLORS.length] }}
               />
               <span className="text-sm">
-                {entry.name} ({entry.value}%)
+                {entry.name} ({entry.events}%)
               </span>
             </div>
           ))}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-
