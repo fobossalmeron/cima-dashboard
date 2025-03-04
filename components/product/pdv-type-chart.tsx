@@ -10,10 +10,9 @@ import {
   Tooltip,
   Label,
 } from "recharts";
-
-interface StoreTypeChartData {
-  name: string;
-  events: number;
+interface PDVTypeChartData {
+  type: string;
+  quantity: number;
 }
 
 const COLORS = [
@@ -27,8 +26,22 @@ const COLORS = [
   "#8dd1e1",
 ];
 
-export function PDVTypeChart({ data }: { data: StoreTypeChartData[] }) {
-  const calculatedTotalPdv = data.reduce((sum, item) => sum + item.events, 0);
+/**
+ * Componente que muestra un gráfico circular con la distribución de tipos de puntos de venta.
+ *
+ * @param {PDVTypeChartData[]} props.data
+ * @property {string} type - Nombre del tipo de punto de venta (ej. "Supermercado", "Tienda de conveniencia")
+ * @property {number} quantity - Número de puntos de venta de este tipo
+ */
+
+export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
+  const calculatedTotalPdv = data.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Función para calcular el porcentaje de cada tipo de PDV
+  const calculatePercentage = (value: number): number => {
+    if (calculatedTotalPdv === 0) return 0;
+    return Math.round((value / calculatedTotalPdv) * 100);
+  };
 
   return (
     <Card>
@@ -45,7 +58,7 @@ export function PDVTypeChart({ data }: { data: StoreTypeChartData[] }) {
                 cy="50%"
                 innerRadius={60}
                 outerRadius={80}
-                dataKey="events"
+                dataKey="quantity"
               >
                 {data.map((entry, index) => (
                   <Cell
@@ -83,19 +96,25 @@ export function PDVTypeChart({ data }: { data: StoreTypeChartData[] }) {
                   }}
                 />
               </Pie>
-              <Tooltip />
+              <Tooltip
+                formatter={(value: number) => [
+                  `${value} (${calculatePercentage(value)}%)`,
+                  "Cantidad",
+                ]}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>
         <div className="w-1/2 items-center justify-center flex flex-col">
           {data.map((entry, index) => (
-            <div key={entry.name} className="flex items-center mb-2">
+            <div key={entry.type} className="flex items-center mb-2">
               <div
                 className="w-3 h-3 mr-2 rounded-sm"
                 style={{ backgroundColor: COLORS[index % COLORS.length] }}
               />
               <span className="text-sm">
-                {entry.name} ({entry.events}%)
+                {entry.type} ({entry.quantity} -{" "}
+                {calculatePercentage(entry.quantity)}%)
               </span>
             </div>
           ))}

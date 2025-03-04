@@ -1,9 +1,9 @@
-import { TrafficDuringActivationChart } from "@/components/sales/traffic-during-activation-chart";
-import { ActivationHoursHeatmap } from "@/components/sales/activation-hours-heatmap";
 import { Header } from "@/components/header";
 import { Content } from "@/components/content";
-import { ActivationsTable } from "@/components/sales/activations-table";
-import { PromoterImage } from "@/components/sales/promoter-image";
+import { TrafficDuringActivationChart } from "@/components/sampling/traffic-during-activation-chart";
+import { ActivationHoursHeatmap } from "@/components/sampling/activation-hours-heatmap";
+import { ActivationsTable } from "@/components/sampling/activations-table";
+import { PromoterImage } from "@/components/sampling/promoter-image";
 
 export default function Sampling() {
   return (

@@ -1,12 +1,12 @@
 "use client";
 
-import { ProductSalesChart } from "@/components/product-sales/product-sales-chart";
 import { Header } from "@/components/header";
 import { Content } from "@/components/content";
 import { products } from "@/data/brands";
 import { TotalSalesByBrand } from "@/components/sales/total-sales-by-brand-chart";
+import { ProductSalesChart } from "@/components/sales/product-sales-chart";
 
-export default function ProductSales() {
+export default function Sales() {
   // Filtrar productos por marca y submarca
   const delFrutalNectares = products.filter(
     (product) =>
