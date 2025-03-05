@@ -14,7 +14,7 @@ const data = [
   { name: "Bajo (25-35 personas)", value: 18, fill: "#00C49F" },
   { name: "Muy Bajo (0-24 personas)", value: 8, fill: "#FFBB28" },
   { name: "Alto (51-60 personas)", value: 23, fill: "#FF8042" },
-  { name: "Muy Alto (más de 60 personas)", value: 14, fill: "#FF8042" },
+  { name: "Muy Alto (más de 60 personas)", value: 15, fill: "#FF8042" },
 ];
 
 export function TrafficDuringActivationChart() {
@@ -53,7 +53,7 @@ export function TrafficDuringActivationChart() {
                 className="w-3 h-3 mr-2 rounded-sm"
                 style={{ backgroundColor: entry.fill }}
               />
-              <span className="text-sm">
+              <span className="text-xs">
                 {entry.name} ({entry.value}%)
               </span>
             </div>
