@@ -1,7 +1,7 @@
 Todo:
 General:
 
-- El selector de fechas está fallando
+Faltan sampling y ventas
 
 NUEVO REPORTE DEMOS - EDT BEBIDAS
 
