@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   Legend,
   Tooltip,
+  TooltipProps,
 } from "recharts";
 import { EthnicityDistributionChartData } from "./consumer.types";
 
@@ -16,9 +17,8 @@ const COLORS = ["#FF8042", "#00C49F", "#FFBB28", "#0088FE", "#9370DB"];
 /**
  * Componente que muestra un gráfico circular con la distribución de consumidores por etnia.
  *
- * @param {Object} props
- * @param {EthnicityDistributionChartData[]} props.data - Datos para el gráfico de distribución por etnia
- * @property {string} ethnicity - Nombre de la etnia
+ * @param {EthnicityDistributionChartData[]} props.data
+ * @property {string} ethnicity - Nombre de la etnia (ej. "Hispana", "Americana", "Afroamericana", etc.)
  * @property {number} quantity - Cantidad de consumidores de esta etnia
  */
 export function EthnicityDistributionChart({
@@ -62,7 +62,28 @@ export function EthnicityDistributionChart({
                 />
               ))}
             </Pie>
-            <Tooltip formatter={(value) => [`${value} personas`, "Cantidad"]} />
+            <Tooltip
+              content={({ active, payload }: TooltipProps<number, string>) => {
+                if (active && payload && payload.length) {
+                  const data = payload[0]
+                    .payload as EthnicityDistributionChartData & {
+                    name: string;
+                  };
+                  const index = formattedData.findIndex(
+                    (item) => item.ethnicity === data.ethnicity
+                  );
+                  const color = COLORS[index % COLORS.length];
+
+                  return (
+                    <div className="bg-white p-3 border shadow-sm">
+                      <p className="font-normal">{data.ethnicity}</p>
+                      <p style={{ color: color }}>{data.quantity} personas</p>
+                    </div>
+                  );
+                }
+                return null;
+              }}
+            />
             <Legend wrapperStyle={{ fontSize: "14px" }} />
           </PieChart>
         </ResponsiveContainer>

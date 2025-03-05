@@ -15,21 +15,21 @@ import { AgeDistributionChartData } from "./consumer.types";
 /**
  * Componente que muestra un gráfico de barras con la distribución de consumidores por rango de edad.
  *
- * @param {Object} props
- * @param {AgeDistributionChartData[]} props.data - Datos para el gráfico de distribución por edad
+ * @param {AgeDistributionChartData[]} props.data
  * @property {string} ageRange - Rango de edad (ej. "18-24", "25-34", "35-44", etc.)
- * @property {number} consumers - Cantidad de consumidores en este rango de edad
+ * @property {number} quantity - Cantidad de consumidores en este rango de edad
  */
+
 export function AgeDistributionChart({
   data,
 }: {
   data: AgeDistributionChartData[];
 }) {
-  const total = data.reduce((sum, item) => sum + item.consumers, 0);
+  const total = data.reduce((sum, item) => sum + item.quantity, 0);
 
   const dataWithPercentages = data.map((item) => ({
     ...item,
-    percentage: ((item.consumers / total) * 100).toFixed(1),
+    percentage: ((item.quantity / total) * 100).toFixed(1),
   }));
 
   return (
@@ -45,10 +45,10 @@ export function AgeDistributionChart({
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="ageRange" style={{ fontSize: "12px" }} />
-            <YAxis dataKey="consumers" style={{ fontSize: "12px" }} />
+            <YAxis dataKey="quantity" style={{ fontSize: "12px" }} />
             <Tooltip formatter={(value: number) => [`${value} personas`]} />
             <Bar
-              dataKey="consumers"
+              dataKey="quantity"
               fill="#8884d8"
               label={{
                 position: "center",

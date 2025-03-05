@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import Image from "next/image"
-import { Download } from "lucide-react"
-import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { Download } from "lucide-react";
+import { useState } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -12,44 +12,27 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+} from "@/components/ui/pagination";
+import { ConsumerImagesData } from "./consumer.types";
 
-const images = [
-  {
-    src: "/placeholder.svg",
-    alt: "Imagen 1"
-  },
-  {
-    src: "/placeholder.svg",
-    alt: "Imagen 2"
-  },
-  {
-    src: "/placeholder.svg",
-    alt: "Imagen 3"
-  },
-  {
-    src: "/placeholder.svg",
-    alt: "Imagen 4"
-  },
-  {
-    src: "/placeholder.svg",
-    alt: "Imagen 5"
-  },
-  {
-    src: "/placeholder.svg",
-    alt: "Imagen 6"
-  }
-]
+/**
+ * Componente que muestra una galería de imágenes de consumidores y productos.
+ *
+ * @param {{ConsumerImagesData[]}} props.data
+ * @property {string} locationName - Nombre de la ubicación (ej. "Food Star", "Stamford Market", etc.)
+ * @property {string} address - Dirección de la ubicación (ej. "5521 Leesburg Pike, 22041, Bailey's Crossroads, Virginia")
+ * @property {string} url - URL de AWS de la imagen (ej. "https://s3.amazonaws.com/bucket-name/image-name.jpg")
+ */
 
-export function ConsumerImages() {
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 2
-  const totalPages = Math.ceil(images.length / itemsPerPage)
+export function ConsumerImages({ data }: { data: ConsumerImagesData[] }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 2;
+  const totalPages = Math.ceil(data.length / itemsPerPage);
 
-  const currentImages = images.slice(
+  const currentImages = data.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
-  )
+  );
 
   return (
     <Card className="col-span-full">
@@ -59,21 +42,26 @@ export function ConsumerImages() {
       <CardContent>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {currentImages.map((image, index) => (
-            <div key={index} className="relative aspect-video group">
-              <Image 
-                src={image.src} 
-                alt={image.alt} 
-                fill 
-                className="object-cover rounded-lg" 
-              />
-              <Button
-                size="icon"
-                variant="secondary"
-                className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() => window.open(image.src, '_blank')}
-              >
-                <Download className="h-4 w-4" />
-              </Button>
+            <div key={index} className="space-y-2">
+              <div className="relative aspect-video group">
+                <Image
+                  src={image.url}
+                  alt={image.locationName + " " + image.address}
+                  fill
+                  className="object-cover rounded-lg"
+                />
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => window.open(image.url, "_blank")}
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {image.locationName + " - " + image.address}
+              </p>
             </div>
           ))}
         </div>
@@ -84,10 +72,12 @@ export function ConsumerImages() {
               <PaginationPrevious
                 href="#"
                 onClick={(e) => {
-                  e.preventDefault()
-                  if (currentPage > 1) setCurrentPage((p) => p - 1)
+                  e.preventDefault();
+                  if (currentPage > 1) setCurrentPage((p) => p - 1);
                 }}
-                className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
+                className={
+                  currentPage <= 1 ? "pointer-events-none opacity-50" : ""
+                }
               />
             </PaginationItem>
             {Array.from({ length: totalPages }).map((_, i) => (
@@ -95,8 +85,8 @@ export function ConsumerImages() {
                 <PaginationLink
                   href="#"
                   onClick={(e) => {
-                    e.preventDefault()
-                    setCurrentPage(i + 1)
+                    e.preventDefault();
+                    setCurrentPage(i + 1);
                   }}
                   isActive={currentPage === i + 1}
                 >
@@ -108,16 +98,19 @@ export function ConsumerImages() {
               <PaginationNext
                 href="#"
                 onClick={(e) => {
-                  e.preventDefault()
-                  if (currentPage < totalPages) setCurrentPage((p) => p + 1)
+                  e.preventDefault();
+                  if (currentPage < totalPages) setCurrentPage((p) => p + 1);
                 }}
-                className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
+                className={
+                  currentPage >= totalPages
+                    ? "pointer-events-none opacity-50"
+                    : ""
+                }
               />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
       </CardContent>
     </Card>
-  )
+  );
 }
-

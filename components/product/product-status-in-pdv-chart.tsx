@@ -13,6 +13,14 @@ import { ProductStatusInPDVChartData } from "./product.types";
 
 const COLORS = ["#00C49F", "#FF8042"];
 
+/**
+ * Componente que muestra un gráfico circular sobre el estado de promoción de productos.
+ * Visualiza la distribución entre productos en promoción y a precio regular.
+ *
+ * @param {ProductStatusInPDVChartData[]} props.data
+ * @property {string} type - El tipo de estado ("En promoción" o "Precio regular")
+ * @property {number} quantity - La cantidad de productos en cada estado
+ */
 export function ProductStatusInPDVChart({
   data,
 }: {

@@ -1,6 +1,6 @@
 export interface AgeDistributionChartData {
     ageRange: "18-24" | "25-34" | "35-44" | "45-54" | "55-64" | "65+";
-    consumers: number;
+    quantity: number;
 }
 
 export interface GenderDistributionChartData {
@@ -23,3 +23,15 @@ export interface ConsumptionMomentsChartData {
     quantity: number;
 }
 
+export interface NetPromoterScoreChartData {
+    vote: number;
+    quantity: number;
+}
+export interface ConsumerFeedbackData {
+    comment: string;
+}
+export interface ConsumerImagesData {
+    locationName: string;
+    address: string;
+    url: string;
+}

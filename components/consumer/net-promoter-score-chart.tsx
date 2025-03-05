@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BarChart,
   Bar,
@@ -16,80 +11,71 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { NPSVote } from "@/types/NPSVote";
 import { Badge } from "@/components/ui/badge";
+import { NetPromoterScoreChartData } from "./consumer.types";
 
-// Datos de ejemplo para uso cuando no se proporcionan datos
-const defaultVotesData: NPSVote[] = [
-  { decile: 10, votes: 254 },
-  { decile: 9, votes: 187 },
-  { decile: 8, votes: 53 },
-  { decile: 7, votes: 31 },
-  { decile: 6, votes: 22 },
-  { decile: 5, votes: 4 },
-  { decile: 4, votes: 3 },
-  { decile: 3, votes: 1 },
-  { decile: 2, votes: 2 },
-  { decile: 1, votes: 20 },
-  { decile: 0, votes: 16 },
-];
-
-// Definimos las props del componente
-interface NetPromoterScoreChartProps {
-  votesData?: NPSVote[];
-}
-
-// Función para determinar el color según la puntuación
-const getBarColor = (decile: number): string => {
-  if (decile >= 9) {
+// Color de la barra según la puntuación del NPS
+const getBarColor = (vote: number): string => {
+  if (vote >= 9) {
     return "hsl(142, 76%, 36%)"; // Verde para promotores (9-10)
-  } else if (decile >= 7) {
+  } else if (vote >= 7) {
     return "hsl(38, 92%, 50%)"; // Amarillo para pasivos (7-8)
   } else {
     return "hsl(0, 84%, 60%)"; // Rojo para detractores (0-6)
   }
 };
 
-// Datos para la leyenda
+// Datos para la leyenda del gráfico
 const legendItems = [
   { value: "Promotores", color: "hsl(142, 76%, 36%)" },
   { value: "Pasivos", color: "hsl(38, 92%, 50%)" },
   { value: "Detractores", color: "hsl(0, 84%, 60%)" },
 ];
 
-export function NetPromoterScoreChart({
-  votesData = defaultVotesData,
-}: NetPromoterScoreChartProps) {
-  // Calcular el total de votos
-  const totalVotes = votesData.reduce((acc, item) => acc + item.votes, 0);
+/**
+ * Componente que muestra un gráfico de barras con la distribución de puntuaciones NPS (Net Promoter Score).
+ * Calcula automáticamente los porcentajes de promotores, pasivos y detractores, así como el valor NPS final.
+ *
+ * @param {NetPromoterScoreChartData[]} props.data
+ * @property {number} vote - Puntuación dada por el consumidor (0-10)
+ * @property {number} quantity - Cantidad de consumidores que dieron esa puntuación
+ */
 
-  // Convertir votos a porcentajes para visualización
-  const dataWithPercentages = votesData.map((item) => ({
-    decile: item.decile,
-    votes: item.votes,
+export function NetPromoterScoreChart({
+  data,
+}: {
+  data: NetPromoterScoreChartData[];
+}) {
+  const totalVotes = data.reduce((acc, item) => acc + item.quantity, 0);
+
+  const dataWithPercentages = data.map((item) => ({
+    vote: item.vote,
+    quantity: item.quantity,
     porcentaje:
       totalVotes > 0
-        ? parseFloat(((item.votes / totalVotes) * 100).toFixed(1))
+        ? parseFloat(((item.quantity / totalVotes) * 100).toFixed(1))
         : 0,
   }));
 
-  const promotores = votesData
-    .filter((item) => item.decile >= 9)
-    .reduce((acc, item) => acc + item.votes, 0);
+  // Calcular el total de votos para cada categoría
+  const promotores = data
+    .filter((item) => item.vote >= 9)
+    .reduce((acc, item) => acc + item.quantity, 0);
 
-  const pasivos = votesData
-    .filter((item) => item.decile >= 7 && item.decile <= 8)
-    .reduce((acc, item) => acc + item.votes, 0);
+  const pasivos = data
+    .filter((item) => item.vote >= 7 && item.vote <= 8)
+    .reduce((acc, item) => acc + item.quantity, 0);
 
-  const detractores = votesData
-    .filter((item) => item.decile <= 6)
-    .reduce((acc, item) => acc + item.votes, 0);
+  const detractores = data
+    .filter((item) => item.vote <= 6)
+    .reduce((acc, item) => acc + item.quantity, 0);
 
-  const total = promotores + pasivos + detractores;
-
-  const porcentajePromotores = total > 0 ? (promotores / total) * 100 : 0;
-  const porcentajePasivos = total > 0 ? (pasivos / total) * 100 : 0;
-  const porcentajeDetractores = total > 0 ? (detractores / total) * 100 : 0;
+  // Calcular el porcentaje de cada categoría
+  const porcentajePromotores =
+    totalVotes > 0 ? (promotores / totalVotes) * 100 : 0;
+  const porcentajePasivos = totalVotes > 0 ? (pasivos / totalVotes) * 100 : 0;
+  const porcentajeDetractores =
+    totalVotes > 0 ? (detractores / totalVotes) * 100 : 0;
 
   // Calcular el NPS real
   const npsReal = porcentajePromotores - porcentajeDetractores;
@@ -120,7 +106,7 @@ export function NetPromoterScoreChart({
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
-              dataKey="decile"
+              dataKey="vote"
               style={{ fontSize: "12px" }}
               tickFormatter={(value) => value.toString()}
             />
@@ -133,11 +119,11 @@ export function NetPromoterScoreChart({
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
                   const entry = dataWithPercentages.find(
-                    (item) => item.decile === label
+                    (item) => item.vote === label
                   );
                   return (
-                    <div className="bg-white p-3 border rounded-lg shadow-sm">
-                      <p>Votos: {entry?.votes.toLocaleString()}</p>
+                    <div className="bg-white p-3 border shadow-sm">
+                      <p>Votos: {entry?.quantity.toLocaleString()}</p>
                       <p>Porcentaje: {entry?.porcentaje}%</p>
                     </div>
                   );
@@ -145,9 +131,9 @@ export function NetPromoterScoreChart({
                 return null;
               }}
             />
-            <Bar dataKey="votes" name="Votos">
+            <Bar dataKey="quantity" name="Votos">
               {dataWithPercentages.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={getBarColor(entry.decile)} />
+                <Cell key={`cell-${index}`} fill={getBarColor(entry.vote)} />
               ))}
             </Bar>
           </BarChart>
@@ -180,7 +166,7 @@ export function NetPromoterScoreChart({
               {`${legendItems[2].value} (${porcentajeDetractores.toFixed(0)}%)`}
             </span>
           </div>
-        </div>{" "}
+        </div>
       </CardContent>
     </Card>
   );

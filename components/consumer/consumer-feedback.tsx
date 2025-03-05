@@ -17,14 +17,21 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { feedback } from "@/data/dummy-comments";
+import { ConsumerFeedbackData } from "./consumer.types";
 
-export function ConsumerFeedback() {
+/**
+ * Componente que muestra los comentarios de los consumidores con paginación.
+ *
+ * @param {ConsumerFeedbackData[]} props.data
+ * @property {string} comment - Texto del comentario del consumidor
+ */
+
+export function ConsumerFeedback({ data }: { data: ConsumerFeedbackData[] }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(feedback.length / itemsPerPage);
+  const totalPages = Math.ceil(data.length / itemsPerPage);
 
-  const currentFeedback = feedback.slice(
+  const currentFeedback = data.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -41,7 +48,9 @@ export function ConsumerFeedback() {
             {currentFeedback.map((item, index) => (
               <div key={index} className="p-3 border rounded-lg">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm text-muted-foreground">{item.comment}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {item.comment}
+                  </p>
                 </div>
               </div>
             ))}
