@@ -14,6 +14,14 @@ import {
 const MapsDataDummy: MapsData = {
   citiesData: [
     {
+      name: "Philadelphia",
+      lat: 39.952583,
+      lng: -75.165222,
+      activations: 30,
+      averageSales: 1800,
+      totalStores: 2,
+    },
+    {
       name: "Stamford",
       lat: 41.05343,
       lng: -73.538734,

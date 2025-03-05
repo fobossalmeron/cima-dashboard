@@ -22,6 +22,7 @@ import {
   CityLocation,
   MapsData,
 } from "@/components/general/general.types";
+import { calculateMapSettings, getCircleOptions } from "./map-utils";
 
 /**
  * Componente que muestra mapas interactivos de ciudades y puntos de venta con datos de ventas y activaciones.
@@ -71,35 +72,10 @@ export function Maps({ data }: { data: MapsData }) {
     return Math.max(...currentData.map((location) => location.activations));
   }, [currentData]);
 
-  const getCircleOptions = (location: BaseLocation) => {
-    // Calculamos el percentil de ventas para determinar el color
-    const salesPercentage =
-      (location.averageSales - minSales) / (maxSales - minSales);
-
-    let color: string;
-    if (salesPercentage <= 0.25) {
-      color = "#FF4D4D"; // Rojo para ventas bajas
-    } else if (salesPercentage <= 0.4) {
-      color = "#FFA500"; // Naranja para ventas medio-bajas
-    } else if (salesPercentage <= 0.65) {
-      color = "#FFD700"; // Amarillo para ventas medio-altas
-    } else {
-      color = "#32CD32"; // Verde para ventas altas
-    }
-
-    return {
-      strokeColor: color,
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: color,
-      fillOpacity: 0.35,
-      zIndex: 1,
-      radius:
-        mapType === "city"
-          ? location.activations * 400
-          : location.activations * 3000,
-    };
-  };
+  // Calculamos el centro y zoom del mapa
+  const mapSettings = useMemo(() => {
+    return calculateMapSettings(currentData);
+  }, [currentData]);
 
   const renderInfoWindow = (location: BaseLocation) => {
     if (mapType === "city") {
@@ -154,8 +130,8 @@ export function Maps({ data }: { data: MapsData }) {
         <GoogleMap
           key={mapType}
           mapContainerStyle={{ width: "100%", height: "400px" }}
-          center={{ lat: 41.3083, lng: -72.9279 }}
-          zoom={mapType === "city" ? 8 : 9}
+          center={mapSettings.center}
+          zoom={mapSettings.zoom}
           options={{
             styles: mapStyles,
             disableDefaultUI: true,
@@ -169,7 +145,7 @@ export function Maps({ data }: { data: MapsData }) {
             <Circle
               key={`${mapType}-${index}`}
               center={{ lat: location.lat, lng: location.lng }}
-              options={getCircleOptions(location)}
+              options={getCircleOptions(location, minSales, maxSales, mapType)}
               onClick={() => setSelectedLocation(location)}
             />
           ))}
