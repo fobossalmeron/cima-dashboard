@@ -1,18 +1,36 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from "recharts";
+import { EthnicityDistributionChartData } from "./consumer.types";
 
-const data = [
-  { name: "Afroamericanos", value: 30 },
-  { name: "Hispanos", value: 40 },
-  { name: "Americanos", value: 20 },
-  { name: "Otro", value: 10 },
-]
+const COLORS = ["#FF8042", "#00C49F", "#FFBB28", "#0088FE", "#9370DB"];
 
-const COLORS = ["#FF8042", "#00C49F", "#FFBB28", "#0088FE", "#9370DB"]
+/**
+ * Componente que muestra un gráfico circular con la distribución de consumidores por etnia.
+ *
+ * @param {Object} props
+ * @param {EthnicityDistributionChartData[]} props.data - Datos para el gráfico de distribución por etnia
+ * @property {string} ethnicity - Nombre de la etnia
+ * @property {number} quantity - Cantidad de consumidores de esta etnia
+ */
+export function EthnicityDistributionChart({
+  data,
+}: {
+  data: EthnicityDistributionChartData[];
+}) {
+  const formattedData = data.map((item) => ({
+    ...item,
+    name: item.ethnicity,
+  }));
 
-export function EthnicityDistributionChart() {
   return (
     <Card>
       <CardHeader>
@@ -22,28 +40,33 @@ export function EthnicityDistributionChart() {
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
-              data={data}
+              data={formattedData}
               cx="50%"
               cy="50%"
               labelLine={false}
               outerRadius={80}
               fill="#8884d8"
-              dataKey="value"
+              dataKey="quantity"
+              nameKey="ethnicity"
               style={{
                 fontSize: 12,
               }}
-              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              label={({ ethnicity, percent }) =>
+                `${ethnicity} ${(percent * 100).toFixed(0)}%`
+              }
             >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              {formattedData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
               ))}
             </Pie>
-            <Tooltip />
-            <Legend wrapperStyle={{ fontSize: '14px' }} />
+            <Tooltip formatter={(value) => [`${value} personas`, "Cantidad"]} />
+            <Legend wrapperStyle={{ fontSize: "14px" }} />
           </PieChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
-

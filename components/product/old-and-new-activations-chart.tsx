@@ -12,14 +12,7 @@ import {
   ResponsiveContainer,
   LabelList,
 } from "recharts";
-
-interface OldAndNewActivationsChart {
-  month: string;
-  new_location_activations: number;
-  previous_location_activations: number;
-  new_locations: number;
-  previous_locations: number;
-}
+import { OldAndNewActivationsChartData } from "./product.types";
 
 /**
  * Componente que muestra un gráfico de barras comparando activaciones en tiendas nuevas y anteriores.
@@ -35,7 +28,7 @@ interface OldAndNewActivationsChart {
 export function OldAndNewActivationsChart({
   data,
 }: {
-  data: OldAndNewActivationsChart[];
+  data: OldAndNewActivationsChartData[];
 }) {
   return (
     <Card className="md:col-span-2">

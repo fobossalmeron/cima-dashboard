@@ -6,27 +6,35 @@ import { OldAndNewActivationsChart } from "@/components/product/old-and-new-acti
 import { PDVProductImages } from "@/components/product/pdv-product-images";
 import { Header } from "@/components/header";
 import { Content } from "@/components/content";
+import {
+  ProductStatusInPDVChartData,
+  ProductLocationInPDVChartData,
+  PDVTypeChartData,
+  PDVProductImagesData,
+  OldAndNewActivationsChartData,
+  AveragePriceInPDVChartData,
+} from "@/components/product/product.types";
 
-const PDVTypeChartData = [
+const PDVTypeChartDummy: PDVTypeChartData[] = [
   { type: "Supermarket", quantity: 25 },
   { type: "Midmarket", quantity: 14 },
   { type: "Downtrade", quantity: 101 },
   { type: "Convenience", quantity: 12 },
 ];
 
-const ProductLocationInPVDChartData = [
+const ProductLocationInPVDChartDummy: ProductLocationInPDVChartData[] = [
   { location: "Estantes", quantity: 43 },
   { location: "Neveras", quantity: 37 },
   { location: "Display Marca", quantity: 120 },
   { location: "Display Tienda", quantity: 10 },
 ];
 
-const ProductStatusInPDVChartData = [
+const ProductStatusInPDVChartDummy: ProductStatusInPDVChartData[] = [
   { type: "En promoción", quantity: 100 },
   { type: "Precio regular", quantity: 40 },
 ];
 
-const AveragePriceInPDVChartData = [
+const AveragePriceInPDVChartDummy: AveragePriceInPDVChartData[] = [
   { brand: "Del Frutal Aguas Frescas", averagePrice: 1.99 },
   { brand: "Del Frutal Pulpa 1L", averagePrice: 2.99 },
   { brand: "Del Frutal Lata", averagePrice: 2.79 },
@@ -40,7 +48,7 @@ const AveragePriceInPDVChartData = [
   { brand: "Naturas Pulpa 1L", averagePrice: 2.59 },
 ];
 
-const OldAndNewActivationsChartData = [
+const OldAndNewActivationsChartDummy: OldAndNewActivationsChartData[] = [
   {
     month: "Enero",
     new_location_activations: 45,
@@ -85,7 +93,7 @@ const OldAndNewActivationsChartData = [
   },
 ];
 
-const PDVProductImagesData = [
+const PDVProductImagesDummy: PDVProductImagesData[] = [
   {
     locationName: "Food Star",
     address: "5521 Leesburg Pike, 22041, Bailey's Crossroads, Virginia",
@@ -119,12 +127,12 @@ export default function ProductInfo() {
       <Header title="Información del producto" />
       <Content>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <PDVTypeChart data={PDVTypeChartData} />
-          <ProductLocationInPDVChart data={ProductLocationInPVDChartData} />
-          <ProductStatusInPDVChart data={ProductStatusInPDVChartData} />
-          <AveragePriceInPDVChart data={AveragePriceInPDVChartData} />
-          <OldAndNewActivationsChart data={OldAndNewActivationsChartData} />
-          <PDVProductImages data={PDVProductImagesData} />
+          <PDVTypeChart data={PDVTypeChartDummy} />
+          <ProductLocationInPDVChart data={ProductLocationInPVDChartDummy} />
+          <ProductStatusInPDVChart data={ProductStatusInPDVChartDummy} />
+          <AveragePriceInPDVChart data={AveragePriceInPDVChartDummy} />
+          <OldAndNewActivationsChart data={OldAndNewActivationsChartDummy} />
+          <PDVProductImages data={PDVProductImagesDummy} />
         </div>
       </Content>
     </div>

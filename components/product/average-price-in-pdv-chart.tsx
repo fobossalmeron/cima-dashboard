@@ -11,6 +11,7 @@ import {
   LabelList,
   Cell,
 } from "recharts";
+import { AveragePriceInPDVChartData } from "./product.types";
 
 // Colores para las barras
 const COLORS = [
@@ -24,12 +25,6 @@ const COLORS = [
   "#3498DB",
   "#E67E22",
 ];
-
-// Interfaz para los datos del gráfico
-interface AveragePriceInPDVChartData {
-  brand: string;
-  averagePrice: number;
-}
 
 /**
  * Componente que muestra un gráfico de barras con el precio promedio de un producto en diferentes puntos de venta.

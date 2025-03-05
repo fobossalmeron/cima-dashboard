@@ -10,24 +10,26 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { AgeDistributionChartData } from "./consumer.types";
 
-const data = [
-  { range: "18-24", cantidad: 150 },
-  { range: "25-34", cantidad: 300 },
-  { range: "35-44", cantidad: 250 },
-  { range: "45-54", cantidad: 200 },
-  { range: "55-64", cantidad: 100 },
-  { range: "65+", cantidad: 50 },
-];
+/**
+ * Componente que muestra un gráfico de barras con la distribución de consumidores por rango de edad.
+ *
+ * @param {Object} props
+ * @param {AgeDistributionChartData[]} props.data - Datos para el gráfico de distribución por edad
+ * @property {string} ageRange - Rango de edad (ej. "18-24", "25-34", "35-44", etc.)
+ * @property {number} consumers - Cantidad de consumidores en este rango de edad
+ */
+export function AgeDistributionChart({
+  data,
+}: {
+  data: AgeDistributionChartData[];
+}) {
+  const total = data.reduce((sum, item) => sum + item.consumers, 0);
 
-export function AgeDistributionChart() {
-  // Calcular el total
-  const total = data.reduce((sum, item) => sum + item.cantidad, 0);
-
-  // Crear nuevo array con porcentajes
   const dataWithPercentages = data.map((item) => ({
     ...item,
-    porcentaje: ((item.cantidad / total) * 100).toFixed(1),
+    percentage: ((item.consumers / total) * 100).toFixed(1),
   }));
 
   return (
@@ -42,19 +44,18 @@ export function AgeDistributionChart() {
             margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="range" style={{ fontSize: "12px" }} />
-            <YAxis dataKey="cantidad" style={{ fontSize: "12px" }} />
-            <Tooltip 
-              formatter={(value: number) => [`${value} personas`]}
-            />
+            <XAxis dataKey="ageRange" style={{ fontSize: "12px" }} />
+            <YAxis dataKey="consumers" style={{ fontSize: "12px" }} />
+            <Tooltip formatter={(value: number) => [`${value} personas`]} />
             <Bar
-              dataKey="cantidad"
+              dataKey="consumers"
               fill="#8884d8"
               label={{
                 position: "center",
                 fill: "white",
                 fontSize: 12,
-                formatter: (value: number) => `${((value / total) * 100).toFixed(1)}%`,
+                formatter: (value: number) =>
+                  `${((value / total) * 100).toFixed(1)}%`,
               }}
             />
           </BarChart>

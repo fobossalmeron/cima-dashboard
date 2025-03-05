@@ -13,12 +13,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-
-interface PDVProductImagesData {
-  locationName: string;
-  address: string;
-  url: string;
-}
+import { PDVProductImagesData } from "./product.types";
 
 /**
  * Componente que muestra una galería de imágenes del producto en diferentes puntos de venta.

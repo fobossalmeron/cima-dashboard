@@ -10,10 +10,7 @@ import {
   Tooltip,
   Label,
 } from "recharts";
-interface PDVTypeChartData {
-  type: string;
-  quantity: number;
-}
+import { PDVTypeChartData } from "./product.types";
 
 const COLORS = [
   "#0088FE",

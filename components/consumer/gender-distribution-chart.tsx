@@ -1,17 +1,36 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from "recharts";
+import { GenderDistributionChartData } from "./consumer.types";
 
-const data = [
-  { name: "Femenino", value: 55 },
-  { name: "Masculino", value: 43 },
-  { name: "Otro", value: 2 },
-]
+const COLORS = ["#FF69B4", "#4169E1", "#9370DB"];
 
-const COLORS = ["#FF69B4", "#4169E1", "#9370DB"]
+/**
+ * Componente que muestra un gráfico circular con la distribución de consumidores por género.
+ *
+ * @param {Object} props
+ * @param {GenderDistributionChartData[]} props.data - Datos para el gráfico de distribución por género
+ * @property {string} gender - Nombre del género
+ * @property {number} quantity - Cantidad de consumidores de este género
+ */
+export function GenderDistributionChart({
+  data,
+}: {
+  data: GenderDistributionChartData[];
+}) {
+  const formattedData = data.map((item) => ({
+    ...item,
+    name: item.gender,
+  }));
 
-export function GenderDistributionChart() {
   return (
     <Card>
       <CardHeader>
@@ -21,26 +40,31 @@ export function GenderDistributionChart() {
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
-              data={data}
+              data={formattedData}
               cx="50%"
               cy="50%"
               labelLine={false}
               outerRadius={80}
               fill="#8884d8"
-              dataKey="value"
-              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              style={{ fontSize: '12px' }}
+              dataKey="quantity"
+              nameKey="gender"
+              label={({ gender, percent }) =>
+                `${gender} ${(percent * 100).toFixed(0)}%`
+              }
+              style={{ fontSize: "12px" }}
             >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              {formattedData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
               ))}
             </Pie>
-            <Tooltip />
-            <Legend wrapperStyle={{ fontSize: '14px' }} />
+            <Tooltip formatter={(value) => [`${value} personas`, "Cantidad"]} />
+            <Legend wrapperStyle={{ fontSize: "14px" }} />
           </PieChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
-

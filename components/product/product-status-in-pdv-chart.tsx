@@ -9,11 +9,7 @@ import {
   Legend,
   Tooltip,
 } from "recharts";
-
-interface ProductStatusInPDVChartData {
-  type: string;
-  quantity: number;
-}
+import { ProductStatusInPDVChartData } from "./product.types";
 
 const COLORS = ["#00C49F", "#FF8042"];
 

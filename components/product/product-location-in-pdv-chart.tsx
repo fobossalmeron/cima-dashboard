@@ -12,10 +12,7 @@ import {
   LabelList,
 } from "recharts";
 import { useMemo } from "react";
-
-interface ProductLocationInPDVChartData {
-  data: { location: string; quantity: number }[];
-}
+import { ProductLocationInPDVChartData } from "./product.types";
 
 /**
  * Componente que muestra un gráfico de barras con la ubicación de productos en punto de venta.
@@ -27,7 +24,9 @@ interface ProductLocationInPDVChartData {
 
 export function ProductLocationInPDVChart({
   data,
-}: ProductLocationInPDVChartData) {
+}: {
+  data: ProductLocationInPDVChartData[];
+}) {
   // Calcular el total y los porcentajes para cada ubicación y ordenar de mayor a menor
   const dataWithPercentages = useMemo(() => {
     const total = data.reduce((sum, item) => sum + item.quantity, 0);
