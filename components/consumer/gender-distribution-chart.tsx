@@ -48,10 +48,9 @@ export function GenderDistributionChart({
               fill="#8884d8"
               dataKey="quantity"
               nameKey="gender"
-              label={({ gender, percent }) =>
-                `${gender} ${(percent * 100).toFixed(0)}%`
-              }
-              style={{ fontSize: "12px" }}
+              className="font-semibold"
+              label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+              style={{ fontSize: "15px" }}
             >
               {formattedData.map((entry, index) => (
                 <Cell

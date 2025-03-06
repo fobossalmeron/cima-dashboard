@@ -123,6 +123,7 @@ export function NetPromoterScoreChart({
                   );
                   return (
                     <div className="bg-white p-3 border shadow-sm">
+                      <p>Calificación: {entry?.vote}</p>
                       <p>Votos: {entry?.quantity.toLocaleString()}</p>
                       <p>Porcentaje: {entry?.porcentaje}%</p>
                     </div>

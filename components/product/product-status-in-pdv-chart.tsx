@@ -26,6 +26,41 @@ export function ProductStatusInPDVChart({
 }: {
   data: ProductStatusInPDVChartData[];
 }) {
+  // Interfaz para las propiedades del tooltip personalizado
+  interface CustomTooltipProps {
+    active?: boolean;
+    payload?: Array<{
+      payload: ProductStatusInPDVChartData;
+      dataKey: string;
+      name: string;
+      color: string;
+    }>;
+  }
+
+  // Componente de tooltip personalizado
+  const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+    if (active && payload && payload.length) {
+      const currentData = payload[0].payload;
+
+      // Encontrar el índice del elemento en el array de datos
+      const dataIndex = data.findIndex(
+        (item) => item.type === currentData.type
+      );
+      const colorIndex = dataIndex >= 0 ? dataIndex % COLORS.length : 0;
+      const color = COLORS[colorIndex];
+
+      return (
+        <div className="bg-background border border-border p-3">
+          <p className="text-base">{currentData.type}</p>
+          <p className="text-base" style={{ color: color }}>
+            {currentData.quantity} ocasiones
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -43,10 +78,9 @@ export function ProductStatusInPDVChart({
               fill="#8884d8"
               dataKey="quantity"
               nameKey="type"
-              fontSize={14}
-              label={({ type, percent }) =>
-                `${type} ${(percent * 100).toFixed(0)}%`
-              }
+              fontSize={15}
+              label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+              className="font-semibold"
             >
               {data.map((entry, index) => (
                 <Cell
@@ -55,7 +89,7 @@ export function ProductStatusInPDVChart({
                 />
               ))}
             </Pie>
-            <Tooltip formatter={(value, name) => [`${value}`, `${name}`]} />
+            <Tooltip content={<CustomTooltip />} />
             <Legend
               layout="horizontal"
               verticalAlign="bottom"

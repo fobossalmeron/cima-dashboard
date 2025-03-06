@@ -63,6 +63,7 @@ export function ConsumptionMomentsChart({
             <Bar
               dataKey="quantity"
               fill="#8884d8"
+              className="font-semibold"
               label={{
                 position: "center",
                 fill: "white",

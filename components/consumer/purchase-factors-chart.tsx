@@ -62,6 +62,7 @@ export function PurchaseFactorsChart({
             <Bar
               dataKey="quantity"
               fill="hsl(217, 91%, 60%)"
+              className="font-semibold"
               label={{
                 position: "center",
                 fill: "white",

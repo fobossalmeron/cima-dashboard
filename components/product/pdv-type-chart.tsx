@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   Label,
+  Legend,
 } from "recharts";
 import { PDVTypeChartData } from "./product.types";
 
@@ -34,10 +35,38 @@ const COLORS = [
 export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
   const calculatedTotalPdv = data.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Función para calcular el porcentaje de cada tipo de PDV
-  const calculatePercentage = (value: number): number => {
-    if (calculatedTotalPdv === 0) return 0;
-    return Math.round((value / calculatedTotalPdv) * 100);
+  // Personalización del tooltip
+  interface CustomTooltipProps {
+    active?: boolean;
+    payload?: Array<{
+      payload: PDVTypeChartData;
+      dataKey: string;
+      name: string;
+      color: string;
+    }>;
+  }
+
+  const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+    if (active && payload && payload.length) {
+      const currentData = payload[0].payload;
+
+      // Encontrar el índice del elemento en el array de datos
+      const dataIndex = data.findIndex(
+        (item) => item.type === currentData.type
+      );
+      const colorIndex = dataIndex >= 0 ? dataIndex % COLORS.length : 0;
+      const color = COLORS[colorIndex];
+
+      return (
+        <div className="bg-background border border-border p-3">
+          <p className="text-base">{currentData.type}</p>
+          <p className="text-base" style={{ color: color }}>
+            {currentData.quantity} puntos de venta
+          </p>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -45,77 +74,66 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
       <CardHeader>
         <CardTitle>Tipo de punto de venta</CardTitle>
       </CardHeader>
-      <CardContent className="flex justify-between items-center">
-        <div className="w-1/2">
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={80}
-                dataKey="quantity"
-              >
-                {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-                <Label
-                  content={({ viewBox }) => {
-                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                      return (
-                        <text
+      <CardContent>
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={80}
+              dataKey="quantity"
+              nameKey="type"
+              labelLine={false}
+              label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+              className="font-semibold"
+            >
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+              <Label
+                content={({ viewBox }) => {
+                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                    return (
+                      <text
+                        x={viewBox.cx}
+                        y={viewBox.cy}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                      >
+                        <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          textAnchor="middle"
-                          dominantBaseline="middle"
+                          className="fill-foreground text-3xl font-bold"
                         >
-                          <tspan
-                            x={viewBox.cx}
-                            y={viewBox.cy}
-                            className="fill-foreground text-3xl font-bold"
-                          >
-                            {calculatedTotalPdv}
-                          </tspan>
-                          <tspan
-                            x={viewBox.cx}
-                            y={(viewBox.cy || 0) + 24}
-                            className="fill-muted-foreground"
-                          >
-                            PDV
-                          </tspan>
-                        </text>
-                      );
-                    }
-                  }}
-                />
-              </Pie>
-              <Tooltip
-                formatter={(value: number) => [
-                  `${value} (${calculatePercentage(value)}%)`,
-                  "Cantidad",
-                ]}
+                          {calculatedTotalPdv}
+                        </tspan>
+                        <tspan
+                          x={viewBox.cx}
+                          y={(viewBox.cy || 0) + 24}
+                          className="fill-muted-foreground"
+                        >
+                          PDV
+                        </tspan>
+                      </text>
+                    );
+                  }
+                }}
               />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="w-1/2 items-center justify-center flex flex-col">
-          {data.map((entry, index) => (
-            <div key={entry.type} className="flex items-center mb-2">
-              <div
-                className="w-3 h-3 mr-2 rounded-sm"
-                style={{ backgroundColor: COLORS[index % COLORS.length] }}
-              />
-              <span className="text-sm">
-                {entry.type} ({entry.quantity} -{" "}
-                {calculatePercentage(entry.quantity)}%)
-              </span>
-            </div>
-          ))}
-        </div>
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+            <Legend
+              layout="horizontal"
+              verticalAlign="bottom"
+              align="center"
+              wrapperStyle={{ fontSize: "14px", paddingTop: "20px" }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
       </CardContent>
     </Card>
   );

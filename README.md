@@ -1,3 +1,7 @@
+# General
+
+- Evolución de ventas y activaciones le falta contraste a los colores
+
 # Sampling
 
 - Tráfico durante samplings no debe mostrar toda la información en la leyenda, y los porcentajes están rotos.
@@ -7,13 +11,6 @@
 # Ventas
 
 Falta trabajar toda la pestaña
-
-# Producto
-
-- Tipo de punto de venta no se pueden ver todos los datos al mismo tiempo, hay que elegir, tooltip y gráfico
-- Ubicación del producto en punto de venta, tooltip con dato duplicado
-- ¿Producto en promoción?, tooltip mejorable
-- Precio promedio del producto en punto de venta, tooltip mejorable
 
 # Consumidor
 

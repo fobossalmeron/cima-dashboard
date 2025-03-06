@@ -48,12 +48,11 @@ export function EthnicityDistributionChart({
               fill="#8884d8"
               dataKey="quantity"
               nameKey="ethnicity"
+              className="font-semibold"
               style={{
-                fontSize: 12,
+                fontSize: 15,
               }}
-              label={({ ethnicity, percent }) =>
-                `${ethnicity} ${(percent * 100).toFixed(0)}%`
-              }
+              label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
             >
               {formattedData.map((entry, index) => (
                 <Cell

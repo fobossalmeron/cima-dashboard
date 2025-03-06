@@ -64,14 +64,22 @@ export function ProductLocationInPDVChart({
             />
             <YAxis className="text-xs" />
             <Tooltip
-              formatter={(value, name) => {
-                if (name === "quantity") {
-                  const item = dataWithPercentages.find(
-                    (item) => item.quantity === value
+              content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  const { location, quantity } = payload[0].payload;
+                  return (
+                    <div className="bg-background border border-border p-3">
+                      <p className="text-base">{location}</p>
+                      <p
+                        className="text-base"
+                        style={{ color: payload[0].color }}
+                      >
+                        {quantity} ocasiones
+                      </p>
+                    </div>
                   );
-                  return [`${value} (${item?.percentage}%)`, "Cantidad"];
                 }
-                return [value, name];
+                return null;
               }}
             />
             <Bar dataKey="quantity" fill="#8884d8">
@@ -79,7 +87,7 @@ export function ProductLocationInPDVChart({
                 dataKey="percentage"
                 position="center"
                 fill="#ffffff"
-                className="text-sm"
+                className="text-sm font-semibold"
                 formatter={(value: number) => `${value}%`}
               />
             </Bar>
