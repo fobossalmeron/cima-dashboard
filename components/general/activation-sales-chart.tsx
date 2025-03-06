@@ -86,11 +86,12 @@ export function ActivationSalesChart({
               type="monotone"
               dataKey="activations"
               name="Activaciones"
-              stroke="#ffc658"
+              stroke="#8884D8"
               label={{
                 position: "top",
-                fill: "#ffc658",
-                fontSize: 12,
+                fill: "#8884D8",
+                fontSize: 14,
+                fontWeight: 600,
               }}
             />
             <Line
@@ -98,11 +99,12 @@ export function ActivationSalesChart({
               type="monotone"
               dataKey="totalSales"
               name="Ventas totales"
-              stroke="#8884d8"
+              stroke="#03aa30"
               label={{
                 position: "bottom",
-                fill: "#8884d8",
-                fontSize: 12,
+                fill: "#03aa30",
+                fontSize: 14,
+                fontWeight: 600,
               }}
             />
             <Line
@@ -110,11 +112,12 @@ export function ActivationSalesChart({
               type="monotone"
               dataKey="averageSales"
               name="Promedio de ventas"
-              stroke="#82ca9d"
+              stroke="#ffae00"
               label={{
                 position: "top",
-                fill: "#82ca9d",
-                fontSize: 12,
+                fill: "#ffae00",
+                fontSize: 14,
+                fontWeight: 600,
               }}
             />
           </LineChart>

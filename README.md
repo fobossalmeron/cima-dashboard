@@ -1,9 +1,5 @@
 # General
 
-## KPIs
-
-- Evolución de ventas y activaciones le falta contraste a los colores
-
 # Sampling
 
 - Velocity promedio por hora. COMO SE SACA EL VELOCITY DE UNA HORA PARTICULAR?
