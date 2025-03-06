@@ -31,7 +31,7 @@ export function OldAndNewActivationsChart({
   data: OldAndNewActivationsChartData[];
 }) {
   return (
-    <Card className="md:col-span-2">
+    <Card className="md:col-span-2 print:col-span-2">
       <CardHeader>
         <CardTitle>Activaciones en tiendas nuevas y anteriores</CardTitle>
       </CardHeader>

@@ -40,7 +40,7 @@ export function PDVProductImages({ data }: { data: PDVProductImagesData[] }) {
         <CardTitle>Imágenes del producto en puntos de venta</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 print:grid-cols-4 gap-4">
           {currentImages.map((image, index) => (
             <div key={index} className="space-y-2">
               <div className="relative aspect-square group">

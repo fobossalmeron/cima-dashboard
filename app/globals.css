@@ -147,3 +147,71 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Estilos para impresión */
+@media print {
+  body,
+  html,
+  main {
+    height: auto !important;
+    overflow: visible !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body {
+    width: 1800px !important;
+    margin: 0 auto !important;
+    transform: scale(1);
+    transform-origin: top left;
+  }
+
+  /* Ajustar márgenes y tamaño de página */
+  @page {
+    size: A3 portrait;
+    margin: 0.5cm 0cm 0cm 0cm;
+  }
+
+  /* Asegurar que los mapas se muestren correctamente */
+  [class*="map"] {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Asegurar que las tablas se muestren correctamente */
+  table,
+  [class*="table"] {
+    /* width: 100% !important;
+    border-collapse: collapse !important; */
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  table th,
+  table td,
+  [class*="table"] th,
+  [class*="table"] td {
+    /* border: 1px solid #ddd !important;
+    padding: 8px !important; */
+  }
+
+  /* Asegurar que los KPIs se muestren correctamente */
+  [class*="kpi"],
+  [class*="card"] {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Asegurar que los encabezados se muestren correctamente */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+}

@@ -32,9 +32,9 @@ export function MobileFilters() {
           <SheetTitle>Filtros</SheetTitle>
         </SheetHeader>
         <div className="mt-4">
-          <Filters className="flex-col items-start justify-start" />
+          <Filters className="flex-col items-start justify-start" mobile />
         </div>
       </SheetContent>
     </Sheet>
   );
-} 
+}

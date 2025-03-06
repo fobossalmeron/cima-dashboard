@@ -11,7 +11,13 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 import { navItems } from "@/data/nav";
 import Link from "next/link";
 
@@ -39,10 +45,16 @@ export function MobileNav({ clientName }: { clientName: string }) {
           <NavigationMenuList className="flex flex-col gap-4 items-start justify-center w-full">
             {navItems.map((item) => (
               <NavigationMenuItem key={item.path}>
-                <Link href={`/${clientName}${item.path}`} legacyBehavior passHref>
-                  <NavigationMenuLink 
+                <Link
+                  href={`/${clientName}/${item.path}`}
+                  legacyBehavior
+                  passHref
+                >
+                  <NavigationMenuLink
                     className={`${navigationMenuTriggerStyle()} ${
-                      pathname === item.path ? "bg-accent text-accent-foreground" : ""
+                      pathname === `/${clientName}/${item.path}`
+                        ? "bg-accent text-accent-foreground"
+                        : ""
                     }`}
                   >
                     {item.title}

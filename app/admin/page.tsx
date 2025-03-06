@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/dialog";
 import { DashboardForm } from "@/components/dashboard-form";
 import { RefreshCcw } from "lucide-react";
-import CimaLogo from "@/public/cima.png";
+// import CimaLogo from "@/public/cima.png";
+import CimaSVG from "@/public/cima.svg";
 import Image from "next/image";
 import { LogOut } from "lucide-react";
 import {
@@ -94,11 +95,7 @@ export default function AdminPage() {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="border-green-500 text-green-500 hover:bg-green-50 hover:text-green-600"
-                    >
+                    <Button asChild variant="primary-outline">
                       <div>
                         <RefreshCcw className="mr-2 h-4 w-4" />
                         <Link href={`/${client.slug}`}>Resync</Link>
@@ -121,7 +118,7 @@ export default function AdminPage() {
     <div>
       <header className="flex w-full items-center border-b bg-background">
         <div className="flex w-full items-center justify-between gap-2 px-6 py-4">
-          <Image src={CimaLogo} alt="Cima Logo" width={80} height={100} />
+          <Image src={CimaSVG} alt="Cima Logo" width={80} height={100} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -161,10 +158,10 @@ export default function AdminPage() {
               <DialogTrigger asChild>
                 <Button variant="default">
                   <PlusCircle className="mr-2 h-4 w-4" />
-                  Crear nuevo dashboard
+                  Nuevo dashboard
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="!max-w-[400px]">
                 <DialogHeader>
                   <DialogTitle>Crear nuevo dashboard</DialogTitle>
                 </DialogHeader>

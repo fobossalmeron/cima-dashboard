@@ -126,7 +126,7 @@ export default function ProductInfo() {
     <div className="space-y-6">
       <Header title="Información del producto" />
       <Content>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-6">
           <PDVTypeChart data={PDVTypeChartDummy} />
           <ProductLocationInPDVChart data={ProductLocationInPVDChartDummy} />
           <ProductStatusInPDVChart data={ProductStatusInPDVChartDummy} />
