@@ -11,7 +11,8 @@ export default async function ClientLayout({
   children: ReactNode;
   params: { client: string };
 }) {
-  const clientData = await getClientData(params.client);
+  const resolvedParams = await params;
+  const clientData = await getClientData(resolvedParams.client);
 
   if (!clientData) {
     notFound();
@@ -25,4 +26,4 @@ export default async function ClientLayout({
       {children}
     </ClientProvider>
   );
-} 
+}

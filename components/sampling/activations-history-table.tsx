@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Table,
@@ -7,7 +7,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   ColumnDef,
   flexRender,
@@ -16,16 +16,11 @@ import {
   SortingState,
   getSortedRowModel,
   getPaginationRowModel,
-} from "@tanstack/react-table"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { ArrowUpDown } from "lucide-react"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+} from "@tanstack/react-table";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ArrowUpDown } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Pagination,
   PaginationContent,
@@ -33,38 +28,28 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
-import { activations } from "@/data/dummy-activations"
+} from "@/components/ui/pagination";
+import { ActivationsHistoryTableData } from "./sampling.types";
 
-interface Activation {
-  fecha: string
-  marca: string
-  pdv: string
-  direccion: string
-  ventasTotales: number
-  promedioVentas: number
-  velocity: number
-}
-
-const columns: ColumnDef<Activation>[] = [
+const columns: ColumnDef<ActivationsHistoryTableData>[] = [
   {
-    accessorKey: "fecha",
+    accessorKey: "date",
     header: "Fecha",
   },
   {
-    accessorKey: "marca",
+    accessorKey: "brand",
     header: "Marca",
   },
   {
-    accessorKey: "pdv",
+    accessorKey: "locationName",
     header: "Punto de venta",
   },
   {
-    accessorKey: "direccion",
+    accessorKey: "address",
     header: "Dirección",
   },
   {
-    accessorKey: "ventasTotales",
+    accessorKey: "sales",
     header: ({ column }) => {
       return (
         <Button
@@ -75,17 +60,10 @@ const columns: ColumnDef<Activation>[] = [
           Ventas Totales
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => {
-      return <div className="text-center">{row.getValue("ventasTotales")}</div>
-    },
-  },
-  {
-    accessorKey: "promedioVentas",
-    header: "Promedio de Ventas",
-    cell: ({ row }) => {
-      return <div className="text-center">{row.getValue("promedioVentas")}</div>
+      return <div className="text-center">{row.getValue("sales")}</div>;
     },
   },
   {
@@ -100,21 +78,35 @@ const columns: ColumnDef<Activation>[] = [
           Velocity
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => {
-      return <div className="text-center">{row.getValue("velocity")}</div>
+      return <div className="text-center">{row.getValue("velocity")}</div>;
     },
   },
-]
+];
 
-const data: Activation[] = activations
+/**
+ * Componente que muestra una tabla con el historial de activaciones de productos.
+ *
+ * @param {ActivationsHistoryTableData[]} props.data
+ * @property {string} date - Fecha de la activación (ej. "16 Feb 2025")
+ * @property {string} brand - Marca del producto (ej. "Del Frutal", "Naturas", etc.)
+ * @property {string} locationName - Nombre de la ubicación (ej. "Presidente Supermarket 44")
+ * @property {string} address - Dirección de la ubicación (ej. "240 NE 8th St, Homestead, FL 33030")
+ * @property {number} sales - Ventas totales durante la activación
+ * @property {number} velocity - Velocidad de ventas (ventas / 4 horas que dura la activación)
+ */
 
-export function ActivationsTable() {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const pageSize = 10
-  
+export function ActivationsHistoryTable({
+  data,
+}: {
+  data: ActivationsHistoryTableData[];
+}) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
   const table = useReactTable({
     data,
     columns,
@@ -129,14 +121,14 @@ export function ActivationsTable() {
         pageSize,
       },
     },
-  })
+  });
 
-  const totalPages = Math.ceil(data.length / pageSize)
+  const totalPages = Math.ceil(data.length / pageSize);
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Historial de samplings</CardTitle>
+        <CardTitle>Historial de activaciones</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -154,7 +146,7 @@ export function ActivationsTable() {
                               header.getContext()
                             )}
                       </TableHead>
-                    )
+                    );
                   })}
                 </TableRow>
               ))}
@@ -168,14 +160,20 @@ export function ActivationsTable() {
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
                       </TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
                     No hay resultados.
                   </TableCell>
                 </TableRow>
@@ -189,13 +187,17 @@ export function ActivationsTable() {
                 <PaginationPrevious
                   href="#"
                   onClick={(e) => {
-                    e.preventDefault()
+                    e.preventDefault();
                     if (currentPage > 1) {
-                      setCurrentPage((p) => p - 1)
-                      table.previousPage()
+                      setCurrentPage((p) => p - 1);
+                      table.previousPage();
                     }
                   }}
-                  className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : ""}
+                  className={
+                    !table.getCanPreviousPage()
+                      ? "pointer-events-none opacity-50"
+                      : ""
+                  }
                 />
               </PaginationItem>
               {Array.from({ length: totalPages }).map((_, i) => (
@@ -203,9 +205,9 @@ export function ActivationsTable() {
                   <PaginationLink
                     href="#"
                     onClick={(e) => {
-                      e.preventDefault()
-                      setCurrentPage(i + 1)
-                      table.setPageIndex(i)
+                      e.preventDefault();
+                      setCurrentPage(i + 1);
+                      table.setPageIndex(i);
                     }}
                     isActive={currentPage === i + 1}
                   >
@@ -217,13 +219,17 @@ export function ActivationsTable() {
                 <PaginationNext
                   href="#"
                   onClick={(e) => {
-                    e.preventDefault()
+                    e.preventDefault();
                     if (currentPage < totalPages) {
-                      setCurrentPage((p) => p + 1)
-                      table.nextPage()
+                      setCurrentPage((p) => p + 1);
+                      table.nextPage();
                     }
                   }}
-                  className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : ""}
+                  className={
+                    !table.getCanNextPage()
+                      ? "pointer-events-none opacity-50"
+                      : ""
+                  }
                 />
               </PaginationItem>
             </PaginationContent>
@@ -231,5 +237,5 @@ export function ActivationsTable() {
         </div>
       </CardContent>
     </Card>
-  )
-} 
+  );
+}

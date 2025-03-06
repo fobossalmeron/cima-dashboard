@@ -19,37 +19,31 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { PromoterImageData } from "./sampling.types";
 
-const images = [
-  {
-    src: "/placeholder.svg",
-    alt: "Imagen de la promotora 1",
-  },
-  {
-    src: "/placeholder.svg",
-    alt: "Imagen de la promotora 2",
-  },
-  {
-    src: "/placeholder.svg",
-    alt: "Imagen de la promotora 3",
-  },
-];
+/**
+ * Componente que muestra una galería de imágenes de promotoras en puntos de venta.
+ *
+ * @param {PromoterImageData[]} props.data
+ * @property {string} url - URL de AWS de la imagen (ej. "https://s3.amazonaws.com/bucket-name/image-name.jpg")
+ * @property {string} name - Nombre de la promotora
+ */
 
-export function PromoterImage() {
+export function PromoterImages({ data }: { data: PromoterImageData[] }) {
   const [currentPage, setCurrentPage] = useState(1);
   const imagesPerPage = 2;
-  const totalPages = Math.ceil(images.length / imagesPerPage);
+  const totalPages = Math.ceil(data.length / imagesPerPage);
 
   // Calcular las imágenes a mostrar en la página actual
   const startIndex = (currentPage - 1) * imagesPerPage;
-  const currentImages = images.slice(startIndex, startIndex + imagesPerPage);
+  const currentImages = data.slice(startIndex, startIndex + imagesPerPage);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Imagen de promotoras</CardTitle>
+        <CardTitle>Imagenes de promotoras</CardTitle>
         <CardDescription>
-          Imagen de las promotoras en el punto de venta
+          Imagenes de las promotoras en el punto de venta
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -61,8 +55,8 @@ export function PromoterImage() {
                 className="relative aspect-video group"
               >
                 <Image
-                  src={image.src}
-                  alt={image.alt}
+                  src={image.url}
+                  alt={image.name}
                   fill
                   className="object-cover rounded-lg"
                 />
@@ -70,7 +64,7 @@ export function PromoterImage() {
                   size="icon"
                   variant="secondary"
                   className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => window.open(image.src, "_blank")}
+                  onClick={() => window.open(image.url, "_blank")}
                 >
                   <Download className="h-4 w-4" />
                 </Button>
