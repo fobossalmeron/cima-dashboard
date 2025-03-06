@@ -9,7 +9,7 @@ import {
   HeatmapDataStructure,
 } from "@/components/sampling/sampling.types";
 import { ActivationsHistoryDummy } from "@/components/sampling/activations-history-table-dummy";
-
+import { TrafficDuringActivationChartData } from "@/components/sampling/sampling.types";
 const ActivationHoursHeatmapDummy: HeatmapDataStructure = {
   Lunes: {
     6: 0,
@@ -118,6 +118,14 @@ const ActivationHoursHeatmapDummy: HeatmapDataStructure = {
   },
 };
 
+const TrafficDuringActivationChartDummy: TrafficDuringActivationChartData[] = [
+  { range: "Medio", value: 37 },
+  { range: "Bajo", value: 18 },
+  { range: "Muy Bajo", value: 8 },
+  { range: "Alto", value: 23 },
+  { range: "Muy Alto", value: 15 },
+];
+
 const PromoterImagesDummy: PromoterImageData[] = [
   {
     url: "/placeholder.svg",
@@ -142,7 +150,9 @@ export default function Sampling() {
           <div className="md:col-span-2 lg:col-span-3">
             <ActivationHoursHeatmap data={ActivationHoursHeatmapDummy} />
           </div>
-          <TrafficDuringActivationChart />
+          <TrafficDuringActivationChart
+            data={TrafficDuringActivationChartDummy}
+          />
           <div className="md:col-span-2 lg:col-span-2">
             <PromoterImages data={PromoterImagesDummy} />
           </div>
