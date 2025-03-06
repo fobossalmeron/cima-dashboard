@@ -1,3 +1,9 @@
+export type WeekDay = "Lunes" | "Martes" | "Miércoles" | "Jueves" | "Viernes" | "Sábado" | "Domingo";
+
+export type HeatmapDataStructure = Record<WeekDay, {
+    [hour: number]: number;
+}>;
+
 export interface ActivationsHistoryTableData {
     date: string;
     brand: string;
