@@ -1,15 +1,22 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface HeatmapData {
-  hour: number
-  day: string
-  value: number
+  hour: number;
+  day: string;
+  value: number;
 }
 
-const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
-const hours = Array.from({ length: 13 }, (_, i) => i + 6)
+const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+const hours = Array.from({ length: 13 }, (_, i) => i + 6);
 
 // Datos predefinidos más realistas
 const data: HeatmapData[] = [
@@ -44,18 +51,19 @@ const data: HeatmapData[] = [
   // ... similar pattern for other days ...
 ].concat(
   // Generar el resto de días con valores similares
-  days.slice(2).flatMap(day =>
-    hours.map(hour => ({
+  days.slice(2).flatMap((day) =>
+    hours.map((hour) => ({
       day,
       hour,
       value: Math.min(
-        day === "Sábado" ? 
-          [10, 15, 30, 45, 55, 60, 65, 60, 50, 45, 40, 35, 30][hour - 6] :
-          [15, 25, 45, 75, 85, 90, 85, 80, 60, 70, 65, 55, 40][hour - 6]
-      , 100)
+        day === "Sábado"
+          ? [10, 15, 30, 45, 55, 60, 65, 60, 50, 45, 40, 35, 30][hour - 6]
+          : [15, 25, 45, 75, 85, 90, 85, 80, 60, 70, 65, 55, 40][hour - 6],
+        100
+      ),
     }))
   )
-)
+);
 
 export function ActivationHoursHeatmap() {
   return (
@@ -68,69 +76,62 @@ export function ActivationHoursHeatmap() {
       </CardHeader>
       <CardContent>
         <div className="py-4">
-          <div className="flex gap-4">
-            {/* Etiquetas del eje Y (horas) */}
-            <div className="flex flex-col justify-between py-[2px] text-sm text-muted-foreground">
-              {hours.map((hour) => (
-                <div key={hour} className="h-[calc((100%-10px)/13)]">
+          {/* Grid principal que incluye etiquetas y datos */}
+          <div
+            className="grid"
+            style={{
+              gridTemplateColumns: `auto repeat(${days.length}, 1fr)`,
+              gap: "2px",
+            }}
+          >
+            {/* Celda vacía en la esquina superior izquierda */}
+            <div className="h-8"></div>
+
+            {/* Etiquetas del eje X (días) */}
+            {days.map((day) => (
+              <div
+                key={day}
+                className="text-center text-xs text-muted-foreground h-8 flex items-center justify-center"
+              >
+                {day}
+              </div>
+            ))}
+
+            {/* Filas con etiquetas de horas y celdas de datos */}
+            {hours.map((hour) => (
+              <React.Fragment key={`row-${hour}`}>
+                {/* Etiqueta de hora */}
+                <div className="text-sm text-muted-foreground pr-2 flex items-center justify-end min-h-[32px]">
                   {`${hour}:00`}
                 </div>
-              ))}
-            </div>
 
-            {/* Grid del heatmap y etiquetas del eje X */}
-            <div className="flex-1">
-              {/* Etiquetas del eje X (días) */}
-              <div
-                className="grid mb-2"
-                style={{
-                  gridTemplateColumns: `repeat(${days.length}, minmax(0, 1fr))`,
-                  gap: "2px",
-                }}
-              >
-                {days.map((day) => (
-                  <div 
-                    key={day} 
-                    className="text-center text-xs text-muted-foreground"
-                  >
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              {/* Grid del heatmap */}
-              <div
-                className="grid"
-                style={{
-                  gridTemplateColumns: `repeat(${days.length}, minmax(0, 1fr))`,
-                  gridTemplateRows: `repeat(${hours.length}, 1fr)`,
-                  gap: "2px",
-                }}
-              >
-                {hours.map((hour) =>
-                  days.map((day) => {
-                    const cellData = data.find(d => d.day === day && d.hour === hour)
-                    const value = cellData?.value || 0
-                    return (
-                      <div
-                        key={`${hour}-${day}`}
-                        className="relative flex items-center justify-center rounded-sm px-2 py-3 min-h-[32px] transition-colors hover:opacity-90"
-                        style={{
-                          backgroundColor: `hsl(0, 75%, ${100 - (value / 100) * 50}%)`,
-                        }}
-                      >
-                        <span className="absolute text-xs font-medium text-white mix-blend-difference">
-                          {value}
-                        </span>
-                      </div>
-                    )
-                  }),
-                )}
-              </div>
-            </div>
+                {/* Celdas de datos para esta hora */}
+                {days.map((day) => {
+                  const cellData = data.find(
+                    (d) => d.day === day && d.hour === hour
+                  );
+                  const value = cellData?.value || 0;
+                  return (
+                    <div
+                      key={`${hour}-${day}`}
+                      className="relative flex items-center justify-center rounded-sm px-2 py-3 min-h-[32px] transition-colors hover:opacity-90"
+                      style={{
+                        backgroundColor: `hsl(0, 75%, ${
+                          100 - (value / 100) * 50
+                        }%)`,
+                      }}
+                    >
+                      <span className="absolute text-xs font-medium text-white mix-blend-difference">
+                        {value}
+                      </span>
+                    </div>
+                  );
+                })}
+              </React.Fragment>
+            ))}
           </div>
         </div>
       </CardContent>
     </Card>
-  )
-} 
+  );
+}
