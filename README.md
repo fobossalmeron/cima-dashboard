@@ -1,14 +1,6 @@
 # General
 
-# Sampling
-
-- Velocity promedio por hora. COMO SE SACA EL VELOCITY DE UNA HORA PARTICULAR?
-
 # Ventas
-
-Falta trabajar toda la pestaña
-
-# Promotoras
 
 Falta trabajar toda la pestaña
 

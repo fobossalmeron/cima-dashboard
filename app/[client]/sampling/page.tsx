@@ -10,6 +10,18 @@ import {
 } from "@/components/sampling/sampling.types";
 import { ActivationsHistoryDummy } from "@/components/sampling/activations-history-table-dummy";
 import { TrafficDuringActivationChartData } from "@/components/sampling/sampling.types";
+
+/**
+ * VELOCITY POR HORA
+ *
+ * Información importante:
+ * - Cada activación dura 4 horas (estándar de la industria)
+ * - El cálculo de velocity por hora:
+ *   - Se asigna el mismo velocity de la activación a las 4 horas que dura
+ *   - Con el tiempo, las horas se irán empalmando (ej: activaciones que comienzan
+ *     a las 2pm, 3pm, 4pm) lo que hará que los datos sean más precisos
+ */
+
 const ActivationHoursHeatmapDummy: HeatmapDataStructure = {
   Lunes: {
     6: 0,
@@ -147,14 +159,14 @@ export default function Sampling() {
       <Header title="Sampling" />
       <Content>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="md:col-span-2 lg:col-span-3">
-            <ActivationHoursHeatmap data={ActivationHoursHeatmapDummy} />
-          </div>
           <TrafficDuringActivationChart
             data={TrafficDuringActivationChartDummy}
           />
           <div className="md:col-span-2 lg:col-span-2">
             <PromoterImages data={PromoterImagesDummy} />
+          </div>
+          <div className="md:col-span-2 lg:col-span-3">
+            <ActivationHoursHeatmap data={ActivationHoursHeatmapDummy} />
           </div>
           <div className="md:col-span-2 lg:col-span-3">
             <ActivationsHistoryTable data={ActivationsHistoryDummy} />
