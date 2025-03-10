@@ -16,16 +16,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Image from "next/image";
+import { ProductSalesData } from "@/components/sales/sales.types";
 
-interface ProductSalesData {
-  id: number;
-  presentation: string;
-  flavor: string;
-  sales: number;
-  image: string;
-}
-
-export function ProductSalesChart({
+export function ProductSalesTable({
   data,
   title,
 }: {
@@ -33,6 +26,7 @@ export function ProductSalesChart({
   title: string;
 }) {
   const totalVentas = data.reduce((sum, item) => sum + item.sales, 0);
+  const numberFormatter = new Intl.NumberFormat("es-MX");
 
   return (
     <div className="space-y-8">
@@ -67,7 +61,7 @@ export function ProductSalesChart({
                     {item.presentation}
                   </TableCell>
                   <TableCell className="text-center">
-                    {item.sales.toLocaleString()}
+                    {numberFormatter.format(item.sales)}
                   </TableCell>
                 </TableRow>
               ))}
@@ -75,7 +69,7 @@ export function ProductSalesChart({
                 <TableCell className="pt-4">Total</TableCell>
                 <TableCell className="pt-4"></TableCell>
                 <TableCell className="text-center pt-4">
-                  {totalVentas.toLocaleString()}
+                  {numberFormatter.format(totalVentas)}
                 </TableCell>
               </TableRow>
             </TableBody>

@@ -4,7 +4,17 @@ import { Header } from "@/components/header";
 import { Content } from "@/components/content";
 import { products } from "@/data/brands";
 import { TotalSalesByBrand } from "@/components/sales/total-sales-by-brand-chart";
-import { ProductSalesChart } from "@/components/sales/product-sales-chart";
+import { ProductSalesTable } from "@/components/sales/product-sales-table";
+import { TotalSalesByBrandData } from "@/components/sales/sales.types";
+
+const TotalSalesByBrandDummy: TotalSalesByBrandData[] = [
+  { brand: "Del Frutal Aguas Frescas", quantity: 5100 },
+  { brand: "Del Frutal Néctares", quantity: 2600 },
+  { brand: "Del Frutal Pulpa", quantity: 4300 },
+  { brand: "Raptor Energy Drink", quantity: 1000 },
+  { brand: "Naturas Néctares", quantity: 1000 },
+  { brand: "Naturas Pulpa", quantity: 1000 },
+];
 
 export default function Sales() {
   // Filtrar productos por marca y submarca
@@ -62,12 +72,12 @@ export default function Sales() {
       <Header title="Ventas" />
       <Content>
         <div className="w-full">
-          <TotalSalesByBrand />
+          <TotalSalesByBrand data={TotalSalesByBrandDummy} />
         </div>
         <h2 className="text-lg font-bold">Raptor Energy Drink</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="md:col-span-2">
-            <ProductSalesChart
+            <ProductSalesTable
               title="Raptor Energy Drink"
               data={raptorEnergyDrink}
             />
@@ -78,42 +88,42 @@ export default function Sales() {
           Del Frutal
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <ProductSalesChart
+          <ProductSalesTable
             title="Del Frutal Néctar - Tetrapack 1L"
             data={delFrutalNectaresTetra}
           />
-          <ProductSalesChart
+          <ProductSalesTable
             title="Del Frutal Néctar - Lata"
             data={delFrutalNectaresLata}
           />
-          <ProductSalesChart
+          <ProductSalesTable
             title="Del Frutal Néctar - 3 Pack 200ml"
             data={delFrutalNectares3Pack}
           />
-          <ProductSalesChart
+          <ProductSalesTable
             title="Del Frutal Aguas Frescas"
             data={delFrutalAguasFrescas}
           />
-          <ProductSalesChart title="Del Frutal Pulpa" data={delFrutalPulpa} />
+          <ProductSalesTable title="Del Frutal Pulpa" data={delFrutalPulpa} />
         </div>
 
         <h2 className="text-lg font-bold lg:col-span-3 md:col-span-2">
           Naturas
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <ProductSalesChart
+          <ProductSalesTable
             title="Naturas Néctar - Lata"
             data={naturasNectaresLata}
           />
-          <ProductSalesChart
+          <ProductSalesTable
             title="Naturas Néctar - Tetrapack 1L"
             data={naturasNectaresTetra}
           />
-          <ProductSalesChart
+          <ProductSalesTable
             title="Naturas Néctar - 3 Pack 200ml"
             data={naturasNectares3Pack}
           />
-          <ProductSalesChart title="Naturas Pulpa" data={naturasPulpa} />
+          <ProductSalesTable title="Naturas Pulpa" data={naturasPulpa} />
         </div>
       </Content>
     </div>
