@@ -6,7 +6,6 @@ export interface TotalSalesByBrandData {
 
 export interface ProductSalesData {
     id: number;
-    presentation: string;
     flavor: string;
     sales: number;
     image: string;

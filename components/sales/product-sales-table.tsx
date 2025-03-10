@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -33,15 +27,13 @@ export function ProductSalesTable({
       <Card>
         <CardHeader>
           <CardTitle>{title}</CardTitle>
-          <CardDescription>Unidades vendidas</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Sabor</TableHead>
-                <TableHead className="text-center">Presentación</TableHead>
-                <TableHead className="text-center">Unidades</TableHead>
+                <TableHead>Presentación</TableHead>
+                <TableHead className="text-end">Unidades vendidas</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -57,18 +49,14 @@ export function ProductSalesTable({
                     />
                     {item.flavor}
                   </TableCell>
-                  <TableCell className="text-center">
-                    {item.presentation}
-                  </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-end">
                     {numberFormatter.format(item.sales)}
                   </TableCell>
                 </TableRow>
               ))}
               <TableRow className="font-medium border-t">
                 <TableCell className="pt-4">Total</TableCell>
-                <TableCell className="pt-4"></TableCell>
-                <TableCell className="text-center pt-4">
+                <TableCell className="text-end pt-4">
                   {numberFormatter.format(totalVentas)}
                 </TableCell>
               </TableRow>
