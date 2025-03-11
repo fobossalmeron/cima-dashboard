@@ -40,7 +40,7 @@ export function ConsumerImages({ data }: { data: ConsumerImagesData[] }) {
         <CardTitle>Imágenes de consumidores y producto</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:grid-cols-2">
           {currentImages.map((image, index) => (
             <div key={index} className="space-y-2">
               <div className="relative aspect-video group">

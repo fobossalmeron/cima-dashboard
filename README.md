@@ -8,12 +8,6 @@ Falta trabajar toda la pestaña
 
 ## Consumidor
 
-- Distribución por género no imprime correctamente los labels
-- Distribución por etnia no imprime correctamente los labels
-
-## Sampling
-
-- Velocity promedio por hora no imprime en print
-- Tráfico durante samplings se encima en print
+- Se hace de dos páginas
 
 NUEVO REPORTE DEMOS - EDT BEBIDAS

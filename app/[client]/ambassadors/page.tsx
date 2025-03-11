@@ -101,13 +101,11 @@ export default function BrandAmbassadors() {
     <div>
       <Header title="Embajadoras de marca" />
       <Content>
-        <div className="grid grid-cols-1 gap-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <SalesByAmbassadorChart data={AmbassadorsDataDummy} />
-            <AmbassadorsTable data={AmbassadorsDataDummy} />
-          </div>
-          <ActivationsVsSalesChart data={AmbassadorsDataDummy} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 print:grid-cols-2 gap-6">
+          <SalesByAmbassadorChart data={AmbassadorsDataDummy} />
+          <AmbassadorsTable data={AmbassadorsDataDummy} />
         </div>
+        <ActivationsVsSalesChart data={AmbassadorsDataDummy} />
       </Content>
     </div>
   );

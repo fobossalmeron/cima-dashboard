@@ -141,10 +141,10 @@ export default function ClientDashboard() {
     <div>
       <Header title={"KPIs Generales"} />
       <Content>
-        <div className="w-full grid grid-cols-1 lg:grid-cols-[67%_31%] gap-8">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-[67%_31%] print:grid-cols-[67%_31%] gap-8">
           <Maps data={MapsDataDummy} />
           <Kpis data={KpisDummy} />
-          <div className="col-span-1 lg:col-span-2">
+          <div className="col-span-1 lg:col-span-2 print:col-span-2">
             <ActivationSalesChart data={ActivationSalesChartDummy} />
           </div>
         </div>

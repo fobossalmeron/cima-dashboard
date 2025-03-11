@@ -6,13 +6,33 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-  Legend,
   Tooltip,
   TooltipProps,
 } from "recharts";
 import { GenderDistributionChartData } from "./consumer.types";
 
 const COLORS = ["#FF69B4", "#4169E1", "#9370DB"];
+
+const CustomLegend = ({ data }: { data: GenderDistributionChartData[] }) => {
+  return (
+    <div className="flex justify-center gap-3 print:static">
+      {data.map((entry, index) => (
+        <div key={`legend-${index}`} className="flex items-center gap-2">
+          <div
+            className="w-3 h-3 rounded-full"
+            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+          />
+          <span
+            className="text-sm"
+            style={{ color: COLORS[index % COLORS.length] }}
+          >
+            {entry.gender}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 /**
  * Componente que muestra un gráfico circular con la distribución de consumidores por género.
@@ -21,6 +41,7 @@ const COLORS = ["#FF69B4", "#4169E1", "#9370DB"];
  * @property {string} gender - Nombre del género (ej. "Hombre", "Mujer", "Otro")
  * @property {number} quantity - Cantidad de consumidores de este género
  */
+
 export function GenderDistributionChart({
   data,
 }: {
@@ -37,12 +58,12 @@ export function GenderDistributionChart({
         <CardTitle>Distribución por género</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={280}>
           <PieChart>
             <Pie
               data={formattedData}
               cx="50%"
-              cy="50%"
+              cy="40%"
               labelLine={false}
               outerRadius={80}
               fill="#8884d8"
@@ -79,9 +100,9 @@ export function GenderDistributionChart({
                 return null;
               }}
             />
-            <Legend wrapperStyle={{ fontSize: "14px" }} />
           </PieChart>
         </ResponsiveContainer>
+        <CustomLegend data={data} />
       </CardContent>
     </Card>
   );

@@ -9,7 +9,6 @@ import {
   ResponsiveContainer,
   Tooltip,
   Label,
-  Legend,
 } from "recharts";
 import { PDVTypeChartData } from "./product.types";
 
@@ -75,7 +74,7 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
         <CardTitle>Tipo de punto de venta</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={260}>
           <PieChart>
             <Pie
               data={data}
@@ -126,14 +125,30 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
               />
             </Pie>
             <Tooltip content={<CustomTooltip />} />
-            <Legend
-              layout="horizontal"
-              verticalAlign="bottom"
-              align="center"
-              wrapperStyle={{ fontSize: "14px", paddingTop: "20px" }}
-            />
           </PieChart>
         </ResponsiveContainer>
+        <div className="flex flex-wrap justify-center gap-3 gap-y-1">
+          {data.map((entry, index) => (
+            <div
+              key={`legend-${index}`}
+              className="flex items-center gap-2"
+              style={{
+                breakInside: "avoid",
+              }}
+            >
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+              />
+              <span
+                className="text-sm"
+                style={{ color: COLORS[index % COLORS.length] }}
+              >
+                {entry.type}
+              </span>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

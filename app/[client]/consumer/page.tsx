@@ -156,18 +156,22 @@ const ConsumerImagesDummy: ConsumerImagesData[] = [
 
 export default function ConsumerProfile() {
   return (
-    <div className="space-y-6">
+    <div>
       <Header title="Perfil del consumidor" />
       <Content>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 print:grid-cols-3 gap-6">
           <AgeDistributionChart data={AgeDistributionChartDummy} />
           <GenderDistributionChart data={GenderDistributionChartDummy} />
           <EthnicityDistributionChart data={EthnicityDistributionChartDummy} />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 print:grid-cols-3 gap-6 mt-6">
           <PurchaseFactorsChart data={PurchaseFactorsChartDummy} />
           <ConsumptionMomentsChart data={ConsumptionMomentsChartDummy} />
           <NetPromoterScoreChart data={NetPromoterScoreChartDummy} />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 print:grid-cols-3 gap-6 mt-6">
           <ConsumerFeedback data={ConsumerFeedbackDummy} />
-          <div className="col-span-1 lg:col-span-2">
+          <div className="col-span-1 lg:col-span-2 print:col-span-2">
             <ConsumerImages data={ConsumerImagesDummy} />
           </div>
         </div>

@@ -1,0 +1,201 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelos básicos que podrías necesitar
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      Role     @default(SUPER_ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  client Client?
+
+  @@map("users")
+}
+
+enum Role {
+  CLIENT
+  SUPER_ADMIN
+}
+
+enum QuestionGroupType {
+  BASIC
+  MATRIX
+}
+
+enum QuestionType {
+  CHECKBOX
+  SELECT
+  MULTISELECT
+  DATE
+  NUMERIC
+  TEXT
+  PHOTO
+}
+
+// Aquí puedes agregar más modelos según tus necesidades
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id])
+  dashboards    Dashboard[]
+
+  @@index([userId])
+  @@map("clients")
+}
+
+model Dashboard {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id])
+  templateId String
+  template  FormTemplate @relation(fields: [templateId], references: [id])
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([templateId])
+  @@map("dashboards")
+}
+
+model FormTemplate {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  active          Boolean  @default(true)
+  sortOrder       Int
+  version         Int      @default(1)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdBy       String
+  updatedBy       String
+
+  // Relaciones
+  dashboards      Dashboard[]
+  questionGroups  QuestionGroup[]
+  questions       Question[]
+
+  @@map("form_templates")
+}
+
+model Question {
+  id                  String   @id @default(cuid())
+  name                String
+  type                QuestionType
+  sortOrder           Int
+  isMandatory         Boolean  @default(false)
+  isAutoFill          Boolean  @default(false)
+  forImageRecognition Boolean @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relaciones
+  formTemplateId      String
+  formTemplate        FormTemplate @relation(fields: [formTemplateId], references: [id])
+  questionGroupId     String?
+  questionGroup       QuestionGroup? @relation(fields: [questionGroupId], references: [id])
+  options             QuestionOption[]
+  attachments         QuestionAttachment[]
+  triggers            QuestionTrigger[]
+
+  @@index([formTemplateId])
+  @@index([questionGroupId])
+  @@map("questions")
+}
+
+model QuestionOption {
+  id        String   @id @default(cuid())
+  value     String
+  sortOrder Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id])
+  triggers   QuestionTrigger[]
+
+  @@index([questionId])
+  @@map("question_options")
+}
+
+model QuestionAttachment {
+  id        String   @id @default(cuid())
+  url       String
+  type      String
+  name      String
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id])
+
+  @@index([questionId])
+  @@map("question_attachments")
+}
+
+model QuestionGroup {
+  id        String   @id @default(cuid())
+  name      String
+  type      QuestionGroupType @default(BASIC)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  formTemplateId String
+  formTemplate   FormTemplate @relation(fields: [formTemplateId], references: [id])
+  questions      Question[]
+  triggers       QuestionTrigger[]
+
+  @@index([formTemplateId])
+  @@map("question_groups")
+}
+
+model QuestionTrigger {
+  id        String   @id @default(cuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id])
+  groupId    String?
+  group      QuestionGroup? @relation(fields: [groupId], references: [id])
+  optionId   String?
+  option     QuestionOption? @relation(fields: [optionId], references: [id])
+
+  @@index([questionId])
+  @@index([groupId])
+  @@index([optionId])
+  @@map("question_triggers")
+}
+
+model ServiceToken {
+  id        String   @id @default(cuid())
+  service   String   @unique // nombre del servicio (e.g., "repsly")
+  token     String
+  fingerprint String
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([service])
+  @@map("service_tokens")
+}
