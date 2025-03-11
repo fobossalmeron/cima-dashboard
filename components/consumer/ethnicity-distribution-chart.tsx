@@ -6,7 +6,6 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-  Legend,
   Tooltip,
   TooltipProps,
 } from "recharts";
@@ -37,12 +36,12 @@ export function EthnicityDistributionChart({
         <CardTitle>Distribución por etnia</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={280}>
           <PieChart>
             <Pie
               data={formattedData}
               cx="50%"
-              cy="50%"
+              cy="40%"
               labelLine={false}
               outerRadius={80}
               fill="#8884d8"
@@ -83,9 +82,30 @@ export function EthnicityDistributionChart({
                 return null;
               }}
             />
-            <Legend wrapperStyle={{ fontSize: "14px" }} />
           </PieChart>
         </ResponsiveContainer>
+        <div className="flex flex-wrap justify-center gap-3 gap-y-1">
+          {formattedData.map((entry, index) => (
+            <div
+              key={`legend-${index}`}
+              className="flex items-center gap-2"
+              style={{
+                breakInside: "avoid",
+              }}
+            >
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+              />
+              <span
+                className="text-sm"
+                style={{ color: COLORS[index % COLORS.length] }}
+              >
+                {entry.ethnicity}
+              </span>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

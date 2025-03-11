@@ -44,7 +44,7 @@ export default function Sales() {
         <div className="w-full">
           <TotalSalesByBrand data={TotalSalesByBrandDummy} />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-6">
           {Object.entries(groupedProducts).flatMap(([brand, subBrands]) =>
             Object.entries(subBrands).map(([subBrand, products]) => (
               <ProductSalesTable

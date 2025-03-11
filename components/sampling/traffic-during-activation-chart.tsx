@@ -13,7 +13,6 @@ import {
   PieChart,
   ResponsiveContainer,
   Tooltip,
-  Legend,
   TooltipProps,
 } from "recharts";
 import { TrafficDuringActivationChartData } from "./sampling.types";
@@ -65,57 +64,76 @@ export function TrafficDuringActivationChart({
           Cantidad de personas en punto de venta
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex justify-between items-center">
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={orderedData}
-              cx="50%"
-              cy="40%"
-              outerRadius={80}
-              paddingAngle={0}
-              dataKey="value"
-              nameKey="range"
-              labelLine={false}
-              className="font-semibold"
-              style={{
-                fontSize: 15,
-              }}
-              label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-            >
-              {orderedData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
-              ))}
-            </Pie>
-            <Tooltip
-              content={({ active, payload }: TooltipProps<number, string>) => {
-                if (active && payload && payload.length) {
-                  const data = payload[0]
-                    .payload as TrafficDuringActivationChartData & {
-                    fill: string;
-                    detail: string;
-                  };
+      <CardContent>
+        <div className="flex flex-col items-center">
+          <ResponsiveContainer width="100%" height={280}>
+            <PieChart>
+              <Pie
+                data={orderedData}
+                cx="50%"
+                cy="40%"
+                outerRadius={80}
+                paddingAngle={0}
+                dataKey="value"
+                nameKey="range"
+                labelLine={false}
+                className="font-semibold"
+                style={{
+                  fontSize: 15,
+                }}
+                label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+              >
+                {orderedData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+              </Pie>
+              <Tooltip
+                content={({
+                  active,
+                  payload,
+                }: TooltipProps<number, string>) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0]
+                      .payload as TrafficDuringActivationChartData & {
+                      fill: string;
+                      detail: string;
+                    };
 
-                  return (
-                    <div className="bg-white p-3 border shadow-sm">
-                      <p className="font-normal">{data.range}</p>
-                      <p className="text-gray-600">({data.detail})</p>
-                      <p style={{ color: data.fill }}>{data.value} ocasiones</p>
-                    </div>
-                  );
-                }
-                return null;
-              }}
-            />
-            <Legend
-              wrapperStyle={{ fontSize: "14px" }}
-              formatter={(value) => {
-                const item = REFERENCE.find((ref) => ref.range === value);
-                return <span style={{ color: item?.fill }}>{value}</span>;
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
+                    return (
+                      <div className="bg-white p-3 border shadow-sm">
+                        <p className="font-normal">{data.range}</p>
+                        <p className="text-gray-600">({data.detail})</p>
+                        <p style={{ color: data.fill }}>
+                          {data.value} ocasiones
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="flex flex-wrap justify-center gap-3 gap-y-1">
+            {REFERENCE.map((entry, index) => (
+              <div
+                key={`legend-${index}`}
+                className="flex items-center gap-2"
+                style={{
+                  breakInside: "avoid",
+                }}
+              >
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: entry.fill }}
+                />
+                <span className="text-sm" style={{ color: entry.fill }}>
+                  {entry.range}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

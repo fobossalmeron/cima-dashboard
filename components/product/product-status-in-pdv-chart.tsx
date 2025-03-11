@@ -1,14 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Legend,
-  Tooltip,
-} from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { ProductStatusInPDVChartData } from "./product.types";
 
 const COLORS = ["#00C49F", "#FF8042"];
@@ -67,7 +60,7 @@ export function ProductStatusInPDVChart({
         <CardTitle>¿Producto en promoción?</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={260}>
           <PieChart>
             <Pie
               data={data}
@@ -90,14 +83,30 @@ export function ProductStatusInPDVChart({
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
-            <Legend
-              layout="horizontal"
-              verticalAlign="bottom"
-              align="center"
-              wrapperStyle={{ fontSize: "14px", paddingTop: "20px" }}
-            />
           </PieChart>
         </ResponsiveContainer>
+        <div className="flex flex-wrap justify-center gap-3 gap-y-1">
+          {data.map((entry, index) => (
+            <div
+              key={`legend-${index}`}
+              className="flex items-center gap-2"
+              style={{
+                breakInside: "avoid",
+              }}
+            >
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+              />
+              <span
+                className="text-sm"
+                style={{ color: COLORS[index % COLORS.length] }}
+              >
+                {entry.type}
+              </span>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

@@ -158,17 +158,19 @@ export default function Sampling() {
     <div className="space-y-6">
       <Header title="Sampling" />
       <Content>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <TrafficDuringActivationChart
-            data={TrafficDuringActivationChartDummy}
-          />
-          <div className="md:col-span-2 lg:col-span-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-6">
+          <div className="lg:col-span-1 md:col-span-2">
+            <TrafficDuringActivationChart
+              data={TrafficDuringActivationChartDummy}
+            />
+          </div>
+          <div className="md:col-span-2 lg:col-span-2 print:col-span-2">
             <PromoterImages data={PromoterImagesDummy} />
           </div>
-          <div className="md:col-span-2 lg:col-span-3">
+          <div className="md:col-span-2 lg:col-span-3 print:col-span-3">
             <ActivationHoursHeatmap data={ActivationHoursHeatmapDummy} />
           </div>
-          <div className="md:col-span-2 lg:col-span-3">
+          <div className="md:col-span-2 lg:col-span-3 print:col-span-3">
             <ActivationsHistoryTable data={ActivationsHistoryDummy} />
           </div>
         </div>
