@@ -1,9 +1,5 @@
 # General
 
-# Ventas
-
-Falta trabajar toda la pestaña
-
 # Print
 
 ## Consumidor

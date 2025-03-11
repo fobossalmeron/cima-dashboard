@@ -1,34 +1,41 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
+import { TotalSalesByBrandData } from "@/components/sales/sales.types";
 
-const data = [
-  { tipo: "Del Frutal Aguas Frescas", unidades: 5100 },
-  { tipo: "Del Frutal Néctares", unidades: 2600 },
-  { tipo: "Del Frutal Pulpa", unidades: 4300 },
-  { tipo: "Raptor Energy Drink", unidades: 1000 },
-  { tipo: "Naturas Néctares", unidades: 1000 }, 
-  { tipo: "Naturas Pulpa", unidades: 1000 }, 
-]
+/**
+ * Componente que muestra un gráfico de barras con el total de ventas por marca.
+ *
+ * @param {TotalSalesByBrandData[]} props.data
+ * @property {string} brand - Nombre de la marca
+ * @property {number} quantity - Cantidad de ventas de esta marca
+ */
 
-// Array de colores que podemos usar para cualquier marca
 const chartColors = [
-  "#FF6B6B", // rojo coral
-  "#4ECDC4", // turquesa
-  "#45B7D1", // azul claro
-  "#96CEB4", // verde menta
-  "#FFEEAD", // amarillo pastel
-  "#D4A5A5", // rosa antiguo
-  "#9B786F", // marrón
-  "#6C88C4", // azul acero
-  "#FFB6B9", // rosa salmón
-  "#8785A2"  // púrpura gris
-]
+  "#FF6B6B",
+  "#4ECDC4",
+  "#45B7D1",
+  "#96CEB4",
+  "#FFEEAD",
+  "#D4A5A5",
+  "#9B786F",
+  "#6C88C4",
+  "#FFB6B9",
+  "#8785A2",
+];
 
-export function TotalSalesByBrand() {
-  // Ordenar los datos por unidades de mayor a menor
-  const sortedData = [...data].sort((a, b) => b.unidades - a.unidades);
+export function TotalSalesByBrand({ data }: { data: TotalSalesByBrandData[] }) {
+  const sortedData = [...data].sort((a, b) => b.quantity - a.quantity);
 
   return (
     <Card>
@@ -39,23 +46,25 @@ export function TotalSalesByBrand() {
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={sortedData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="tipo" fontSize={12} />
-            <YAxis 
-              tickFormatter={(value) => `${value.toLocaleString()}`} 
-              fontSize={12} 
+            <XAxis dataKey="brand" fontSize={12} />
+            <YAxis
+              tickFormatter={(value) => `${value.toLocaleString()}`}
+              fontSize={12}
             />
-            <Tooltip 
+            <Tooltip
               formatter={(value: number) => [`${value} unidades vendidas`]}
             />
-            <Bar dataKey="unidades" fill="#000">
+            <Bar dataKey="quantity" fill="#000">
               {sortedData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={chartColors[index % chartColors.length]}
+                />
               ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
-

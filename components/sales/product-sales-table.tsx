@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -16,16 +10,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Image from "next/image";
+import { ProductSalesData } from "@/components/sales/sales.types";
 
-interface ProductSalesData {
-  id: number;
-  presentation: string;
-  flavor: string;
-  sales: number;
-  image: string;
-}
-
-export function ProductSalesChart({
+export function ProductSalesTable({
   data,
   title,
 }: {
@@ -33,21 +20,20 @@ export function ProductSalesChart({
   title: string;
 }) {
   const totalVentas = data.reduce((sum, item) => sum + item.sales, 0);
+  const numberFormatter = new Intl.NumberFormat("es-MX");
 
   return (
     <div className="space-y-8">
       <Card>
         <CardHeader>
           <CardTitle>{title}</CardTitle>
-          <CardDescription>Unidades vendidas</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Sabor</TableHead>
-                <TableHead className="text-center">Presentación</TableHead>
-                <TableHead className="text-center">Unidades</TableHead>
+                <TableHead>Presentación</TableHead>
+                <TableHead className="text-end">Unidades vendidas</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -63,19 +49,15 @@ export function ProductSalesChart({
                     />
                     {item.flavor}
                   </TableCell>
-                  <TableCell className="text-center">
-                    {item.presentation}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {item.sales.toLocaleString()}
+                  <TableCell className="text-end">
+                    {numberFormatter.format(item.sales)}
                   </TableCell>
                 </TableRow>
               ))}
               <TableRow className="font-medium border-t">
                 <TableCell className="pt-4">Total</TableCell>
-                <TableCell className="pt-4"></TableCell>
-                <TableCell className="text-center pt-4">
-                  {totalVentas.toLocaleString()}
+                <TableCell className="text-end pt-4">
+                  {numberFormatter.format(totalVentas)}
                 </TableCell>
               </TableRow>
             </TableBody>
