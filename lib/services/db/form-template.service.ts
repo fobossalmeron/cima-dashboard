@@ -1,15 +1,17 @@
 import { prisma } from '@/lib/prisma'
 import { FormTemplate } from '@/types/api/form-template'
 import { QuestionGroupType, QuestionType } from '@prisma/client'
+import { RepslyApiService } from '@/lib/services/api/repsly.service'
+import { ProductMetricsService } from './product-metrics.service'
 
 export class FormTemplateDbService {
   static async createFromTemplate(
     template: FormTemplate,
     clientId: string,
     dashboardName: string,
-  ) {
+  ): Promise<FormTemplate> {
     const { Questions, QuestionGroups, ...formTemplateData } = template
-    return await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       // Crear el formulario
       const formTemplate = await tx.formTemplate.create({
         data: {
@@ -49,7 +51,7 @@ export class FormTemplateDbService {
         ),
       )
 
-      // Crear las preguntas y sus opciones
+      // Crear las preguntas
       const questions = await Promise.all(
         Questions.map(async (question) => {
           // Primero creamos la pregunta
@@ -57,15 +59,15 @@ export class FormTemplateDbService {
             data: {
               id: question.Id,
               formTemplateId: formTemplate.id,
-              sortOrder: question.SortOrder,
               type:
                 (question.Type.toUpperCase() as QuestionType) ||
                 QuestionType.TEXT,
               name: question.Name,
+              sortOrder: question.SortOrder,
               isMandatory: question.IsMandatory,
               isAutoFill: question.IsAutoFill,
-              questionGroupId: question.QuestionGroupId,
               forImageRecognition: question.ForImageRecognition ?? false,
+              questionGroupId: question.QuestionGroupId,
             },
           })
 
@@ -124,12 +126,61 @@ export class FormTemplateDbService {
         }),
       )
 
-      return {
-        ...formTemplate,
-        questions,
-        questionGroups,
+      const templateResult: FormTemplate = {
+        Id: formTemplate.id,
+        Name: formTemplate.name,
+        Description: formTemplate.description || '',
+        Active: formTemplate.active,
+        SortOrder: formTemplate.sortOrder,
+        Version: formTemplate.version,
+        CreatedBy: formTemplate.createdBy,
+        LastUpdatedBy: formTemplate.updatedBy,
+        CreatedUtc: formTemplate.createdAt.toISOString(),
+        LastUpdatedUtc: formTemplate.updatedAt.toISOString(),
+        LastUpdatedLocal: formTemplate.updatedAt.toLocaleString(),
+        Questions: questions.map((q) => ({
+          Id: q.id,
+          Name: q.name,
+          Type: q.type,
+          SortOrder: q.sortOrder,
+          IsMandatory: q.isMandatory,
+          IsAutoFill: q.isAutoFill,
+          QuestionGroupId: q.questionGroupId,
+          ForImageRecognition: q.forImageRecognition,
+          MatrixGroupId: null,
+          Options: [],
+          Attachments: [],
+          Triggers: [],
+        })),
+        QuestionGroups: questionGroups.map((g) => ({
+          Id: g.id,
+          Name: g.name,
+          Type: g.type,
+          FreeFormItems: {},
+          TriggeredBy: [] as { QuestionId: string; QuestionValue: string }[],
+        })),
       }
+
+      return templateResult
     })
+
+    // Generar las métricas de productos
+    try {
+      await ProductMetricsService.createFromFormTemplate(result.Id)
+    } catch (error) {
+      console.error('Error al generar métricas de productos:', error)
+      // No lanzamos el error para no afectar la creación del template
+    }
+
+    // Importar productos después de crear el template
+    try {
+      await RepslyApiService.importProducts()
+    } catch (error) {
+      console.error('Error al importar productos:', error)
+      // No lanzamos el error para no afectar la creación del template
+    }
+
+    return result
   }
 
   static async getById(id: string) {

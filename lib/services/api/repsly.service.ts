@@ -1,4 +1,8 @@
-import { FormTemplateResponse } from '@/types/api'
+import {
+  FormTemplateResponse,
+  ImportProductsResponse,
+  RepslyProductsResponse,
+} from '@/types/api'
 import { FormSearchResponse } from '@/types/dashboard'
 
 export class RepslyApiService {
@@ -33,5 +37,41 @@ export class RepslyApiService {
     }
 
     return response.json() as Promise<FormTemplateResponse>
+  }
+
+  static async getProducts(
+    page: number = 1,
+    pageSize: number = 100,
+  ): Promise<RepslyProductsResponse> {
+    const response = await fetch(
+      `/api/repsly/products?page=${page}&pageSize=${pageSize}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error('Error al obtener productos de Repsly')
+    }
+
+    return response.json() as Promise<RepslyProductsResponse>
+  }
+
+  static async importProducts(): Promise<ImportProductsResponse> {
+    const response = await fetch('/api/repsly/products/import', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error('Error al importar productos de Repsly')
+    }
+
+    return response.json() as Promise<ImportProductsResponse>
   }
 }

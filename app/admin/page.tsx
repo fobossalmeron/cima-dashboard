@@ -1,38 +1,71 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ClientData } from '@/types/api'
 import { AdminHeader } from '@/components/headers'
-import { ClientsTable } from '@/components/tables'
+import { DashboardsTable } from '@/components/tables'
 import { NewDashboardForm } from '@/types/dashboard'
 import { toast } from 'sonner'
 import { NewDashboardDialog } from '@/components/dialogs/dashboard'
 import {
-  ClientsApiService,
   RepslyApiService,
   FormTemplateApiService,
+  ClientsApiService,
+  ProductsApiService,
 } from '@/lib/services/api'
+import { DashboardsService } from '@/lib/services/db'
+import { ClientData, DashboardWithClientAndTemplate } from '@/types/api'
 
 export default function AdminPage() {
   const [clients, setClients] = useState<ClientData[]>([])
+  const [dashboards, setDashboards] = useState<
+    DashboardWithClientAndTemplate[]
+  >([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  useEffect(() => {
-    const loadClients = async () => {
-      try {
-        setIsLoading(true)
-        const data = await ClientsApiService.getAll()
-        setClients(data)
-      } catch (err) {
-        setError('Error al cargar los clientes')
-        console.error('Error al cargar clientes:', err)
-      } finally {
-        setIsLoading(false)
-      }
+  const loadClients = async () => {
+    try {
+      setIsLoading(true)
+      const data = await ClientsApiService.getAll()
+      setClients(data)
+    } catch (err) {
+      setError('Error al cargar los clientes')
+      console.error('Error al cargar clientes:', err)
+    } finally {
+      setIsLoading(false)
     }
+  }
+
+  const loadDashboards = async () => {
+    try {
+      setIsLoading(true)
+      const data = await DashboardsService.getAll()
+      setDashboards(data)
+    } catch (err) {
+      setError('Error al cargar los dashboards')
+      console.error('Error al cargar dashboards:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const loadProductsFromTemplate = async (templateId: string) => {
+    try {
+      setIsLoading(true)
+      const data = await ProductsApiService.loadFromTemplate(templateId)
+      console.log('Data:', data)
+    } catch (err) {
+      setError('Error al cargar los productos')
+      console.error('Error al cargar productos:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
     loadClients()
+    loadDashboards()
   }, [])
 
   const handleSubmit = async (data: NewDashboardForm) => {
@@ -101,7 +134,10 @@ export default function AdminPage() {
             {error}
           </div>
         ) : (
-          <ClientsTable clients={clients} />
+          <DashboardsTable
+            dashboards={dashboards}
+            onLoadProducts={loadProductsFromTemplate}
+          />
         )}
       </div>
     </div>

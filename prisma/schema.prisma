@@ -58,7 +58,7 @@ model Client {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relaciones
+  // Relationships
   userId        String   @unique
   user          User     @relation(fields: [userId], references: [id])
   dashboards    Dashboard[]
@@ -94,10 +94,11 @@ model FormTemplate {
   createdBy       String
   updatedBy       String
 
-  // Relaciones
+  // Relationships
   dashboards      Dashboard[]
   questionGroups  QuestionGroup[]
   questions       Question[]
+  productMetrics  ProductMetrics[]
 
   @@map("form_templates")
 }
@@ -113,7 +114,7 @@ model Question {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  // Relaciones
+  // Relationships
   formTemplateId      String
   formTemplate        FormTemplate @relation(fields: [formTemplateId], references: [id])
   questionGroupId     String?
@@ -134,7 +135,7 @@ model QuestionOption {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relaciones
+  // Relationships
   questionId String
   question   Question @relation(fields: [questionId], references: [id])
   triggers   QuestionTrigger[]
@@ -162,7 +163,7 @@ model QuestionGroup {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relaciones
+  // Relationships
   formTemplateId String
   formTemplate   FormTemplate @relation(fields: [formTemplateId], references: [id])
   questions      Question[]
@@ -198,4 +199,106 @@ model ServiceToken {
 
   @@index([service])
   @@map("service_tokens")
+}
+
+model Brand {
+  id        String   @id @default(cuid())
+  name      String   @unique
+
+  // Relationships
+  subBrands SubBrand[]
+  products  Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("brands")
+}
+
+model SubBrand {
+  id        String   @id @default(cuid())
+  name      String   
+
+  // Relationships
+  brandId String
+  brand   Brand    @relation(fields: [brandId], references: [id])
+  products  Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, brandId])
+  @@map("sub_brands")
+}
+
+model Presentation {
+  id        String   @id @default(cuid())
+  name      String   @unique
+
+  // Relationships
+  products  Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("presentations")
+}
+
+model Flavor {
+  id        String   @id @default(cuid())
+  name      String   @unique
+
+  // Relationships
+  products  Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("flavors")
+}
+
+model Product {
+  id        String   @id @default(cuid())
+  name      String
+
+  // Relationships
+  brandId   String
+  brand     Brand    @relation(fields: [brandId], references: [id])
+  subBrandId String?
+  subBrand  SubBrand? @relation(fields: [subBrandId], references: [id])
+  presentationId String?
+  presentation Presentation? @relation(fields: [presentationId], references: [id])
+  flavorId String?
+  flavor   Flavor? @relation(fields: [flavorId], references: [id])
+  metrics  ProductMetrics[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, brandId])
+  @@index([brandId])
+  @@index([subBrandId])
+  @@index([presentationId])
+  @@index([flavorId])
+  @@map("products")
+}
+
+model ProductMetrics {
+  id        String   @id @default(cuid())
+  price     Float
+  sales     Int      @default(0)
+  date      DateTime @default(now())
+  
+  // Relationships
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  formId    String
+  form      FormTemplate @relation(fields: [formId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([formId])
+  @@map("product_metrics")
 }
