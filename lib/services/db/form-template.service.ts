@@ -1,17 +1,291 @@
 import { prisma } from '@/lib/prisma'
-import { FormTemplate } from '@/types/api/form-template'
-import { QuestionGroupType, QuestionType } from '@prisma/client'
-import { RepslyApiService } from '@/lib/services/api/repsly.service'
-import { ProductMetricsService } from './product-metrics.service'
+import {
+  FormTemplate,
+  Question,
+  QuestionOption,
+  QuestionTrigger,
+  QuestionType,
+  QuestionGroupType,
+} from '@prisma/client'
+import { FormTemplate as RepslyFormTemplate } from '@/types/api/form-template'
 
-export class FormTemplateDbService {
+export type FormTemplateWithQuestionsAndOptions = FormTemplate & {
+  questions: (Question & {
+    options: QuestionOption[]
+    triggers: QuestionTrigger[]
+  })[]
+}
+
+export class FormTemplateService {
+  static async getAll(): Promise<FormTemplate[]> {
+    return await prisma.formTemplate.findMany({
+      include: {
+        questions: {
+          include: {
+            options: {
+              include: {
+                triggers: true,
+              },
+            },
+            attachments: true,
+            triggers: {
+              include: {
+                group: true,
+                option: true,
+              },
+            },
+          },
+        },
+        questionGroups: {
+          include: {
+            triggers: true,
+          },
+        },
+        dashboards: {
+          include: {
+            client: true,
+          },
+        },
+      },
+    })
+  }
+
+  static async getById(
+    id: string,
+  ): Promise<FormTemplateWithQuestionsAndOptions | null> {
+    return await prisma.formTemplate.findUnique({
+      where: { id },
+      include: {
+        questions: {
+          include: {
+            options: {
+              include: {
+                triggers: true,
+              },
+            },
+            attachments: true,
+            triggers: {
+              include: {
+                group: true,
+                option: true,
+              },
+            },
+            questionGroup: true,
+          },
+        },
+        questionGroups: {
+          include: {
+            triggers: true,
+          },
+        },
+        dashboards: {
+          include: {
+            client: true,
+          },
+        },
+      },
+    })
+  }
+
+  static async create(data: {
+    name: string
+    description?: string | null
+    sortOrder: number
+    createdBy: string
+    updatedBy: string
+    questions: {
+      name: string
+      type: QuestionType
+      sortOrder: number
+      isMandatory?: boolean
+      isAutoFill?: boolean
+      forImageRecognition?: boolean
+      questionGroupId?: string | null
+      options?: {
+        value: string
+        sortOrder: number
+      }[]
+      triggers?: {
+        optionId: string
+        groupId: string
+      }[]
+    }[]
+  }): Promise<FormTemplateWithQuestionsAndOptions> {
+    return await prisma.formTemplate.create({
+      data: {
+        name: data.name,
+        description: data.description,
+        sortOrder: data.sortOrder,
+        createdBy: data.createdBy,
+        updatedBy: data.updatedBy,
+        active: true,
+        version: 1,
+        questions: {
+          create: data.questions.map((question) => ({
+            name: question.name,
+            type: question.type,
+            sortOrder: question.sortOrder,
+            isMandatory: question.isMandatory ?? false,
+            isAutoFill: question.isAutoFill ?? false,
+            forImageRecognition: question.forImageRecognition ?? false,
+            questionGroupId: question.questionGroupId,
+            options: question.options
+              ? {
+                  create: question.options.map((opt) => ({
+                    ...opt,
+                    sortOrder: opt.sortOrder,
+                  })),
+                }
+              : undefined,
+            triggers: question.triggers
+              ? {
+                  create: question.triggers,
+                }
+              : undefined,
+          })),
+        },
+      },
+      include: {
+        questions: {
+          include: {
+            options: true,
+            triggers: true,
+          },
+        },
+      },
+    })
+  }
+
+  static async update(
+    id: string,
+    data: Partial<FormTemplate>,
+  ): Promise<FormTemplateWithQuestionsAndOptions> {
+    return await prisma.formTemplate.update({
+      where: { id },
+      data,
+      include: {
+        questions: {
+          include: {
+            options: true,
+            triggers: true,
+          },
+        },
+      },
+    })
+  }
+
+  static async remove(id: string): Promise<FormTemplate> {
+    return await prisma.formTemplate.delete({
+      where: { id },
+    })
+  }
+
+  static async addQuestion(
+    templateId: string,
+    data: {
+      name: string
+      type: QuestionType
+      sortOrder: number
+      isMandatory?: boolean
+      isAutoFill?: boolean
+      forImageRecognition?: boolean
+      questionGroupId?: string | null
+      options?: {
+        value: string
+        sortOrder: number
+      }[]
+      triggers?: {
+        optionId: string
+        groupId: string
+      }[]
+    },
+  ): Promise<Question> {
+    return await prisma.question.create({
+      data: {
+        name: data.name,
+        type: data.type,
+        sortOrder: data.sortOrder,
+        isMandatory: data.isMandatory ?? false,
+        isAutoFill: data.isAutoFill ?? false,
+        forImageRecognition: data.forImageRecognition ?? false,
+        questionGroupId: data.questionGroupId,
+        formTemplateId: templateId,
+        options: data.options
+          ? {
+              create: data.options.map((opt) => ({
+                ...opt,
+                sortOrder: opt.sortOrder,
+              })),
+            }
+          : undefined,
+        triggers: data.triggers
+          ? {
+              create: data.triggers,
+            }
+          : undefined,
+      },
+      include: {
+        options: true,
+        triggers: true,
+      },
+    })
+  }
+
+  static async removeQuestion(id: string): Promise<Question> {
+    return await prisma.question.delete({
+      where: { id },
+    })
+  }
+
+  static async addOptionToQuestion(
+    questionId: string,
+    data: {
+      value: string
+      sortOrder: number
+    },
+  ): Promise<QuestionOption> {
+    return await prisma.questionOption.create({
+      data: {
+        ...data,
+        questionId,
+      },
+    })
+  }
+
+  static async removeOption(id: string): Promise<QuestionOption> {
+    return await prisma.questionOption.delete({
+      where: { id },
+    })
+  }
+
+  static async addTriggerToQuestion(
+    questionId: string,
+    data: {
+      optionId: string
+      groupId: string
+    },
+  ): Promise<QuestionTrigger> {
+    return await prisma.questionTrigger.create({
+      data: {
+        ...data,
+        questionId,
+      },
+    })
+  }
+
+  static async removeTrigger(id: string): Promise<QuestionTrigger> {
+    return await prisma.questionTrigger.delete({
+      where: { id },
+    })
+  }
+
   static async createFromTemplate(
-    template: FormTemplate,
+    template: RepslyFormTemplate,
     clientId: string,
     dashboardName: string,
-  ): Promise<FormTemplate> {
+  ) {
     const { Questions, QuestionGroups, ...formTemplateData } = template
-    const result = await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx) => {
       // Crear el formulario
       const formTemplate = await tx.formTemplate.create({
         data: {
@@ -51,7 +325,7 @@ export class FormTemplateDbService {
         ),
       )
 
-      // Crear las preguntas
+      // Crear las preguntas y sus opciones
       const questions = await Promise.all(
         Questions.map(async (question) => {
           // Primero creamos la pregunta
@@ -59,15 +333,15 @@ export class FormTemplateDbService {
             data: {
               id: question.Id,
               formTemplateId: formTemplate.id,
+              sortOrder: question.SortOrder,
               type:
                 (question.Type.toUpperCase() as QuestionType) ||
                 QuestionType.TEXT,
               name: question.Name,
-              sortOrder: question.SortOrder,
               isMandatory: question.IsMandatory,
               isAutoFill: question.IsAutoFill,
-              forImageRecognition: question.ForImageRecognition ?? false,
               questionGroupId: question.QuestionGroupId,
+              forImageRecognition: question.ForImageRecognition ?? false,
             },
           })
 
@@ -126,127 +400,11 @@ export class FormTemplateDbService {
         }),
       )
 
-      const templateResult: FormTemplate = {
-        Id: formTemplate.id,
-        Name: formTemplate.name,
-        Description: formTemplate.description || '',
-        Active: formTemplate.active,
-        SortOrder: formTemplate.sortOrder,
-        Version: formTemplate.version,
-        CreatedBy: formTemplate.createdBy,
-        LastUpdatedBy: formTemplate.updatedBy,
-        CreatedUtc: formTemplate.createdAt.toISOString(),
-        LastUpdatedUtc: formTemplate.updatedAt.toISOString(),
-        LastUpdatedLocal: formTemplate.updatedAt.toLocaleString(),
-        Questions: questions.map((q) => ({
-          Id: q.id,
-          Name: q.name,
-          Type: q.type,
-          SortOrder: q.sortOrder,
-          IsMandatory: q.isMandatory,
-          IsAutoFill: q.isAutoFill,
-          QuestionGroupId: q.questionGroupId,
-          ForImageRecognition: q.forImageRecognition,
-          MatrixGroupId: null,
-          Options: [],
-          Attachments: [],
-          Triggers: [],
-        })),
-        QuestionGroups: questionGroups.map((g) => ({
-          Id: g.id,
-          Name: g.name,
-          Type: g.type,
-          FreeFormItems: {},
-          TriggeredBy: [] as { QuestionId: string; QuestionValue: string }[],
-        })),
+      return {
+        ...formTemplate,
+        questions,
+        questionGroups,
       }
-
-      return templateResult
-    })
-
-    // Generar las métricas de productos
-    try {
-      await ProductMetricsService.createFromFormTemplate(result.Id)
-    } catch (error) {
-      console.error('Error al generar métricas de productos:', error)
-      // No lanzamos el error para no afectar la creación del template
-    }
-
-    // Importar productos después de crear el template
-    try {
-      await RepslyApiService.importProducts()
-    } catch (error) {
-      console.error('Error al importar productos:', error)
-      // No lanzamos el error para no afectar la creación del template
-    }
-
-    return result
-  }
-
-  static async getById(id: string) {
-    return await prisma.formTemplate.findUnique({
-      where: { id },
-      include: {
-        questions: {
-          include: {
-            options: {
-              include: {
-                triggers: true,
-              },
-            },
-            attachments: true,
-            triggers: {
-              include: {
-                group: true,
-                option: true,
-              },
-            },
-          },
-        },
-        questionGroups: {
-          include: {
-            triggers: true,
-          },
-        },
-        dashboards: {
-          include: {
-            client: true,
-          },
-        },
-      },
-    })
-  }
-
-  static async getAll() {
-    return await prisma.formTemplate.findMany({
-      include: {
-        questions: {
-          include: {
-            options: {
-              include: {
-                triggers: true,
-              },
-            },
-            attachments: true,
-            triggers: {
-              include: {
-                group: true,
-                option: true,
-              },
-            },
-          },
-        },
-        questionGroups: {
-          include: {
-            triggers: true,
-          },
-        },
-        dashboards: {
-          include: {
-            client: true,
-          },
-        },
-      },
     })
   }
 }

@@ -1,19 +1,101 @@
-import {
-  DashboardResponse,
-  DashboardWithClientAndTemplate,
-} from '@/types/api/dashboard'
+import { prisma } from '@/lib/prisma'
+import { DashboardWithClientAndTemplate } from '@/types/api'
+import { Dashboard } from '@prisma/client'
 
 export class DashboardsService {
   static async getAll(): Promise<DashboardWithClientAndTemplate[]> {
-    const dashboards = await fetch('/api/dashboards')
-    if (!dashboards.ok) {
-      throw new Error('Error al obtener dashboards')
-    }
-    const data: DashboardResponse = await dashboards.json()
-    if (data.error === null) {
-      return data.data
-    } else {
-      throw new Error(`Error al obtener dashboards: ${data.error}`)
-    }
+    return await prisma.dashboard.findMany({
+      include: {
+        client: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        template: true,
+      },
+    })
+  }
+
+  static async getById(id: string): Promise<Dashboard | null> {
+    return await prisma.dashboard.findUnique({
+      where: { id },
+      include: {
+        client: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    })
+  }
+
+  static async create(
+    data: Omit<Dashboard, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Dashboard> {
+    return await prisma.dashboard.create({
+      data,
+      include: {
+        client: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    })
+  }
+
+  static async update(
+    id: string,
+    data: Partial<Dashboard>,
+  ): Promise<Dashboard> {
+    return await prisma.dashboard.update({
+      where: { id },
+      data,
+      include: {
+        client: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    })
+  }
+
+  static async remove(id: string): Promise<Dashboard> {
+    return await prisma.dashboard.delete({
+      where: { id },
+      include: {
+        client: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    })
   }
 }

@@ -12,8 +12,8 @@ import {
   ClientsApiService,
   ProductsApiService,
 } from '@/lib/services/api'
-import { DashboardsService } from '@/lib/services/db'
 import { ClientData, DashboardWithClientAndTemplate } from '@/types/api'
+import { DashboardsApiService } from '@/lib/services/api'
 
 export default function AdminPage() {
   const [clients, setClients] = useState<ClientData[]>([])
@@ -40,7 +40,7 @@ export default function AdminPage() {
   const loadDashboards = async () => {
     try {
       setIsLoading(true)
-      const data = await DashboardsService.getAll()
+      const data = await DashboardsApiService.getAll()
       setDashboards(data)
     } catch (err) {
       setError('Error al cargar los dashboards')
@@ -70,7 +70,6 @@ export default function AdminPage() {
 
   const handleSubmit = async (data: NewDashboardForm) => {
     try {
-      console.log('Data:', data)
       // Obtener el template de Repsly
       const formTemplateResponse = await RepslyApiService.getFormTemplate(
         data.formId,
@@ -89,13 +88,16 @@ export default function AdminPage() {
       const formTemplate = formTemplateResponse.data
       const dashboardName = data.name
       // Guardar el template en nuestra base de datos
-      await FormTemplateApiService.create(
+      const template = await FormTemplateApiService.create(
         formTemplate,
         selectedClient,
         dashboardName,
       )
 
+      await ProductsApiService.loadFromTemplate(template.id)
+
       toast.success('Dashboard creado exitosamente')
+      loadDashboards()
       setIsDialogOpen(false)
     } catch (error) {
       console.error('Error al crear dashboard:', error)

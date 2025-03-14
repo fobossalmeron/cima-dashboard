@@ -1,7 +1,7 @@
 import { FormTemplateRequest } from '@/types/api/form-template'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { FormTemplateDbService } from '@/lib/services/db'
+import { FormTemplateService } from '@/lib/services/db'
 
 export async function POST(request: Request) {
   try {
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     if (!client) {
       return NextResponse.json({ error: 'Client not found' }, { status: 404 })
     }
-    const result = await FormTemplateDbService.createFromTemplate(
+    const result = await FormTemplateService.createFromTemplate(
       template,
       clientId,
       dashboardName,
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const formTemplates = await FormTemplateDbService.getAll()
+    const formTemplates = await FormTemplateService.getAll()
     return NextResponse.json(formTemplates)
   } catch (error) {
     console.error('Error getting form templates:', error)

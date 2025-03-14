@@ -1,20 +1,14 @@
-import { prisma } from '@/lib/prisma'
 import {
   DashboardErrorResponse,
   DashboardResponse,
   DashboardSuccessResponse,
-  DashboardWithClientAndTemplate,
 } from '@/types/api'
+import { DashboardsService } from '@/lib/services/db'
 import { NextResponse } from 'next/server'
 
 export async function GET(): Promise<NextResponse<DashboardResponse>> {
   try {
-    const dashboards = (await prisma.dashboard.findMany({
-      include: {
-        client: true,
-        template: true,
-      },
-    })) as DashboardWithClientAndTemplate[]
+    const dashboards = await DashboardsService.getAll()
 
     return NextResponse.json<DashboardSuccessResponse>({
       data: dashboards,

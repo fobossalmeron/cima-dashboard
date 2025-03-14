@@ -1,4 +1,4 @@
-import { ProductsService } from '@/lib/services/db'
+import { ProductTemplateProcessor } from '@/lib/services/db'
 import {
   LoadProductsFromTemplateErrorResponse,
   LoadProductsFromTemplateResponse,
@@ -19,14 +19,17 @@ export async function GET(
       )
     }
 
-    const dashboard = await ProductsService.loadFromTemplate(id)
+    const dashboard = await ProductTemplateProcessor.processTemplate(id)
 
     return NextResponse.json<LoadProductsFromTemplateSuccessResponse>({
       data: dashboard,
       error: null,
     })
   } catch (error) {
-    console.error('Error al obtener dashboards:', error)
+    console.error(
+      'Error al obtener dashboards:',
+      error instanceof Error ? error.message : error,
+    )
     return NextResponse.json<LoadProductsFromTemplateErrorResponse>(
       {
         error: error instanceof Error ? error.message : 'Error desconocido',

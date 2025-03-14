@@ -1,27 +1,50 @@
 import { prisma } from '@/lib/prisma'
 import { ServiceToken } from '@prisma/client'
 
-export async function getServiceToken(
-  service: string,
-): Promise<ServiceToken | null> {
-  try {
-    const token = await prisma.serviceToken.findUnique({
-      where: { service },
+export class ServiceTokenService {
+  static async getAll(): Promise<ServiceToken[]> {
+    return await prisma.serviceToken.findMany()
+  }
+
+  static async getById(id: string): Promise<ServiceToken | null> {
+    return await prisma.serviceToken.findUnique({
+      where: { id },
     })
+  }
 
-    if (!token) {
-      return null
-    }
+  static async create(
+    data: Omit<ServiceToken, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<ServiceToken> {
+    return await prisma.serviceToken.create({
+      data,
+    })
+  }
 
-    // Verificar si el token ha expirado
-    if (token.expiresAt && token.expiresAt < new Date()) {
-      // Aquí podrías implementar la lógica para refrescar el token si es necesario
-      return null
-    }
+  static async update(
+    id: string,
+    data: Partial<ServiceToken>,
+  ): Promise<ServiceToken> {
+    return await prisma.serviceToken.update({
+      where: { id },
+      data,
+    })
+  }
 
-    return token
-  } catch (error) {
-    console.error('Error al obtener el token:', error)
-    return null
+  static async remove(id: string): Promise<ServiceToken> {
+    return await prisma.serviceToken.delete({
+      where: { id },
+    })
+  }
+
+  static async findByToken(
+    service: string,
+    id: string,
+  ): Promise<ServiceToken | null> {
+    return await prisma.serviceToken.findUnique({
+      where: {
+        id,
+        service,
+      },
+    })
   }
 }

@@ -203,6 +203,7 @@ model ServiceToken {
 
 model Brand {
   id        String   @id @default(cuid())
+  slug      String   @unique
   name      String   @unique
 
   // Relationships
@@ -217,7 +218,8 @@ model Brand {
 
 model SubBrand {
   id        String   @id @default(cuid())
-  name      String   
+  slug      String   @unique
+  name      String
 
   // Relationships
   brandId String
@@ -227,7 +229,7 @@ model SubBrand {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([name, brandId])
+  @@unique([slug, brandId])
   @@map("sub_brands")
 }
 
@@ -246,6 +248,7 @@ model Presentation {
 
 model Flavor {
   id        String   @id @default(cuid())
+  slug      String   @unique
   name      String   @unique
 
   // Relationships
@@ -260,6 +263,7 @@ model Flavor {
 model Product {
   id        String   @id @default(cuid())
   name      String
+  imageUrl  String?  @map("image_url")
 
   // Relationships
   brandId   String
