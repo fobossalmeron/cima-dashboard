@@ -1,15 +1,15 @@
-"use client";
+'use client'
 
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { MoreVertical, LogOut } from "lucide-react";
+import Image from 'next/image'
+import { Button } from '@/components/ui/button'
+import { MoreVertical, LogOut } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import CimaSVG from "@/public/cima.svg";
+} from '@/components/ui/dropdown-menu'
+import CimaSVG from '@/public/cima_logo_simple.svg'
 
 export function AdminHeader() {
   return (
@@ -29,7 +29,7 @@ export function AdminHeader() {
           <DropdownMenuContent align="end" className="w-40">
             <DropdownMenuItem
               onClick={() => {
-                window.location.href = "/login";
+                window.location.href = '/login'
               }}
             >
               <LogOut className="mr-2 h-4 w-4" />
@@ -39,5 +39,5 @@ export function AdminHeader() {
         </DropdownMenu>
       </div>
     </header>
-  );
-} 
+  )
+}

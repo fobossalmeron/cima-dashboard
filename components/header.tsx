@@ -1,17 +1,16 @@
-"use client";
+'use client'
 
-import { Nav } from "@/components/nav";
-import { Filters } from "@/components/filters";
-import { Separator } from "@/components/ui/separator";
-// import CimaLogo from "@/public/cima.png";
-import CimaSVG from "@/public/cima.svg";
-import Image from "next/image";
-import { MobileNav } from "@/components/mobile-nav";
-import { MobileFilters } from "@/components/mobile-filters";
-import { useClient } from "@/lib/context/ClientContext";
+import { Nav } from '@/components/nav'
+import { Filters } from '@/components/filters'
+import { Separator } from '@/components/ui/separator'
+import CimaSVG from '@/public/cima_logo_simple.svg'
+import Image from 'next/image'
+import { MobileNav } from '@/components/mobile-nav'
+import { MobileFilters } from '@/components/mobile-filters'
+import { useClient } from '@/lib/context/ClientContext'
 
 export const Header = ({ title }: { title: string }) => {
-  const { clientData } = useClient();
+  const { clientData } = useClient()
 
   return (
     <div className="flex flex-col justify-between items-start w-full gap-8">
@@ -42,5 +41,5 @@ export const Header = ({ title }: { title: string }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
