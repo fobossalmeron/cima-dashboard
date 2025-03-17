@@ -21,13 +21,21 @@ export class ServiceTokenService {
   }
 
   static async update(
-    id: string,
-    data: Partial<ServiceToken>,
+    service: string,
+    data: Partial<{
+      token: string
+      refreshToken: string | null
+      fingerprint: string | null
+      expiresIn: number | null
+      expiresAt: Date | null
+    }>,
   ): Promise<ServiceToken> {
-    return await prisma.serviceToken.update({
-      where: { id },
+    const token = await prisma.serviceToken.update({
+      where: { service },
       data,
     })
+
+    return token
   }
 
   static async remove(id: string): Promise<ServiceToken> {
@@ -45,6 +53,12 @@ export class ServiceTokenService {
         id,
         service,
       },
+    })
+  }
+
+  static async findByService(service: string): Promise<ServiceToken | null> {
+    return await prisma.serviceToken.findUnique({
+      where: { service },
     })
   }
 }

@@ -1,29 +1,34 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+} from '@/components/ui/sheet'
+import { Button } from '@/components/ui/button'
+import { Menu } from 'lucide-react'
 import {
   NavigationMenu,
   NavigationMenuList,
   NavigationMenuItem,
   NavigationMenuLink,
   navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
-import { navItems } from "@/data/nav";
-import Link from "next/link";
+} from '@/components/ui/navigation-menu'
+import { navItems } from '@/data/nav'
+import Link from 'next/link'
 
-export function MobileNav({ clientName }: { clientName: string }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname();
+interface MobileNavProps {
+  clientId: string
+  dashboardId: string
+}
+
+export function MobileNav({ clientId, dashboardId }: MobileNavProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const pathname = usePathname()
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -46,15 +51,15 @@ export function MobileNav({ clientName }: { clientName: string }) {
             {navItems.map((item) => (
               <NavigationMenuItem key={item.path}>
                 <Link
-                  href={`/${clientName}/${item.path}`}
+                  href={`/${clientId}/${dashboardId}/${item.path}`}
                   legacyBehavior
                   passHref
                 >
                   <NavigationMenuLink
                     className={`${navigationMenuTriggerStyle()} ${
-                      pathname === `/${clientName}/${item.path}`
-                        ? "bg-accent text-accent-foreground"
-                        : ""
+                      pathname === `/${clientId}/${dashboardId}/${item.path}`
+                        ? 'bg-accent text-accent-foreground'
+                        : ''
                     }`}
                   >
                     {item.title}
@@ -66,5 +71,5 @@ export function MobileNav({ clientName }: { clientName: string }) {
         </NavigationMenu>
       </SheetContent>
     </Sheet>
-  );
+  )
 }

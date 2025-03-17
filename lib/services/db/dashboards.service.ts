@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
-import { DashboardWithClientAndTemplate } from '@/types/api'
 import { Dashboard } from '@prisma/client'
+import { DashboardWithClientAndTemplate } from '@/types/api'
 
 export class DashboardsService {
   static async getAll(): Promise<DashboardWithClientAndTemplate[]> {

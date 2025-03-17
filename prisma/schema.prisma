@@ -68,14 +68,15 @@ model Client {
 }
 
 model Dashboard {
-  id        String   @id @default(cuid())
-  clientId  String
-  client    Client   @relation(fields: [clientId], references: [id])
-  templateId String
-  template  FormTemplate @relation(fields: [templateId], references: [id])
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId    String
+  template    FormTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  templateId  String
+  submissions FormSubmission[]
 
   @@index([clientId])
   @@index([templateId])
@@ -122,6 +123,7 @@ model Question {
   options             QuestionOption[]
   attachments         QuestionAttachment[]
   triggers            QuestionTrigger[]
+  answers             Answer[]
 
   @@index([formTemplateId])
   @@index([questionGroupId])
@@ -139,6 +141,7 @@ model QuestionOption {
   questionId String
   question   Question @relation(fields: [questionId], references: [id])
   triggers   QuestionTrigger[]
+  answers    Answer[]
 
   @@index([questionId])
   @@map("question_options")
@@ -189,13 +192,16 @@ model QuestionTrigger {
 }
 
 model ServiceToken {
-  id        String   @id @default(cuid())
-  service   String   @unique // nombre del servicio (e.g., "repsly")
-  token     String
-  fingerprint String
-  expiresAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String    @id @default(cuid())
+  service           String    @unique // nombre del servicio (e.g., "repsly")
+  serviceClientId   String?   @map("service_client_id")
+  token             String
+  refreshToken      String?   @map("refresh_token")
+  fingerprint       String?
+  expiresIn         Int?      // Tiempo de expiración en segundos
+  expiresAt         DateTime? @map("expires_at") // Fecha y hora de expiración
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   @@index([service])
   @@map("service_tokens")
@@ -305,4 +311,118 @@ model ProductMetrics {
   @@index([productId])
   @@index([formId])
   @@map("product_metrics")
+}
+
+model Representative {
+  id        String   @id @default(cuid())
+  name      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  formSubmissions FormSubmission[]
+
+  @@map("representatives")
+}
+
+model Location {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  name        String
+  address     String
+  postalCode  String    @map("postal_code")
+  city        String
+  state       String
+  country     String
+  latitude    Float
+  longitude   Float
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Relationships
+  formSubmissions FormSubmission[]
+
+  @@map("locations")
+}
+
+model Dealer {
+  id                String        @id @default(cuid())
+  name              String
+  nameOther         String?       @map("name_other")
+  sellerName        String?       @map("seller_name")
+  sellerMobile      String?       @map("seller_mobile")
+  sellerEmail       String?       @map("seller_email")
+  notes             String?
+
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+
+  // Relationships
+  formSubmissionId  String?       @unique @map("form_submission_id")
+  formSubmission FormSubmission?  @relation(fields: [formSubmissionId], references: [id])
+
+  @@index([formSubmissionId])
+
+  @@map("dealers")
+}
+
+model FormSubmission {
+  id                String          @id @default(cuid())
+  submittedAt       DateTime        @map("submitted_at")
+  notes             String?
+  tags              String[]
+  email             String?
+  phone             String?
+  mobilePhone       String?         @map("mobile_phone")
+  status            String?
+  registered        Boolean         @default(false)
+  startDate         DateTime        @map("start_date")
+  endDate           DateTime        @map("end_date")
+  legalName         String?         @map("legal_name")
+  formLink          String          @map("form_link")
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // Relationships
+  locationId        String?
+  location          Location?       @relation(fields: [locationId], references: [id])
+  representativeId  String?
+  representative    Representative? @relation(fields: [representativeId], references: [id])
+  answers           Answer[]
+  dashboard         Dashboard       @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  dashboardId       String
+  dealer            Dealer?
+
+  @@index([locationId])
+  @@index([representativeId])
+  @@index([dashboardId])
+  // Unique submission per dashboard, location, representative and date
+  @@unique([dashboardId, locationId, representativeId, submittedAt])
+  @@map("form_submissions")
+}
+
+model Answer {
+  id              String          @id @default(cuid())
+  questionKey     String          @map("question_key")
+  value           String         
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // Relationships
+  submissionId    String          @map("submission_id")
+  submission      FormSubmission  @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  questionId      String          @map("question_id")
+  question        Question        @relation(fields: [questionId], references: [id])
+  optionId        String?         @map("option_id")
+  selectedOption  QuestionOption? @relation(fields: [optionId], references: [id])
+
+  @@index([submissionId])
+  @@index([questionId])
+  @@index([optionId])
+  @@index([questionKey])
+
+  @@map("answers")
 }

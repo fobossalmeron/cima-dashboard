@@ -1,36 +1,22 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
-import { ServiceToken } from '@prisma/client'
 import { FormTemplateResponse } from '@/types/api'
+import { RepslyAuthService } from '@/lib/services/repsly/repsly-auth.service'
 
 const REPSLY_API_URL = process.env.REPSLY_API_URL
-
-async function getRepslyToken(): Promise<ServiceToken> {
-  const token = await prisma.serviceToken.findUnique({
-    where: { service: 'repsly' },
-  })
-
-  if (!token) {
-    throw new Error('No se encontró el token de Repsly')
-  }
-
-  return token
-}
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse<FormTemplateResponse>> {
   try {
-    const { token, fingerprint } = await getRepslyToken()
+    const { token, fingerprint } = await RepslyAuthService.getToken()
     const { id } = await params
     const response = await fetch(`${REPSLY_API_URL}/Template/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
-        Fingerprint: fingerprint,
+        Fingerprint: fingerprint ?? '',
       },
     })
 

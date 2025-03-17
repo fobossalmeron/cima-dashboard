@@ -10,7 +10,7 @@ import { MobileFilters } from '@/components/mobile-filters'
 import { useClient } from '@/lib/context/ClientContext'
 
 export const Header = ({ title }: { title: string }) => {
-  const { clientData } = useClient()
+  const { clientData: client, dashboardData: dashboard } = useClient()
 
   return (
     <div className="flex flex-col justify-between items-start w-full gap-8">
@@ -19,17 +19,17 @@ export const Header = ({ title }: { title: string }) => {
           <Image src={CimaSVG} alt="Cima Logo" width={80} height={100} />
           <Separator orientation="vertical" className="mr-2 h-4" />
           <div className="text-xl font-semibold">
-            Dashboard de {clientData.name}
+            Dashboard de {client.name}
           </div>
         </div>
       </header>
       <div className="w-full flex items-center gap-2 justify-between px-6">
         <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
         <div className="container lg:hidden print:hidden w-auto">
-          <MobileNav clientName={clientData.slug} />
+          <MobileNav clientId={client.id} dashboardId={dashboard.id} />
         </div>
         <nav className="hidden lg:flex print:hidden">
-          <Nav clientName={clientData.slug} />
+          <Nav clientId={client.id} dashboardId={dashboard.id} />
         </nav>
       </div>
       <div className="w-full flex items-center gap-2 justify-between px-6">

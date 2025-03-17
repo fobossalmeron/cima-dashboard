@@ -111,3 +111,21 @@ export interface GetAllBrandsWithSubBrandsErrorResponse {
 export type GetAllBrandsWithSubBrandsResponse =
   | GetAllBrandsWithSubBrandsSuccessResponse
   | GetAllBrandsWithSubBrandsErrorResponse
+
+export interface FormSubmissionEntryData {
+  [key: string]: string | number | null
+}
+
+export interface SyncDashboardSuccessResponse {
+  data: FormSubmissionEntryData[]
+  error: null
+}
+
+export interface SyncDashboardErrorResponse {
+  error: string
+  data: null
+}
+
+export type SyncDashboardResponse =
+  | SyncDashboardSuccessResponse
+  | SyncDashboardErrorResponse

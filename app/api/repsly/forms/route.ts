@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 import {
   FormSearchRequest,
@@ -7,29 +6,17 @@ import {
   SearchOperator,
   SearchType,
 } from '@/types/dashboard'
-import { FormTemplateSearchResponse } from '@/types/api/form-template-search-response'
-import { ServiceToken } from '@prisma/client'
+import { FormTemplateSearchResponse } from '@/types/api'
+import { RepslyAuthService } from '@/lib/services/repsly/repsly-auth.service'
 
 const REPSLY_API_URL = process.env.REPSLY_API_URL
-
-async function getRepslyToken(): Promise<ServiceToken> {
-  const token = await prisma.serviceToken.findUnique({
-    where: { service: 'repsly' },
-  })
-
-  if (!token) {
-    throw new Error('No se encontró el token de Repsly')
-  }
-
-  return token
-}
 
 export async function POST(
   request: Request,
 ): Promise<NextResponse<FormSearchResponse>> {
   try {
     const { search } = await request.json()
-    const { token, fingerprint } = await getRepslyToken()
+    const { token, fingerprint } = await RepslyAuthService.getToken()
 
     const requestBody: FormSearchRequest = {
       Skip: 0,
@@ -59,7 +46,7 @@ export async function POST(
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
-        Fingerprint: fingerprint,
+        Fingerprint: fingerprint ?? '',
       },
       body: JSON.stringify(requestBody),
     })
@@ -89,6 +76,7 @@ export async function POST(
     })
   } catch (error) {
     console.error('Error al buscar formularios:', error)
+
     return NextResponse.json(
       { error: 'Error al buscar formularios' },
       { status: 500 },

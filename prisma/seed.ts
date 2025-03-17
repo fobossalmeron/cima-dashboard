@@ -47,6 +47,8 @@ async function main() {
     create: {
       service: 'repsly',
       token: process.env.REPSLY_TOKEN || 'your-token-here',
+      refreshToken:
+        process.env.REPSLY_REFRESH_TOKEN || 'your-refresh-token-here',
       fingerprint: process.env.REPSLY_FINGERPRINT || 'your-fingerprint-here',
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 horas
     },
