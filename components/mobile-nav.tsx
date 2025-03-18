@@ -23,10 +23,9 @@ import Link from 'next/link'
 
 interface MobileNavProps {
   clientId: string
-  dashboardId: string
 }
 
-export function MobileNav({ clientId, dashboardId }: MobileNavProps) {
+export function MobileNav({ clientId }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
 
@@ -51,13 +50,13 @@ export function MobileNav({ clientId, dashboardId }: MobileNavProps) {
             {navItems.map((item) => (
               <NavigationMenuItem key={item.path}>
                 <Link
-                  href={`/${clientId}/${dashboardId}/${item.path}`}
+                  href={`/${clientId}/${item.path}`}
                   legacyBehavior
                   passHref
                 >
                   <NavigationMenuLink
                     className={`${navigationMenuTriggerStyle()} ${
-                      pathname === `/${clientId}/${dashboardId}/${item.path}`
+                      pathname === `/${clientId}/${item.path}`
                         ? 'bg-accent text-accent-foreground'
                         : ''
                     }`}

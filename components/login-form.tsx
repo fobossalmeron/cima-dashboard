@@ -1,39 +1,97 @@
-import type React from "react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+'use client'
+//#region React and external libraries
+// React and external libraries
+import type React from 'react'
+import { useState } from 'react'
+import { useForm, FormProvider } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 
-export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
+// UI Components (shadcn)
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  FormInput,
+  FormError,
+} from '@/components/ui'
+
+// Hooks and contexts
+import { useAuth } from '@/lib/contexts/auth-context'
+
+// Utilities and types
+import { cn } from '@/lib/utils'
+import { loginSchema, type LoginFormValues } from '@/lib/schemas/auth'
+
+//#endregion
+
+export function LoginForm({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<'div'>) {
+  const { login } = useAuth()
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  })
+
+  async function onSubmit(data: LoginFormValues) {
+    setError(null)
+    setIsLoading(true)
+
+    try {
+      await login(data.email, data.password)
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message)
+      } else {
+        setError('Error al iniciar sesión')
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Iniciar sesión</CardTitle>
-          <CardDescription>Ingresa tus datos para iniciar sesión</CardDescription>
+          <CardDescription>
+            Ingresa tus datos para iniciar sesión
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="tu@cimasales.com" required />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Cotnraseña</Label>
-                </div>
-                <Input id="password" type="password" required />
-              </div>
-              <Button type="submit" className="w-full">
-                Login
+          <FormProvider {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormError message={error} />
+              <FormInput<LoginFormValues>
+                name="email"
+                label="Email"
+                type="email"
+                placeholder="admin@cima.com"
+              />
+              <FormInput<LoginFormValues>
+                name="password"
+                label="Contraseña"
+                type="password"
+                placeholder="••••••••"
+              />
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
               </Button>
-            </div>
-          </form>
+            </form>
+          </FormProvider>
         </CardContent>
       </Card>
     </div>
   )
 }
-

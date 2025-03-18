@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { ClientsService } from '@/lib/services/db'
+import { ClientController } from '@/lib/controllers'
 
 export async function GET() {
   console.log('Iniciando GET /api/clients')
@@ -24,4 +25,8 @@ export async function GET() {
       { status: 500 },
     )
   }
+}
+
+export async function POST(request: NextRequest) {
+  return ClientController.create(request)
 }

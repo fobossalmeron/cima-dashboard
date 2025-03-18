@@ -26,8 +26,6 @@ export class DashboardSyncService {
       throw new Error('Dashboard not found')
     }
 
-    
-
     // Obtener todas las preguntas del template con sus relaciones
     const questions: QuestionWithRelations[] = await prisma.question.findMany({
       where: {

@@ -7,34 +7,33 @@ import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import { NewDashboardForm } from '@/types/dashboard'
 import { FormTemplateSearchResponse } from '@/types/api/form-template-search-response'
-import { ClientData } from '@/types/api'
-import { FormSelect, FormAutocomplete, FormInput } from './elements'
+import { FormAutocomplete, FormInput } from './elements'
 
 const formSchema = z.object({
-  clientId: z.string().min(1, 'Debes seleccionar un cliente'),
-  formId: z.string().min(1, 'Debes seleccionar un formulario'),
-  name: z.string().min(1, 'El nombre es requerido'),
+  clientName: z.string().min(1, 'El nombre del cliente es requerido'),
+  clientSlug: z
+    .string()
+    .min(1, 'El slug del cliente es requerido')
+    .regex(
+      /^[a-z0-9-]+$/,
+      'El slug solo puede contener letras minúsculas, números y guiones',
+    ),
+  templateId: z.string().min(1, 'Debes seleccionar un formulario'),
 })
 
 interface DashboardFormProps {
-  clients: ClientData[]
   onSubmit: (data: NewDashboardForm) => void
 }
 
-export function DashboardForm({ clients, onSubmit }: DashboardFormProps) {
+export function DashboardForm({ onSubmit }: DashboardFormProps) {
   const form = useForm<NewDashboardForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      clientId: '',
-      formId: '',
-      name: '',
+      clientName: '',
+      clientSlug: '',
+      templateId: '',
     },
   })
-
-  const clientOptions = clients.map((client) => ({
-    value: client.id.toString(),
-    label: client.name,
-  }))
 
   const formSearchConfig = {
     url: '/api/repsly/forms',
@@ -55,15 +54,23 @@ export function DashboardForm({ clients, onSubmit }: DashboardFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormSelect label="Cliente" name="clientId" options={clientOptions} />
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Información del Cliente</h3>
+          <FormInput label="Nombre del Cliente" name="clientName" />
+        </div>
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Ruta del Cliente</h3>
+          <FormInput label="Slug del Cliente" name="clientSlug" />
+        </div>
 
-        <FormAutocomplete
-          label="Formulario"
-          name="formId"
-          searchConfig={formSearchConfig}
-        />
-
-        <FormInput label="Nombre" name="name" />
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Información del Dashboard</h3>
+          <FormAutocomplete
+            label="Formulario"
+            name="templateId"
+            searchConfig={formSearchConfig}
+          />
+        </div>
 
         <Button type="submit" className="w-full">
           Crear Dashboard

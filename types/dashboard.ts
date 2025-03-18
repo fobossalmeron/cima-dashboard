@@ -1,4 +1,5 @@
-import { FormTemplateResponse } from './api/form-template-search-response'
+import { ApiStatus } from '@/enums/api-status'
+import { FormTemplateSearchResponse } from './api/form-template-search-response'
 
 export interface FormTemplate {
   id: string
@@ -31,16 +32,27 @@ export interface FormSearchRequest {
   SortDescending: boolean
 }
 
-export interface FormSearchResponse {
-  error?: string
-  data?: {
-    items: FormTemplateResponse[]
-    total: number
-  }
+export interface FormSearchData {
+  items: FormTemplateSearchResponse[]
+  total: number
 }
 
+export interface FormSearchSuccessResponse {
+  status: ApiStatus.SUCCESS
+  data: FormSearchData
+}
+
+export interface FormSearchErrorResponse {
+  status: ApiStatus.ERROR
+  error: string
+}
+
+export type FormSearchResponse =
+  | FormSearchSuccessResponse
+  | FormSearchErrorResponse
+
 export interface NewDashboardForm {
-  clientId: string
-  formId: string
-  name: string
+  clientName: string
+  clientSlug: string
+  templateId: string
 }

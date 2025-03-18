@@ -1,26 +1,39 @@
 import {
-  FormTemplateResponse,
+  FormTemplate,
+  FormTemplateSearchResponse,
   ImportProductsResponse,
   RefreshTokenApiRequest,
   RefreshTokenApiResponse,
   RepslyProductsResponse,
   SyncDashboardResponse,
 } from '@/types/api'
-import { FormSearchResponse } from '@/types/dashboard'
+import {
+  FormSearchData,
+  FormSearchRequest,
+  SearchOperator,
+  SearchType,
+} from '@/types/dashboard'
 import { ServiceToken } from '@prisma/client'
 import { ServiceTokenService } from '../db'
 import { RepslyAuthService } from '../repsly/repsly-auth.service'
 
 export class RepslyApiService {
+  private static getBaseUrl() {
+    // En el servidor, usar la URL completa
+    if (typeof window === 'undefined') {
+      return `${process.env.NEXT_PUBLIC_API_URL}`
+    }
+    // En el cliente, usar rutas relativas
+    return ''
+  }
+
   static async makeAuthenticatedRequest<T>(
     url: string,
     options: RequestInit & {
       headers?: HeadersInit
     },
   ): Promise<T> {
-    const tokenResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/repsly/token`,
-    )
+    const tokenResponse = await fetch(`${this.getBaseUrl()}/api/repsly/token`)
 
     if (!tokenResponse.ok) {
       throw new Error('No se encontró el token de Repsly')
@@ -95,7 +108,7 @@ export class RepslyApiService {
       ...options.headers,
     }
 
-    const response = await fetch(url, {
+    const response = await fetch(`${this.getBaseUrl()}${url}`, {
       ...options,
       headers,
     })
@@ -129,25 +142,91 @@ export class RepslyApiService {
     throw new Error(`Tipo de contenido no soportado: ${contentType}`)
   }
 
-  static async searchForms(
-    searchTerm: string = '',
-  ): Promise<FormSearchResponse> {
-    return this.makeAuthenticatedRequest<FormSearchResponse>(
-      '/api/repsly/forms',
-      {
-        method: 'POST',
-        body: JSON.stringify({ searchTerm }),
+  static async searchForms(searchTerm: string = ''): Promise<FormSearchData> {
+    const REPSLY_API_URL = process.env.REPSLY_API_URL ?? ''
+    const { token, fingerprint } = await RepslyAuthService.getToken()
+
+    const requestBody: FormSearchRequest = {
+      Skip: 0,
+      Limit: 10,
+      Elements: [
+        {
+          Operator: SearchOperator.Is,
+          Type: SearchType.IsActive,
+          Value: true,
+        },
+        ...(searchTerm.length > 0
+          ? [
+              {
+                Operator: SearchOperator.Contains,
+                Type: SearchType.Search,
+                Value: searchTerm,
+              },
+            ]
+          : []),
+      ],
+      SortField: 'LastUpdatedUtc',
+      SortDescending: true,
+    }
+
+    const response = await fetch(`${REPSLY_API_URL}/Template/List`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        Fingerprint: fingerprint ?? '',
       },
+      body: JSON.stringify(requestBody),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error al buscar formularios: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const items = (data as any[]).map(
+      (item): FormTemplateSearchResponse => ({
+        id: item.Id,
+        name: item.Name,
+        description: item.Description,
+        active: item.Active,
+        sortOrder: item.SortOrder,
+        version: item.Version,
+        createdAt: item.CreatedAt,
+        updatedAt: item.UpdatedAt,
+        createdBy: item.CreatedBy,
+        updatedBy: item.UpdatedBy,
+      }),
     )
+    const total = items.length
+
+    return {
+      items,
+      total,
+    }
   }
 
-  static async getFormTemplate(id: string): Promise<FormTemplateResponse> {
-    return this.makeAuthenticatedRequest<FormTemplateResponse>(
-      `/api/repsly/forms/${id}`,
-      {
-        method: 'GET',
+  static async getFormTemplate(id: string): Promise<FormTemplate> {
+    const { token, fingerprint } = await RepslyAuthService.getToken()
+    const REPSLY_API_URL = process.env.REPSLY_API_URL
+
+    const response = await fetch(`${REPSLY_API_URL}/Template/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        Fingerprint: fingerprint ?? '',
       },
-    )
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error al obtener el formulario: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+
+    return data as FormTemplate
   }
 
   static async getProducts(

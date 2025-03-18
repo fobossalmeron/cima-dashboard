@@ -1,3 +1,4 @@
+import { ApiStatus } from '@/enums/api-status'
 import {
   Brand,
   Flavor,
@@ -117,13 +118,15 @@ export interface FormSubmissionEntryData {
 }
 
 export interface SyncDashboardSuccessResponse {
+  status: ApiStatus.SUCCESS
   data: FormSubmissionEntryData[]
-  error: null
+  error?: null
 }
 
 export interface SyncDashboardErrorResponse {
+  status: ApiStatus.ERROR
   error: string
-  data: null
+  data?: null
 }
 
 export type SyncDashboardResponse =

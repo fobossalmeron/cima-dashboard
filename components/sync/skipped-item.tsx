@@ -10,10 +10,10 @@ export function SkippedItem({
   return (
     <div
       key={submission.rowIndex}
-      className="mb-4 p-3 bg-green-50/50 rounded-lg"
+      className="mb-4 p-3 bg-yellow-50/50 border border-yellow-500 rounded-lg"
     >
       <div className="flex items-center gap-2 mb-2">
-        <Badge variant="outline" className="bg-green-50">
+        <Badge variant="outline" className="bg-yellow-50 border-yellow-500">
           Registro {submission.rowIndex + 1}
         </Badge>
       </div>

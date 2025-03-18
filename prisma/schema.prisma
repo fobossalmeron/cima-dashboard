@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,20 +7,364 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Modelos básicos que podrías necesitar
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String    @id @default(cuid())
+  email     String    @unique
   name      String?
   password  String
-  role      Role     @default(SUPER_ADMIN)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relaciones
-  client Client?
+  role      Role      @default(SUPER_ADMIN)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  client    Client?
+  sessions  Session[]
 
   @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+model Client {
+  id         String      @id @default(cuid())
+  name       String
+  slug       String      @unique
+  active     Boolean     @default(true)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  userId     String      @unique
+  user       User        @relation(fields: [userId], references: [id])
+  dashboards Dashboard[]
+
+  @@index([userId])
+  @@map("clients")
+}
+
+model Dashboard {
+  id          String           @id @default(cuid())
+  clientId    String
+  templateId  String
+  name        String
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  client      Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  template    FormTemplate     @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  submissions FormSubmission[]
+
+  @@index([clientId])
+  @@index([templateId])
+  @@map("dashboards")
+}
+
+model FormTemplate {
+  id             String           @id @default(cuid())
+  name           String
+  description    String?
+  active         Boolean          @default(true)
+  sortOrder      Int
+  version        Int              @default(1)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  createdBy      String
+  updatedBy      String
+  dashboards     Dashboard[]
+  productMetrics ProductMetrics[]
+  questionGroups QuestionGroup[]
+  questions      Question[]
+
+  @@map("form_templates")
+}
+
+model Question {
+  id                  String               @id @default(cuid())
+  name                String
+  type                QuestionType
+  sortOrder           Int
+  isMandatory         Boolean              @default(false)
+  isAutoFill          Boolean              @default(false)
+  forImageRecognition Boolean              @default(false)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  formTemplateId      String
+  questionGroupId     String?
+  answers             Answer[]
+  attachments         QuestionAttachment[]
+  options             QuestionOption[]
+  triggers            QuestionTrigger[]
+  formTemplate        FormTemplate         @relation(fields: [formTemplateId], references: [id])
+  questionGroup       QuestionGroup?       @relation(fields: [questionGroupId], references: [id])
+
+  @@index([formTemplateId])
+  @@index([questionGroupId])
+  @@map("questions")
+}
+
+model QuestionOption {
+  id         String            @id @default(cuid())
+  value      String
+  sortOrder  Int
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  questionId String
+  answers    Answer[]
+  question   Question          @relation(fields: [questionId], references: [id])
+  triggers   QuestionTrigger[]
+
+  @@index([questionId])
+  @@map("question_options")
+}
+
+model QuestionAttachment {
+  id         String   @id @default(cuid())
+  url        String
+  type       String
+  name       String
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id])
+
+  @@index([questionId])
+  @@map("question_attachments")
+}
+
+model QuestionGroup {
+  id             String            @id @default(cuid())
+  name           String
+  type           QuestionGroupType @default(BASIC)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  formTemplateId String
+  formTemplate   FormTemplate      @relation(fields: [formTemplateId], references: [id])
+  triggers       QuestionTrigger[]
+  questions      Question[]
+
+  @@index([formTemplateId])
+  @@map("question_groups")
+}
+
+model QuestionTrigger {
+  id         String          @id @default(cuid())
+  questionId String
+  groupId    String?
+  optionId   String?
+  group      QuestionGroup?  @relation(fields: [groupId], references: [id])
+  option     QuestionOption? @relation(fields: [optionId], references: [id])
+  question   Question        @relation(fields: [questionId], references: [id])
+
+  @@index([questionId])
+  @@index([groupId])
+  @@index([optionId])
+  @@map("question_triggers")
+}
+
+model ServiceToken {
+  id              String    @id @default(cuid())
+  service         String    @unique
+  token           String
+  fingerprint     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  refreshToken    String?   @map("refresh_token")
+  serviceClientId String?   @map("service_client_id")
+  expiresIn       Int?
+  expiresAt       DateTime? @map("expires_at")
+
+  @@index([service])
+  @@map("service_tokens")
+}
+
+model Brand {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  slug      String     @unique
+  products  Product[]
+  subBrands SubBrand[]
+
+  @@map("brands")
+}
+
+model SubBrand {
+  id        String    @id @default(cuid())
+  name      String
+  brandId   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  slug      String    @unique
+  products  Product[]
+  brand     Brand     @relation(fields: [brandId], references: [id])
+
+  @@unique([slug, brandId])
+  @@map("sub_brands")
+}
+
+model Presentation {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+
+  @@map("presentations")
+}
+
+model Flavor {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  slug      String    @unique
+  products  Product[]
+
+  @@map("flavors")
+}
+
+model Product {
+  id             String           @id @default(cuid())
+  name           String
+  brandId        String
+  subBrandId     String?
+  presentationId String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  flavorId       String?
+  imageUrl       String?          @map("image_url")
+  metrics        ProductMetrics[]
+  brand          Brand            @relation(fields: [brandId], references: [id])
+  flavor         Flavor?          @relation(fields: [flavorId], references: [id])
+  presentation   Presentation?    @relation(fields: [presentationId], references: [id])
+  subBrand       SubBrand?        @relation(fields: [subBrandId], references: [id])
+
+  @@unique([name, brandId])
+  @@index([brandId])
+  @@index([subBrandId])
+  @@index([presentationId])
+  @@index([flavorId])
+  @@map("products")
+}
+
+model ProductMetrics {
+  id        String       @id @default(cuid())
+  price     Float
+  sales     Int          @default(0)
+  date      DateTime     @default(now())
+  productId String
+  formId    String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  form      FormTemplate @relation(fields: [formId], references: [id])
+  product   Product      @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+  @@index([formId])
+  @@map("product_metrics")
+}
+
+model Representative {
+  id              String           @id @default(cuid())
+  name            String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  formSubmissions FormSubmission[]
+
+  @@map("representatives")
+}
+
+model Location {
+  id              String           @id @default(cuid())
+  code            String           @unique
+  name            String
+  address         String
+  postalCode      String           @map("postal_code")
+  city            String
+  state           String
+  country         String
+  latitude        Float
+  longitude       Float
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  formSubmissions FormSubmission[]
+
+  @@map("locations")
+}
+
+model Dealer {
+  id               String          @id @default(cuid())
+  name             String
+  nameOther        String?         @map("name_other")
+  sellerName       String?         @map("seller_name")
+  sellerMobile     String?         @map("seller_mobile")
+  sellerEmail      String?         @map("seller_email")
+  notes            String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  formSubmissionId String?         @unique @map("form_submission_id")
+  formSubmission   FormSubmission? @relation(fields: [formSubmissionId], references: [id])
+
+  @@index([formSubmissionId])
+  @@map("dealers")
+}
+
+model FormSubmission {
+  id               String          @id @default(cuid())
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  dashboardId      String
+  email            String?
+  locationId       String?
+  mobilePhone      String?         @map("mobile_phone")
+  notes            String?
+  phone            String?
+  registered       Boolean         @default(false)
+  representativeId String?
+  status           String?
+  tags             String[]
+  endDate          DateTime        @map("end_date")
+  legalName        String?         @map("legal_name")
+  startDate        DateTime        @map("start_date")
+  submittedAt      DateTime        @map("submitted_at")
+  formLink         String          @map("form_link")
+  answers          Answer[]
+  dealer           Dealer?
+  dashboard        Dashboard       @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  location         Location?       @relation(fields: [locationId], references: [id])
+  representative   Representative? @relation(fields: [representativeId], references: [id])
+
+  @@unique([dashboardId, locationId, representativeId, submittedAt])
+  @@index([locationId])
+  @@index([representativeId])
+  @@index([dashboardId])
+  @@map("form_submissions")
+}
+
+model Answer {
+  id             String          @id @default(cuid())
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  value          String
+  optionId       String?         @map("option_id")
+  questionId     String          @map("question_id")
+  questionKey    String          @map("question_key")
+  submissionId   String          @map("submission_id")
+  selectedOption QuestionOption? @relation(fields: [optionId], references: [id])
+  question       Question        @relation(fields: [questionId], references: [id])
+  submission     FormSubmission  @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+  @@index([questionId])
+  @@index([optionId])
+  @@index([questionKey])
+  @@map("answers")
 }
 
 enum Role {
@@ -47,382 +385,4 @@ enum QuestionType {
   NUMERIC
   TEXT
   PHOTO
-}
-
-// Aquí puedes agregar más modelos según tus necesidades
-
-model Client {
-  id        String   @id @default(cuid())
-  name      String
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relationships
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id])
-  dashboards    Dashboard[]
-
-  @@index([userId])
-  @@map("clients")
-}
-
-model Dashboard {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  name        String
-  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  clientId    String
-  template    FormTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  templateId  String
-  submissions FormSubmission[]
-
-  @@index([clientId])
-  @@index([templateId])
-  @@map("dashboards")
-}
-
-model FormTemplate {
-  id              String   @id @default(cuid())
-  name            String
-  description     String?
-  active          Boolean  @default(true)
-  sortOrder       Int
-  version         Int      @default(1)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  createdBy       String
-  updatedBy       String
-
-  // Relationships
-  dashboards      Dashboard[]
-  questionGroups  QuestionGroup[]
-  questions       Question[]
-  productMetrics  ProductMetrics[]
-
-  @@map("form_templates")
-}
-
-model Question {
-  id                  String   @id @default(cuid())
-  name                String
-  type                QuestionType
-  sortOrder           Int
-  isMandatory         Boolean  @default(false)
-  isAutoFill          Boolean  @default(false)
-  forImageRecognition Boolean @default(false)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  // Relationships
-  formTemplateId      String
-  formTemplate        FormTemplate @relation(fields: [formTemplateId], references: [id])
-  questionGroupId     String?
-  questionGroup       QuestionGroup? @relation(fields: [questionGroupId], references: [id])
-  options             QuestionOption[]
-  attachments         QuestionAttachment[]
-  triggers            QuestionTrigger[]
-  answers             Answer[]
-
-  @@index([formTemplateId])
-  @@index([questionGroupId])
-  @@map("questions")
-}
-
-model QuestionOption {
-  id        String   @id @default(cuid())
-  value     String
-  sortOrder Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relationships
-  questionId String
-  question   Question @relation(fields: [questionId], references: [id])
-  triggers   QuestionTrigger[]
-  answers    Answer[]
-
-  @@index([questionId])
-  @@map("question_options")
-}
-
-model QuestionAttachment {
-  id        String   @id @default(cuid())
-  url       String
-  type      String
-  name      String
-  questionId String
-  question   Question @relation(fields: [questionId], references: [id])
-
-  @@index([questionId])
-  @@map("question_attachments")
-}
-
-model QuestionGroup {
-  id        String   @id @default(cuid())
-  name      String
-  type      QuestionGroupType @default(BASIC)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relationships
-  formTemplateId String
-  formTemplate   FormTemplate @relation(fields: [formTemplateId], references: [id])
-  questions      Question[]
-  triggers       QuestionTrigger[]
-
-  @@index([formTemplateId])
-  @@map("question_groups")
-}
-
-model QuestionTrigger {
-  id        String   @id @default(cuid())
-  questionId String
-  question   Question @relation(fields: [questionId], references: [id])
-  groupId    String?
-  group      QuestionGroup? @relation(fields: [groupId], references: [id])
-  optionId   String?
-  option     QuestionOption? @relation(fields: [optionId], references: [id])
-
-  @@index([questionId])
-  @@index([groupId])
-  @@index([optionId])
-  @@map("question_triggers")
-}
-
-model ServiceToken {
-  id                String    @id @default(cuid())
-  service           String    @unique // nombre del servicio (e.g., "repsly")
-  serviceClientId   String?   @map("service_client_id")
-  token             String
-  refreshToken      String?   @map("refresh_token")
-  fingerprint       String?
-  expiresIn         Int?      // Tiempo de expiración en segundos
-  expiresAt         DateTime? @map("expires_at") // Fecha y hora de expiración
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  @@index([service])
-  @@map("service_tokens")
-}
-
-model Brand {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  name      String   @unique
-
-  // Relationships
-  subBrands SubBrand[]
-  products  Product[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("brands")
-}
-
-model SubBrand {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  name      String
-
-  // Relationships
-  brandId String
-  brand   Brand    @relation(fields: [brandId], references: [id])
-  products  Product[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([slug, brandId])
-  @@map("sub_brands")
-}
-
-model Presentation {
-  id        String   @id @default(cuid())
-  name      String   @unique
-
-  // Relationships
-  products  Product[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("presentations")
-}
-
-model Flavor {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  name      String   @unique
-
-  // Relationships
-  products  Product[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("flavors")
-}
-
-model Product {
-  id        String   @id @default(cuid())
-  name      String
-  imageUrl  String?  @map("image_url")
-
-  // Relationships
-  brandId   String
-  brand     Brand    @relation(fields: [brandId], references: [id])
-  subBrandId String?
-  subBrand  SubBrand? @relation(fields: [subBrandId], references: [id])
-  presentationId String?
-  presentation Presentation? @relation(fields: [presentationId], references: [id])
-  flavorId String?
-  flavor   Flavor? @relation(fields: [flavorId], references: [id])
-  metrics  ProductMetrics[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([name, brandId])
-  @@index([brandId])
-  @@index([subBrandId])
-  @@index([presentationId])
-  @@index([flavorId])
-  @@map("products")
-}
-
-model ProductMetrics {
-  id        String   @id @default(cuid())
-  price     Float
-  sales     Int      @default(0)
-  date      DateTime @default(now())
-  
-  // Relationships
-  productId String
-  product   Product  @relation(fields: [productId], references: [id])
-  formId    String
-  form      FormTemplate @relation(fields: [formId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([productId])
-  @@index([formId])
-  @@map("product_metrics")
-}
-
-model Representative {
-  id        String   @id @default(cuid())
-  name      String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relationships
-  formSubmissions FormSubmission[]
-
-  @@map("representatives")
-}
-
-model Location {
-  id          String    @id @default(cuid())
-  code        String    @unique
-  name        String
-  address     String
-  postalCode  String    @map("postal_code")
-  city        String
-  state       String
-  country     String
-  latitude    Float
-  longitude   Float
-
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-
-  // Relationships
-  formSubmissions FormSubmission[]
-
-  @@map("locations")
-}
-
-model Dealer {
-  id                String        @id @default(cuid())
-  name              String
-  nameOther         String?       @map("name_other")
-  sellerName        String?       @map("seller_name")
-  sellerMobile      String?       @map("seller_mobile")
-  sellerEmail       String?       @map("seller_email")
-  notes             String?
-
-  createdAt DateTime              @default(now())
-  updatedAt DateTime              @updatedAt
-
-  // Relationships
-  formSubmissionId  String?       @unique @map("form_submission_id")
-  formSubmission FormSubmission?  @relation(fields: [formSubmissionId], references: [id])
-
-  @@index([formSubmissionId])
-
-  @@map("dealers")
-}
-
-model FormSubmission {
-  id                String          @id @default(cuid())
-  submittedAt       DateTime        @map("submitted_at")
-  notes             String?
-  tags              String[]
-  email             String?
-  phone             String?
-  mobilePhone       String?         @map("mobile_phone")
-  status            String?
-  registered        Boolean         @default(false)
-  startDate         DateTime        @map("start_date")
-  endDate           DateTime        @map("end_date")
-  legalName         String?         @map("legal_name")
-  formLink          String          @map("form_link")
-
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-
-  // Relationships
-  locationId        String?
-  location          Location?       @relation(fields: [locationId], references: [id])
-  representativeId  String?
-  representative    Representative? @relation(fields: [representativeId], references: [id])
-  answers           Answer[]
-  dashboard         Dashboard       @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
-  dashboardId       String
-  dealer            Dealer?
-
-  @@index([locationId])
-  @@index([representativeId])
-  @@index([dashboardId])
-  // Unique submission per dashboard, location, representative and date
-  @@unique([dashboardId, locationId, representativeId, submittedAt])
-  @@map("form_submissions")
-}
-
-model Answer {
-  id              String          @id @default(cuid())
-  questionKey     String          @map("question_key")
-  value           String         
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-
-  // Relationships
-  submissionId    String          @map("submission_id")
-  submission      FormSubmission  @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  questionId      String          @map("question_id")
-  question        Question        @relation(fields: [questionId], references: [id])
-  optionId        String?         @map("option_id")
-  selectedOption  QuestionOption? @relation(fields: [optionId], references: [id])
-
-  @@index([submissionId])
-  @@index([questionId])
-  @@index([optionId])
-  @@index([questionKey])
-
-  @@map("answers")
 }

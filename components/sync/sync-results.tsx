@@ -68,41 +68,43 @@ export function SyncResults({ results, onClose }: SyncResultsProps) {
             </CardHeader>
             <AccordionContent>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Accordion type="multiple" className="space-y-4">
                   {/* Registros Válidos */}
-                  <Card className="border-green-200">
-                    <CardHeader className="border-b bg-green-50/50">
+                  <AccordionItem value="valid" className="border rounded-lg">
+                    <AccordionTrigger className="px-4 hover:no-underline">
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="h-5 w-5 text-green-500" />
-                        <CardTitle className="text-lg">
+                        <span className="text-lg font-medium">
                           Registros Válidos ({totalValid})
-                        </CardTitle>
+                        </span>
                       </div>
-                    </CardHeader>
-                    <CardContent className="p-4">
-                      <ScrollArea className="h-[300px]">
-                        {results.validSubmissions.map((submission, index) => (
-                          <SyncItem
-                            key={index}
-                            index={index}
-                            submission={submission}
-                          />
-                        ))}
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4">
+                      <ScrollArea className="h-[300px] w-full">
+                        <div className="grid grid-cols-2 gap-4 pr-4">
+                          {results.validSubmissions.map((submission, index) => (
+                            <SyncItem
+                              key={index}
+                              index={index}
+                              submission={submission}
+                            />
+                          ))}
+                        </div>
                       </ScrollArea>
-                    </CardContent>
-                  </Card>
+                    </AccordionContent>
+                  </AccordionItem>
 
                   {/* Registros con Errores */}
-                  <Card className="border-red-200">
-                    <CardHeader className="border-b bg-red-50/50">
+                  <AccordionItem value="invalid" className="border rounded-lg">
+                    <AccordionTrigger className="px-4 hover:no-underline">
                       <div className="flex items-center gap-2">
                         <AlertCircle className="h-5 w-5 text-red-500" />
-                        <CardTitle className="text-lg">
+                        <span className="text-lg font-medium">
                           Registros con Errores ({totalInvalid})
-                        </CardTitle>
+                        </span>
                       </div>
-                    </CardHeader>
-                    <CardContent className="p-4">
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4">
                       <ScrollArea className="h-[300px]">
                         {results.invalidSubmissions.map((submission) => (
                           <ErrorItem
@@ -111,30 +113,38 @@ export function SyncResults({ results, onClose }: SyncResultsProps) {
                           />
                         ))}
                       </ScrollArea>
-                    </CardContent>
-                  </Card>
+                    </AccordionContent>
+                  </AccordionItem>
+
                   {/* Registros Saltados */}
-                  <Card className="border-yellow-200">
-                    <CardHeader className="border-b bg-yellow-50/50">
+                  <AccordionItem
+                    value="skipped"
+                    className="border rounded-lg !border-b-1"
+                  >
+                    <AccordionTrigger className="px-4 hover:no-underline">
                       <div className="flex items-center gap-2">
                         <AlertCircle className="h-5 w-5 text-yellow-500" />
-                        <CardTitle className="text-lg">
+                        <span className="text-lg font-medium">
                           Registros Saltados ({totalSkipped})
-                        </CardTitle>
+                        </span>
                       </div>
-                    </CardHeader>
-                    <CardContent className="p-4">
-                      <ScrollArea className="h-[300px]">
-                        {results.skippedSubmissions.map((submission) => (
-                          <SkippedItem
-                            key={submission.rowIndex}
-                            submission={submission}
-                          />
-                        ))}
-                      </ScrollArea>
-                    </CardContent>
-                  </Card>
-                </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4">
+                      <div className="w-full">
+                        <ScrollArea className="h-[300px] w-full">
+                          <div className="grid grid-cols-2 gap-4 pr-4">
+                            {results.skippedSubmissions.map((submission) => (
+                              <SkippedItem
+                                key={submission.rowIndex}
+                                submission={submission}
+                              />
+                            ))}
+                          </div>
+                        </ScrollArea>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </CardContent>
             </AccordionContent>
           </Card>

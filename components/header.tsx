@@ -10,7 +10,7 @@ import { MobileFilters } from '@/components/mobile-filters'
 import { useClient } from '@/lib/context/ClientContext'
 
 export const Header = ({ title }: { title: string }) => {
-  const { clientData: client, dashboardData: dashboard } = useClient()
+  const { clientData: client } = useClient()
 
   return (
     <div className="flex flex-col justify-between items-start w-full gap-8">
@@ -26,10 +26,10 @@ export const Header = ({ title }: { title: string }) => {
       <div className="w-full flex items-center gap-2 justify-between px-6">
         <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
         <div className="container lg:hidden print:hidden w-auto">
-          <MobileNav clientId={client.id} dashboardId={dashboard.id} />
+          <MobileNav clientId={client.id} />
         </div>
         <nav className="hidden lg:flex print:hidden">
-          <Nav clientId={client.id} dashboardId={dashboard.id} />
+          <Nav clientId={client.id} />
         </nav>
       </div>
       <div className="w-full flex items-center gap-2 justify-between px-6">

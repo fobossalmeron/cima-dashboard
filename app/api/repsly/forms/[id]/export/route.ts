@@ -6,6 +6,7 @@ import {
   SyncDashboardSuccessResponse,
 } from '@/types/api'
 import { RepslyApiService } from '@/lib/services/api/repsly.service'
+import { ApiStatus } from '@/enums/api-status'
 
 interface RepslyExportData {
   [key: string]: string | number | null
@@ -68,13 +69,14 @@ export async function GET(
     const jsonData = parseCSV(csvText)
 
     return NextResponse.json<SyncDashboardSuccessResponse>({
+      status: ApiStatus.SUCCESS,
       data: jsonData,
-      error: null,
     })
   } catch (error) {
     console.error('Error al buscar formularios:', error)
     return NextResponse.json<SyncDashboardErrorResponse>(
       {
+        status: ApiStatus.ERROR,
         error:
           error instanceof Error
             ? error.message

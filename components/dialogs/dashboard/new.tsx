@@ -9,20 +9,17 @@ import {
 import { Button } from '@/components/ui/button'
 import { DashboardForm } from '@/components/forms'
 import { NewDashboardForm } from '@/types/dashboard'
-import { ClientData } from '@/types/api'
 
 export interface NewDashboardDialogProps {
   isDialogOpen: boolean
   setIsDialogOpen: (isOpen: boolean) => void
   handleSubmit: (data: NewDashboardForm) => void
-  clients: ClientData[]
 }
 
 export function NewDashboardDialog({
   isDialogOpen,
   setIsDialogOpen,
   handleSubmit,
-  clients,
 }: NewDashboardDialogProps) {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -36,7 +33,7 @@ export function NewDashboardDialog({
         <DialogHeader>
           <DialogTitle>Crear nuevo dashboard</DialogTitle>
         </DialogHeader>
-        <DashboardForm onSubmit={handleSubmit} clients={clients} />
+        <DashboardForm onSubmit={handleSubmit} />
       </DialogContent>
     </Dialog>
   )

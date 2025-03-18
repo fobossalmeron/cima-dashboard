@@ -1,10 +1,20 @@
-NUEVO REPORTE DEMOS - EDT BEBIDAS
-
 # Cima Dashboard
 
-## Arquitectura de Servicios
+## Table of Contents
 
-### Estructura de Carpetas
+- [Architecture](#architecture)
+- [Getting Started](#getting-started)
+- [Development Guidelines](#development-guidelines)
+  - [Import Conventions](#import-conventions)
+  - [Code Style](#code-style) (TODO)
+  - [Testing Guidelines](#testing-guidelines) (TODO)
+  - [Git Workflow](#git-workflow) (TODO)
+
+## Architecture
+
+### Service Architecture
+
+#### Folder Structure
 
 ```
 /services
@@ -45,44 +55,44 @@ NUEVO REPORTE DEMOS - EDT BEBIDAS
     /route.ts
 ```
 
-### Principios y Convenciones
+#### Principles and Conventions
 
-1. **Organización por Contexto**
+1. **Context Organization**
 
-   - Los servicios se organizan por dominio o contexto de negocio
-   - Servicios relacionados con el mismo modelo o lógica se agrupan en la misma carpeta
-   - Cada servicio tiene una responsabilidad única y clara
+   - Services are organized by business domain or context
+   - Related services working with the same model or logic are grouped in the same folder
+   - Each service has a single, clear responsibility
 
-2. **Servicios de Terceros**
+2. **Third-Party Services**
 
-   - Los servicios que interactúan con APIs externas tienen su propia carpeta
-   - Se separan las responsabilidades de autenticación y operaciones
-   - Ejemplo: `/services/repsly` para todos los servicios relacionados con Repsly
+   - Services that interact with external APIs have their own folder
+   - Authentication and operations responsibilities are separated
+   - Example: `/services/repsly` for all Repsly-related services
 
 3. **Controllers**
 
-   - Actúan como intermediarios entre los endpoints y los servicios
-   - Manejan la validación de datos y la transformación de respuestas
-   - No contienen lógica de negocio
+   - Act as intermediaries between endpoints and services
+   - Handle data validation and response transformation
+   - Do not contain business logic
 
 4. **Endpoints**
 
-   - Ubicados en `/app/api`
-   - Cada endpoint corresponde a una función pública de un servicio
-   - Manejan la comunicación HTTP y la serialización/deserialización
+   - Located in `/app/api`
+   - Each endpoint corresponds to a public service function
+   - Handle HTTP communication and serialization/deserialization
 
-5. **Flujo de Datos**
+5. **Data Flow**
    ```
    Frontend -> Controller -> Service -> Database/External API
    ```
 
-### Ejemplo de Implementación
+#### Implementation Example
 
 ```typescript
 // /services/repsly/repsly.service.ts
 export class RepslyService {
   static async exportForm(id: string): Promise<string> {
-    // Lógica de negocio
+    // Business logic
   }
 }
 
@@ -107,27 +117,91 @@ export async function GET(
 }
 ```
 
-### Beneficios
+#### Benefits
 
-1. **Separación de Responsabilidades**
+1. **Separation of Concerns**
 
-   - Cada capa tiene una responsabilidad clara
-   - Facilita el testing y mantenimiento
-   - Mejora la reutilización de código
+   - Each layer has a clear responsibility
+   - Facilitates testing and maintenance
+   - Improves code reusability
 
-2. **Seguridad**
+2. **Security**
 
-   - Los servicios nunca son accedidos directamente desde el frontend
-   - Validación y sanitización de datos en cada capa
-   - Manejo centralizado de autenticación
+   - Services are never accessed directly from the frontend
+   - Data validation and sanitization at each layer
+   - Centralized authentication handling
 
-3. **Mantenibilidad**
+3. **Maintainability**
 
-   - Estructura clara y predecible
-   - Fácil de extender y modificar
-   - Mejor organización del código
+   - Clear and predictable structure
+   - Easy to extend and modify
+   - Better code organization
 
-4. **Escalabilidad**
-   - Fácil de agregar nuevos servicios
-   - Posibilidad de reutilizar lógica entre servicios
-   - Mejor manejo de dependencias
+4. **Scalability**
+   - Easy to add new services
+   - Ability to reuse logic between services
+   - Better dependency management
+
+## Development Guidelines
+
+### Import Conventions
+
+We follow a specific order for organizing imports in our TypeScript/React files:
+
+```typescript
+// 1. React and external libraries
+import React from 'react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+
+// 2. UI Components (shadcn)
+import { Button, Card } from '@/components/ui'
+
+// 3. Custom components
+import { CustomComponent } from '@/components'
+
+// 4. Hooks and contexts
+import { useAuth } from '@/lib/contexts'
+
+// 5. Utilities and types
+import { cn } from '@/lib/utils'
+import type { MyType } from '@/types'
+
+// 6. Styles (if any)
+import './styles.css'
+```
+
+Within each group:
+
+- Type imports (`type`) go at the end of the group
+- Named imports come before default imports
+- Maintain alphabetical order within each group
+
+This organization helps with:
+
+- Better code readability
+- Clear dependency structure
+- Easier maintenance
+- Consistent code style across the project
+
+### Code Style (TODO)
+
+- Add coding standards
+- Add naming conventions
+- Add file organization guidelines
+
+### Testing Guidelines (TODO)
+
+- Add testing strategy
+- Add testing tools and setup
+- Add testing best practices
+
+### Git Workflow (TODO)
+
+- Add branching strategy
+- Add commit message conventions
+- Add PR guidelines
+
+## Getting Started
+
+(TODO: Add installation and setup instructions)

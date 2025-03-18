@@ -6,7 +6,6 @@ export * from './clustering'
 export * from './dashboard'
 export * from './dashboard-sync'
 export * from './form-template'
-export * from './form-template-response'
 export * from './form-template-search-response'
 export * from './products'
 
