@@ -1,9 +1,9 @@
 import { ApiStatus } from '@/enums/api-status'
-import { AuthService } from '@/lib/services/db/auth.service'
+import { RepslyAuthService } from '@/lib/services'
 import { NextResponse } from 'next/server'
 
 export async function POST() {
-  const refreshTokenResponse = await AuthService.refreshToken()
+  const refreshTokenResponse = await RepslyAuthService.refreshToken()
 
   if (refreshTokenResponse.status === ApiStatus.ERROR) {
     return NextResponse.json(refreshTokenResponse, {

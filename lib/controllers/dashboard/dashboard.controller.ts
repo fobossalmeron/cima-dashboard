@@ -1,4 +1,4 @@
-import { DashboardSyncService } from '@/lib/services/db'
+import { DashboardSyncService } from '@/lib/services'
 import { RepslyApiService } from '@/lib/services/api'
 import { NextRequest, NextResponse } from 'next/server'
 import { SyncDashboardSuccessResponse } from '@/types/api'

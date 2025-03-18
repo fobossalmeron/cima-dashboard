@@ -1,7 +1,7 @@
 import { ApiStatus } from '@/enums/api-status'
 import { prisma } from '@/lib/prisma'
 import { RepslyApiService } from '@/lib/services/api'
-import { ClientsService, FormTemplateService } from '@/lib/services/db'
+import { ClientsService, FormTemplateService } from '@/lib/services'
 import { FormTemplateRequest, FormTemplateResponse } from '@/types/api'
 import { NextRequest, NextResponse } from 'next/server'
 

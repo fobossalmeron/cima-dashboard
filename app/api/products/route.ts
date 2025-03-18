@@ -1,4 +1,4 @@
-import { BrandsService } from '@/lib/services/db'
+import { BrandsService } from '@/lib/services'
 import {
   GetAllBrandsWithSubBrandsErrorResponse,
   GetAllBrandsWithSubBrandsResponse,

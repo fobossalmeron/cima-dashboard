@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { RepslyService } from '@/lib/services/repsly/repsly.service'
+import { RepslyService } from '@/lib/services'
 
 export async function POST() {
   try {

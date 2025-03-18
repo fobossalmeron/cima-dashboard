@@ -1,4 +1,4 @@
-import { ClientsService } from '@/lib/services/db'
+import { ClientsService } from '@/lib/services'
 import { NextRequest, NextResponse } from 'next/server'
 
 export class ClientController {

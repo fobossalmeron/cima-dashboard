@@ -17,12 +17,14 @@ import {
   formatPresentation,
 } from '@/lib/constants/regex'
 import { TextClusteringService } from '../text-clustering.service'
-import { FormTemplateService } from './form-template.service'
 import { prisma } from '@/lib/prisma'
-import { BrandsService } from './brands.service'
-import { SubBrandService } from './sub-brand.service'
+import {
+  BrandsService,
+  FlavorService,
+  FormTemplateService,
+  SubBrandService,
+} from '../form-templates'
 import { PresentationService } from './presentation.service'
-import { FlavorService } from './flavor.service'
 import { ProductsService } from './products.service'
 import { PresentationsEnum } from '@/enums/presentations'
 import { SubBrandsEnum } from '@/enums/sub-brands'

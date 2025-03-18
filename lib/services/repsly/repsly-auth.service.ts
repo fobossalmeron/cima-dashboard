@@ -34,7 +34,82 @@ export class RepslyAuthService {
     return expiryTime - currentTime < RepslyAuthService.TOKEN_EXPIRY_THRESHOLD
   }
 
-  static async refreshToken(data: TokenData) {
+  static async refreshToken() {
+    const refreshTokenUrl = process.env.REPSLY_REFRESH_TOKEN_URL
+    if (!refreshTokenUrl) {
+      return {
+        status: ApiStatus.ERROR,
+        statusCode: 500,
+        error: 'Missing environment variables',
+        data: null,
+      }
+    }
+
+    const serviceToken = await RepslyAuthService.getToken()
+
+    if (!serviceToken) {
+      return {
+        status: ApiStatus.ERROR,
+        statusCode: 404,
+        error: 'Service token not found',
+        data: null,
+      }
+    }
+
+    const { refreshToken, serviceClientId } = serviceToken
+
+    if (!serviceClientId) {
+      return {
+        status: ApiStatus.ERROR,
+        statusCode: 404,
+        error: 'Service client ID not found',
+        data: null,
+      }
+    }
+
+    if (!refreshToken) {
+      return {
+        status: ApiStatus.ERROR,
+        statusCode: 404,
+        error: 'Refresh token not found',
+        data: null,
+      }
+    }
+
+    const formData = new FormData()
+    formData.append('client_id', serviceClientId)
+    formData.append('grant_type', 'refresh_token')
+    formData.append('scope', 'email offline_access openid profile')
+    formData.append('refresh_token', refreshToken)
+
+    const response = await fetch(refreshTokenUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Accept: 'application/json',
+      },
+      body: formData,
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(
+        `Error al actualizar el token: ${error.error || 'Unknown error'}`,
+      )
+    }
+
+    const data = await response.json()
+
+    await RepslyAuthService.saveRefreshToken(data)
+
+    return {
+      status: ApiStatus.SUCCESS,
+      statusCode: 200,
+      data,
+    }
+  }
+
+  static async saveRefreshToken(data: TokenData) {
     const expiresAt = new Date(Date.now() + data.expires_in * 1000)
 
     await prisma.serviceToken.upsert({
@@ -61,11 +136,7 @@ export class RepslyAuthService {
       const tokenData = await RepslyAuthService.getToken()
 
       if (RepslyAuthService.isTokenExpiringSoon(tokenData)) {
-        await RepslyAuthService.refreshToken({
-          access_token: tokenData.token,
-          expires_in: 3600, // 1 hora
-          token_type: 'Bearer',
-        })
+        await RepslyAuthService.refreshToken()
       }
 
       const response = await fetch(url, {

@@ -3,7 +3,7 @@ import {
   DashboardResponse,
   DashboardSuccessResponse,
 } from '@/types/api'
-import { DashboardsService } from '@/lib/services/db'
+import { DashboardsService } from '@/lib/services'
 import { NextResponse } from 'next/server'
 
 export async function GET(): Promise<NextResponse<DashboardResponse>> {

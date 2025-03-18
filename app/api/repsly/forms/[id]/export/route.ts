@@ -5,7 +5,7 @@ import {
   SyncDashboardResponse,
   SyncDashboardSuccessResponse,
 } from '@/types/api'
-import { RepslyApiService } from '@/lib/services/api/repsly.service'
+import { RepslyApiService } from '@/lib/services/api'
 import { ApiStatus } from '@/enums/api-status'
 
 interface RepslyExportData {

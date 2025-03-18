@@ -1,4 +1,4 @@
-import { FormTemplateService } from '@/lib/services/db'
+import { FormTemplateService } from '@/lib/services'
 import { NextResponse } from 'next/server'
 
 export async function GET(

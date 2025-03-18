@@ -1,4 +1,4 @@
-import { ProductTemplateProcessor } from '@/lib/services/db'
+import { ProductTemplateProcessor } from '@/lib/services'
 import {
   LoadProductsFromTemplateErrorResponse,
   LoadProductsFromTemplateResponse,

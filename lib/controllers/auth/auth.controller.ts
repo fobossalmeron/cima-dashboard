@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { AuthService } from '@/lib/services/auth/auth.service'
+import { AuthService } from '@/lib/services'
 
 export class AuthController {
   static async login(req: NextRequest) {

@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 import { ClientProvider } from '@/lib/context/ClientContext'
 import { notFound } from 'next/navigation'
-import { ClientsService } from '@/lib/services/db'
+import { ClientsService } from '@/lib/services'
 
 export default async function ClientLayout({
   children,

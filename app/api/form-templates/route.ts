@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { FormTemplateService } from '@/lib/services/db'
+import { FormTemplateService } from '@/lib/services'
 import { FormTemplateController } from '@/lib/controllers/form-template/form-template.controller'
 
 export async function POST(request: NextRequest) {

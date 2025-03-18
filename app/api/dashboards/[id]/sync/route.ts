@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { SyncRequest, SyncResponse } from '@/types/api'
-import { DashboardSyncService } from '@/lib/services/db/dashboard-sync.service'
+import { DashboardSyncService } from '@/lib/services'
 
 export async function POST(
   request: Request,

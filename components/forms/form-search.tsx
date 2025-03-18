@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { RepslyService } from '@/lib/services/repsly/repsly.service'
+import { RepslyService } from '@/lib/services'
 import { useToast } from '@/components/ui/use-toast'
 import { ApiStatus } from '@/enums/api-status'
 
