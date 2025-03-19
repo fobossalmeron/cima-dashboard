@@ -1,3 +1,8 @@
+import { ApiStatus } from '@/enums/api-status'
+import { FormTemplateWithQuestionsAndOptions } from '@/lib/services'
+import { Dashboard, Client, User } from '@prisma/client'
+import { NextResponse } from 'next/server'
+
 export interface FormTemplateOption {
   Id: string
   Value: string
@@ -59,7 +64,59 @@ export interface FormTemplate {
 }
 
 export interface FormTemplateRequest {
+  clientName: string
+  clientSlug: string
+  templateId: string
+  dashboardName?: string
+}
+
+export interface FormTemplateSuccessResponse {
+  status: ApiStatus.SUCCESS
+  data: FormTemplateBodyResponse
+}
+
+export interface FormTemplateErrorResponse {
+  status: ApiStatus.ERROR
+  error: string
+}
+
+export type FormTemplateResponse =
+  | FormTemplateSuccessResponse
+  | FormTemplateErrorResponse
+
+export interface FormTemplateServiceParams {
   clientId: string
   template: FormTemplate
-  dashboardName: string
+  dashboardName?: string
+}
+
+export interface DashboardCreateParams {
+  clientId: string
+  name: string
+  templateId: string
+}
+
+export interface FormTemplateCreateParams {
+  id: string
+  name: string
+  description: string
+  active: boolean
+  sortOrder: number
+  version: number
+  createdBy: string
+  updatedBy: string
+}
+
+export interface FormTemplateCreateResponse {
+  dashboard: Dashboard
+  template: FormTemplateWithQuestionsAndOptions
+}
+
+export interface FormTemplateBodyResponse extends FormTemplateCreateResponse {
+  client: Client
+  user: User
+}
+
+export interface NextResponseFormTemplate extends Omit<NextResponse, 'body'> {
+  body: FormTemplateBodyResponse
 }

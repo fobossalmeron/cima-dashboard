@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @plugin "tailwindcss-animate";
 
@@ -177,14 +177,14 @@
   }
 
   /* Asegurar que los mapas se muestren correctamente */
-  [class*="map"] {
+  [class*='map'] {
     page-break-inside: avoid;
     break-inside: avoid;
   }
 
   /* Asegurar que las tablas se muestren correctamente */
   table,
-  [class*="table"] {
+  [class*='table'] {
     /* width: 100% !important;
     border-collapse: collapse !important; */
     page-break-inside: avoid;
@@ -193,15 +193,15 @@
 
   table th,
   table td,
-  [class*="table"] th,
-  [class*="table"] td {
+  [class*='table'] th,
+  [class*='table'] td {
     /* border: 1px solid #ddd !important;
     padding: 8px !important; */
   }
 
   /* Asegurar que los KPIs se muestren correctamente */
-  [class*="kpi"],
-  [class*="card"] {
+  [class*='kpi'],
+  [class*='card'] {
     page-break-inside: avoid;
     break-inside: avoid;
   }

@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 async function main() {
   // Crear usuario administrador
   const adminPassword = await hash('superadmin123', 12)
-  const admin = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: 'admin@cima.com' },
     update: {},
     create: {
@@ -17,29 +17,6 @@ async function main() {
     },
   })
 
-  // Crear usuario cliente
-  const userPassword = await hash('admin123', 12)
-  const user = await prisma.user.upsert({
-    where: { email: 'admin@client.com' },
-    update: {},
-    create: {
-      email: 'admin@client.com',
-      name: 'Administrador Cliente',
-      password: userPassword,
-      role: Role.CLIENT,
-    },
-  })
-
-  // Crear cliente asociado al usuario
-  const client = await prisma.client.upsert({
-    where: { userId: user.id },
-    update: {},
-    create: {
-      name: 'Cliente Demo',
-      userId: user.id,
-    },
-  })
-
   // Crear token de Repsly
   await prisma.serviceToken.upsert({
     where: { service: 'repsly' },
@@ -47,12 +24,15 @@ async function main() {
     create: {
       service: 'repsly',
       token: process.env.REPSLY_TOKEN || 'your-token-here',
+      refreshToken:
+        process.env.REPSLY_REFRESH_TOKEN || 'your-refresh-token-here',
+      serviceClientId: process.env.REPSLY_CLIENT_ID || 'your-client-id-here',
       fingerprint: process.env.REPSLY_FINGERPRINT || 'your-fingerprint-here',
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 horas
+      expiresAt: process.env.REPSLY_EXPIRES_AT
+        ? new Date(parseInt(process.env.REPSLY_EXPIRES_AT) * 1000)
+        : new Date(),
     },
   })
-
-  console.log({ admin, user, client })
 }
 
 main()

@@ -10,8 +10,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import CimaSVG from '@/public/cima_logo_simple.svg'
+import { useAuth } from '@/lib/contexts/auth-context'
 
 export function AdminHeader() {
+  const { logout } = useAuth()
+
   return (
     <header className="flex w-full items-center border-b bg-background">
       <div className="flex w-full items-center justify-between gap-2 px-6 py-4">
@@ -27,11 +30,7 @@ export function AdminHeader() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem
-              onClick={() => {
-                window.location.href = '/login'
-              }}
-            >
+            <DropdownMenuItem onClick={logout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Cerrar sesión</span>
             </DropdownMenuItem>

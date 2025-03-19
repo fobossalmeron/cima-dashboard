@@ -7,7 +7,6 @@ export class FormTemplateApiService {
     client: ClientData,
     dashboardName: string,
   ) {
-    console.log({ template, client, dashboardName })
     const response = await fetch('/api/form-templates', {
       method: 'POST',
       headers: {

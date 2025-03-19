@@ -1,33 +1,51 @@
-import { DashboardData } from "@/types/DashboardData";
-
-// Datos de dashboard de ejemplo (temporal)
-const mockDashboard = {
-  activation1: {
-    id: "prod_01",
-    name: "Producto 1",
-    price: 100,
-    sales: 50,
-  },
-  activation2: {
-    id: "prod_02",
-    name: "Producto 2",
-    price: 200,
-    sales: 30,
-  }
-};
+import { DashboardData } from '@/types/DashboardData'
+import { prisma } from '@/lib/prisma'
 
 /**
  * Obtiene los datos del dashboard
  * @returns DashboardData con productos, precios y ventas
  */
-export async function getDashboardData(formID: string): Promise<DashboardData> {
+export async function getDashboardData(formId: string): Promise<DashboardData> {
   try {
-    // NOTA: Esta implementación será reemplazada por Prisma con:
-    // return await prisma.dashboard.findMany();
-    console.log("formID", formID);
-    return mockDashboard;
+    // Obtener las métricas de productos para el form template
+    const productMetrics = await prisma.productMetrics.findMany({
+      where: {
+        formId: formId,
+      },
+      include: {
+        product: {
+          include: {
+            brand: true,
+            subBrand: true,
+            presentation: true,
+            flavor: true,
+          },
+        },
+      },
+    })
+
+    // Transformar los datos al formato esperado
+    const dashboardData: DashboardData = {}
+
+    for (const metric of productMetrics) {
+      const product = metric.product
+      const productKey = `${product.brand.name}_${
+        product.subBrand?.name || ''
+      }_${product.presentation?.name || ''}_${
+        product.flavor?.name || ''
+      }`.replace(/\s+/g, '_')
+
+      dashboardData[productKey] = {
+        id: product.id,
+        name: product.name,
+        price: metric.price,
+        sales: metric.sales,
+      }
+    }
+
+    return dashboardData
   } catch (error) {
-    console.error("Error al obtener datos del dashboard:", error);
-    throw error;
+    console.error('Error al obtener datos del dashboard:', error)
+    throw error
   }
-} 
+}

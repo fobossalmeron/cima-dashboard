@@ -1,0 +1,20 @@
+import { Client, Dashboard, FormTemplate } from '@prisma/client'
+
+export type DashboardWithClientAndTemplate = Dashboard & {
+  client: Client
+  template: FormTemplate
+}
+
+export interface DashboardSuccessResponse {
+  data: DashboardWithClientAndTemplate[]
+  error: null
+}
+
+export interface DashboardErrorResponse {
+  data?: null
+  error: string
+}
+
+export type DashboardResponse =
+  | DashboardSuccessResponse
+  | DashboardErrorResponse

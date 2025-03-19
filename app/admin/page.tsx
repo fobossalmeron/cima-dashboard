@@ -1,72 +1,127 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ClientData } from '@/types/api'
 import { AdminHeader } from '@/components/headers'
-import { ClientsTable } from '@/components/tables'
+import { DashboardsTable } from '@/components/tables'
 import { NewDashboardForm } from '@/types/dashboard'
 import { toast } from 'sonner'
 import { NewDashboardDialog } from '@/components/dialogs/dashboard'
-import {
-  ClientsApiService,
-  RepslyApiService,
-  FormTemplateApiService,
-} from '@/lib/services/api'
+import { DashboardWithClientAndTemplate, ValidationResult } from '@/types/api'
+import { SyncResults } from '@/components/sync/sync-results'
+import { ApiStatus } from '@/enums/api-status'
 
 export default function AdminPage() {
-  const [clients, setClients] = useState<ClientData[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [dashboards, setDashboards] = useState<
+    DashboardWithClientAndTemplate[]
+  >([])
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [createDashboardLoading, setCreateDashboardLoading] =
+    useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+  const [syncResults, setSyncResults] = useState<ValidationResult | null>(null)
+  const [isSyncing, setIsSyncing] = useState<boolean>(false)
+  const [isCleaning, setIsCleaning] = useState<boolean>(false)
+
+  const loadDashboards = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/dashboard')
+      if (!response.ok) {
+        throw new Error('Error al obtener los dashboards')
+      }
+      const data = await response.json()
+      setDashboards(data.data)
+    } catch (err) {
+      setError('Error al cargar los dashboards')
+      console.error('Error al cargar dashboards:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const loadClients = async () => {
-      try {
-        setIsLoading(true)
-        const data = await ClientsApiService.getAll()
-        setClients(data)
-      } catch (err) {
-        setError('Error al cargar los clientes')
-        console.error('Error al cargar clientes:', err)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    loadClients()
+    loadDashboards()
   }, [])
 
   const handleSubmit = async (data: NewDashboardForm) => {
     try {
-      console.log('Data:', data)
-      // Obtener el template de Repsly
-      const formTemplateResponse = await RepslyApiService.getFormTemplate(
-        data.formId,
-      )
-      if (!formTemplateResponse.data) {
-        throw new Error('No se encontró el formulario')
+      setCreateDashboardLoading(true)
+      // Create the dashboard, client and form template
+      const response = await fetch(`/api/form-templates`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        setCreateDashboardLoading(false)
+        throw new Error(error.error || 'Error al crear el dashboard')
       }
 
-      // Encontrar el cliente seleccionado
-      const selectedClient = clients.find(
-        (client) => client.id.toString() === data.clientId,
-      )
-      if (!selectedClient) {
-        throw new Error('No se encontró el cliente')
+      const result = await response.json()
+      if (result.status === ApiStatus.SUCCESS) {
+        toast.success('Dashboard creado exitosamente')
+        loadDashboards()
+        setIsDialogOpen(false)
+        setCreateDashboardLoading(false)
+      } else {
+        throw new Error(result.error || 'Error al crear el dashboard')
       }
-      const formTemplate = formTemplateResponse.data
-      const dashboardName = data.name
-      // Guardar el template en nuestra base de datos
-      await FormTemplateApiService.create(
-        formTemplate,
-        selectedClient,
-        dashboardName,
-      )
-
-      toast.success('Dashboard creado exitosamente')
-      setIsDialogOpen(false)
     } catch (error) {
       console.error('Error al crear dashboard:', error)
       toast.error('Error al crear el dashboard')
+      setCreateDashboardLoading(false)
+    }
+  }
+
+  const handleSyncDashboard = async (dashboardId: string) => {
+    try {
+      setIsSyncing(true)
+      setSyncResults(null)
+
+      const response = await fetch(`/api/dashboard/${dashboardId}/sync`)
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Error al sincronizar el dashboard')
+      }
+
+      const result = await response.json()
+      setSyncResults(result)
+      toast.success('Dashboard sincronizado exitosamente')
+      loadDashboards()
+    } catch (error) {
+      console.error('Error al sincronizar el dashboard:', error)
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Error al sincronizar el dashboard',
+      )
+    } finally {
+      setIsSyncing(false)
+    }
+  }
+
+  const handleClearDashboard = async (dashboardId: string) => {
+    try {
+      setIsCleaning(true)
+      const response = await fetch(`/api/dashboard/${dashboardId}/clear`, {
+        method: 'POST',
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Error al limpiar el dashboard')
+      }
+
+      toast.success('Dashboard limpiado exitosamente')
+      loadDashboards()
+    } catch (error) {
+      console.error('Error al limpiar el dashboard:', error)
+      toast.error('Error al limpiar el dashboard')
+    } finally {
+      setIsCleaning(false)
     }
   }
 
@@ -88,7 +143,7 @@ export default function AdminPage() {
             isDialogOpen={isDialogOpen}
             setIsDialogOpen={setIsDialogOpen}
             handleSubmit={handleSubmit}
-            clients={clients}
+            loading={createDashboardLoading}
           />
         </div>
 
@@ -101,7 +156,21 @@ export default function AdminPage() {
             {error}
           </div>
         ) : (
-          <ClientsTable clients={clients} />
+          <>
+            <DashboardsTable
+              dashboards={dashboards}
+              onSyncDashboard={handleSyncDashboard}
+              onClearDashboard={handleClearDashboard}
+              isSyncing={isSyncing}
+              isCleaning={isCleaning}
+            />
+            {syncResults && (
+              <SyncResults
+                results={syncResults}
+                onClose={() => setSyncResults(null)}
+              />
+            )}
+          </>
         )}
       </div>
     </div>

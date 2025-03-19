@@ -7,34 +7,34 @@ import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import { NewDashboardForm } from '@/types/dashboard'
 import { FormTemplateSearchResponse } from '@/types/api/form-template-search-response'
-import { ClientData } from '@/types/api'
-import { FormSelect, FormAutocomplete, FormInput } from './elements'
+import { FormAutocomplete, FormInput } from './elements'
 
 const formSchema = z.object({
-  clientId: z.string().min(1, 'Debes seleccionar un cliente'),
-  formId: z.string().min(1, 'Debes seleccionar un formulario'),
-  name: z.string().min(1, 'El nombre es requerido'),
+  clientName: z.string().min(1, 'El nombre del cliente es requerido'),
+  clientSlug: z
+    .string()
+    .min(1, 'El slug del cliente es requerido')
+    .regex(
+      /^[a-z0-9-]+$/,
+      'El slug solo puede contener letras minúsculas, números y guiones',
+    ),
+  templateId: z.string().min(1, 'Debes seleccionar un formulario'),
 })
 
 interface DashboardFormProps {
-  clients: ClientData[]
   onSubmit: (data: NewDashboardForm) => void
+  loading: boolean
 }
 
-export function DashboardForm({ clients, onSubmit }: DashboardFormProps) {
+export function DashboardForm({ onSubmit, loading }: DashboardFormProps) {
   const form = useForm<NewDashboardForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      clientId: '',
-      formId: '',
-      name: '',
+      clientName: '',
+      clientSlug: '',
+      templateId: '',
     },
   })
-
-  const clientOptions = clients.map((client) => ({
-    value: client.id.toString(),
-    label: client.name,
-  }))
 
   const formSearchConfig = {
     url: '/api/repsly/forms',
@@ -55,18 +55,19 @@ export function DashboardForm({ clients, onSubmit }: DashboardFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormSelect label="Cliente" name="clientId" options={clientOptions} />
-
+        <FormInput label="Nombre del Cliente" name="clientName" />
+        <FormInput
+          label="URL del dashboard"
+          description="(Sin espacios ni caracteres especiales)"
+          name="clientSlug"
+        />
         <FormAutocomplete
           label="Formulario"
-          name="formId"
+          name="templateId"
           searchConfig={formSearchConfig}
         />
-
-        <FormInput label="Nombre" name="name" />
-
-        <Button type="submit" className="w-full">
-          Crear Dashboard
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? 'Creando...' : 'Crear Dashboard'}
         </Button>
       </form>
     </Form>

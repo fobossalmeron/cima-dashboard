@@ -1,4 +1,4 @@
-import { FormTemplateDbService } from '@/lib/services/db/form-template.service'
+import { FormTemplateService } from '@/lib/services'
 import { NextResponse } from 'next/server'
 
 export async function GET(
@@ -7,7 +7,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const formTemplate = await FormTemplateDbService.getById(id)
+    const formTemplate = await FormTemplateService.getById(id)
 
     if (!formTemplate) {
       return NextResponse.json(

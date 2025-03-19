@@ -1,13 +1,13 @@
-"use client";
+'use client'
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { RefreshCcw } from "lucide-react";
-import Link from "next/link";
-import { ClientData } from "@/types/ClientData";
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { RefreshCcw } from 'lucide-react'
+import Link from 'next/link'
+import { ClientData } from '@/types/api'
 
 interface ClientsTableProps {
-  clients: ClientData[];
+  clients: ClientData[]
 }
 
 export function ClientsTable({ clients }: ClientsTableProps) {
@@ -18,9 +18,7 @@ export function ClientsTable({ clients }: ClientsTableProps) {
           <CardContent className="p-4 flex justify-between items-center">
             <div>
               <h3 className="font-medium">{client.name}</h3>
-              <p className="text-sm text-gray-600">
-                Form: {client.formId}
-              </p>
+              <p className="text-sm text-gray-600">Form: {client.formId}</p>
             </div>
             <div className="flex gap-2">
               <Button asChild variant="primary-outline">
@@ -37,5 +35,5 @@ export function ClientsTable({ clients }: ClientsTableProps) {
         </Card>
       ))}
     </div>
-  );
-} 
+  )
+}

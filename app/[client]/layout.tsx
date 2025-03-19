@@ -1,29 +1,33 @@
-import { ReactNode } from "react";
-import { getClientData } from "@/lib/db/get-client";
-import { getDashboardData } from "@/lib/db/get-dashboard";
-import { ClientProvider } from "@/lib/context/ClientContext";
-import { notFound } from "next/navigation";
+import { ReactNode } from 'react'
+import { ClientProvider } from '@/lib/context/ClientContext'
+import { notFound } from 'next/navigation'
+import { ClientsService } from '@/lib/services'
 
 export default async function ClientLayout({
   children,
   params,
 }: {
-  children: ReactNode;
-  params: { client: string };
+  children: ReactNode
+  params: Promise<{ client: string }>
 }) {
-  const resolvedParams = await params;
-  const clientData = await getClientData(resolvedParams.client);
+  const resolvedParams = await params
+  const clientData = await ClientsService.getBySlug(resolvedParams.client)
 
   if (!clientData) {
-    notFound();
-    return null;
+    notFound()
+    return null
   }
 
-  const dashboardData = await getDashboardData(clientData.formId);
+  const dashboardData = clientData.dashboard
+
+  if (!dashboardData) {
+    notFound()
+    return null
+  }
 
   return (
     <ClientProvider clientData={clientData} dashboardData={dashboardData}>
       {children}
     </ClientProvider>
-  );
+  )
 }
