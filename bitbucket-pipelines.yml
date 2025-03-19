@@ -1,0 +1,23 @@
+image: node:23.6.0
+
+pipelines:
+  branches:
+    develop:
+      - step:
+          name: 'Build and Deploy Cima Dashboard in Development'
+          script:
+            - npm install --global vercel
+            - vercel link --yes --project=cima-dashboard --token=$VERCEL_TOKEN
+            - vercel pull --yes --environment=preview --git-branch=develop
+              --token=$VERCEL_TOKEN
+            - vercel build --token=$VERCEL_TOKEN --debug
+            - vercel deploy --prebuilt --token=$VERCEL_TOKEN
+    main:
+      - step:
+          name: 'Build and Deploy Cima Dashboard in Production'
+          script:
+            - npm install --global vercel
+            - vercel link --yes --project=cima-dashboard --token=$VERCEL_TOKEN
+            - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+            - vercel build --prod --token=$VERCEL_TOKEN
+            - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
