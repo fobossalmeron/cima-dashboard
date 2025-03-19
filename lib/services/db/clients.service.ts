@@ -1,10 +1,11 @@
 import { prisma } from '@/lib/prisma'
 import { Role } from '@/enums/role'
-import { Client, Prisma } from '@prisma/client'
+import { Client, Prisma, User } from '@prisma/client'
 import {
   CreateClientRequest,
   ClientWithRelations,
   DashboardWithRelations,
+  CreateClientResponse,
 } from '@/types/api/clients'
 import { AuthService } from '../auth'
 
@@ -112,22 +113,6 @@ export class ClientsService {
     }
   }
 
-  static async create(data: CreateClientRequest): Promise<Client> {
-    return await prisma.$transaction(async (tx) => {
-      const user = await this.createUser(tx, data)
-
-      const client = await tx.client.create({
-        data: {
-          name: data.name,
-          slug: data.slug,
-          userId: user.id,
-        },
-      })
-
-      return client
-    })
-  }
-
   static async update(
     id: string,
     data: Partial<{
@@ -156,7 +141,7 @@ export class ClientsService {
   private static async createUser(
     tx: Prisma.TransactionClient,
     data: CreateClientRequest,
-  ) {
+  ): Promise<User> {
     const password = Math.random().toString(36).slice(-8)
     const hashedPassword = await AuthService.hashPassword(password)
     return tx.user.create({
@@ -166,5 +151,50 @@ export class ClientsService {
         role: Role.CLIENT,
       },
     })
+  }
+
+  private static async createClient(
+    tx: Prisma.TransactionClient,
+    data: CreateClientRequest,
+    user: User,
+  ): Promise<Client> {
+    return tx.client.create({
+      data: {
+        name: data.name,
+        slug: data.slug,
+        userId: user.id,
+      },
+    })
+  }
+
+  static async create(
+    data: CreateClientRequest,
+    tx?: Prisma.TransactionClient,
+  ): Promise<CreateClientResponse> {
+    if (tx) {
+      const user = await this.createUser(tx, data)
+      const client = await this.createClient(tx, data, user)
+
+      return {
+        user,
+        client,
+      }
+    } else {
+      // Crear usuario y cliente en una transacción
+      const result = await prisma.$transaction(async (tx) => {
+        // Crear el usuario
+        const user = await this.createUser(tx, data)
+
+        // Crear el cliente
+        const client = await this.createClient(tx, data, user)
+
+        return {
+          user,
+          client,
+        }
+      })
+
+      return result
+    }
   }
 }
