@@ -8,7 +8,6 @@ import {
 } from '@/lib/services'
 import { FormTemplateRequest, FormTemplateResponse } from '@/types/api'
 import { NextRequest, NextResponse } from 'next/server'
-import { logger } from '@/lib/utils/logger'
 
 export class FormTemplateController {
   static async create(
@@ -31,9 +30,6 @@ export class FormTemplateController {
             },
             tx,
           )
-        logger.info(
-          `Processing template ${JSON.stringify(formTemplate, null, 2)}`,
-        )
         await ProductTemplateProcessorService.processTemplate(formTemplate, tx)
         return {
           client,
