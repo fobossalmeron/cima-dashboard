@@ -1,8 +1,9 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { AuthService } from '@/lib/services'
+import { runtime } from '@/lib/config/runtime'
 
-export const runtime = 'edge'
+export { runtime }
 
 export async function GET() {
   try {

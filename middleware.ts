@@ -2,26 +2,27 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 // Rutas que requieren autenticación
-const protectedRoutes = ['/admin']
+// const protectedRoutes: string[] = []
 
 // Rutas públicas
-const publicRoutes = ['/login']
+// const publicRoutes = ['/login']
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  const session = request.cookies.get('session')
+  // const { pathname } = request.nextUrl
+  // const session = request.cookies.get('session')
 
-  // Si es una ruta protegida y no hay sesión, redirigir a login
-  if (protectedRoutes.some((route) => pathname.startsWith(route)) && !session) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('from', pathname)
-    return NextResponse.redirect(loginUrl)
-  }
+  // // Si es una ruta protegida y no hay sesión, redirigir a login
+  // if (protectedRoutes.some((route) => pathname.startsWith(route)) && !session) {
+  //   const loginUrl = new URL('/login', request.url)
+  //   loginUrl.searchParams.set('from', pathname)
+  //   return NextResponse.redirect(loginUrl)
+  // }
 
-  // Si es una ruta pública y hay sesión, redirigir a dashboard
-  if (publicRoutes.includes(pathname) && session) {
-    return NextResponse.redirect(new URL('/admin', request.url))
-  }
+  // // Si es una ruta pública y hay sesión, redirigir a dashboard
+  // if (publicRoutes.includes(pathname) && session) {
+  //   return NextResponse.redirect(new URL('/admin', request.url))
+  // }
 
   return NextResponse.next()
 }

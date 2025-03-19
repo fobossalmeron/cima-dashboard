@@ -1,7 +1,8 @@
 import { AuthController } from '@/lib/controllers/auth/auth.controller'
 import { NextRequest } from 'next/server'
+import { runtime } from '@/lib/config/runtime'
 
-export const runtime = 'edge'
+export { runtime }
 
 export async function POST(req: NextRequest) {
   return AuthController.logout(req)
