@@ -1,4 +1,4 @@
-import { BrandWithSubBrands } from '@/types/api'
+import { BrandWithSubBrands } from '@/types/api/products'
 import Image from 'next/image'
 
 interface ProductsTableProps {

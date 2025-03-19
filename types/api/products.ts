@@ -107,12 +107,16 @@ export interface BrandWithSubBrands extends Brand {
   subBrands: SubBrandWithProducts[]
 }
 
+export interface BrandWithOnlySubBrands extends Brand {
+  subBrands: SubBrand[]
+}
+
 export interface AnswerWithQuestion extends Answer {
   question: Question
 }
 
 export interface GetAllBrandsWithSubBrandsSuccessResponse {
-  data: BrandWithSubBrands[]
+  data: BrandWithOnlySubBrands[]
   error: null
 }
 
