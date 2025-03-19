@@ -95,8 +95,8 @@ export interface QuestionGroup {
 }
 
 export interface ProductWithFlavorAndPresentation extends Product {
-  flavor: Flavor
-  presentation: Presentation
+  flavor: Flavor | null
+  presentation: Presentation | null
 }
 
 export interface SubBrandWithProducts extends SubBrand {
