@@ -5,10 +5,6 @@ export interface ProductData {
   sales: number
 }
 
-export interface DashboardData {
-  [key: string]: ProductData
-}
-
 export interface ProductMetricsData {
   id: string
   price: number

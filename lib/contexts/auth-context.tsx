@@ -26,10 +26,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
 
   useEffect(() => {
-    validateSession()
+    // validateSession()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async function validateSession() {
     try {
       const response = await fetch('/api/auth/session')

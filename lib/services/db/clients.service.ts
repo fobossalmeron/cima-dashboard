@@ -1,12 +1,14 @@
 import { prisma } from '@/lib/prisma'
+import { Role } from '@/enums/role'
+import { Client, Prisma, User } from '@prisma/client'
 import {
-  ClientWithRelations,
   CreateClientRequest,
-  CreateClientResponse,
+  ClientWithRelations,
   DashboardWithRelations,
+  CreateClientResponse,
 } from '@/types/api/clients'
-import { Client, Prisma, Role, User } from '@prisma/client'
-import { hash } from 'bcryptjs'
+import { AuthService } from '../auth'
+import { withTransaction } from '@/prisma/prisma'
 
 export class ClientsService {
   static async getAll(): Promise<Client[]> {
@@ -112,12 +114,37 @@ export class ClientsService {
     }
   }
 
+  static async update(
+    id: string,
+    data: Partial<{
+      name: string
+      slug: string
+    }>,
+  ): Promise<Client> {
+    return await prisma.client.update({
+      where: { id },
+      data,
+    })
+  }
+
+  static async remove(id: string): Promise<Client> {
+    return await prisma.client.delete({
+      where: { id },
+    })
+  }
+
+  static async findBySlug(slug: string): Promise<Client | null> {
+    return await prisma.client.findUnique({
+      where: { slug },
+    })
+  }
+
   private static async createUser(
     tx: Prisma.TransactionClient,
     data: CreateClientRequest,
   ): Promise<User> {
     const password = Math.random().toString(36).slice(-8)
-    const hashedPassword = await hash(password, 10)
+    const hashedPassword = await AuthService.hashPassword(password)
     return tx.user.create({
       data: {
         email: `${data.slug}@example.com`,
@@ -155,7 +182,7 @@ export class ClientsService {
       }
     } else {
       // Crear usuario y cliente en una transacción
-      const result = await prisma.$transaction(async (tx) => {
+      const result = await withTransaction(async (tx) => {
         // Crear el usuario
         const user = await this.createUser(tx, data)
 

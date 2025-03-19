@@ -51,6 +51,7 @@ export function Autocomplete({
     }
 
     fetchResults()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

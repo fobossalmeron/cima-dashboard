@@ -1,5 +1,5 @@
 import { ApiStatus } from '@/enums/api-status'
-import { prisma } from '@/lib/prisma'
+import { withTransaction } from '@/prisma/prisma'
 import { RepslyApiService } from '@/lib/services/api'
 import {
   ClientsService,
@@ -8,7 +8,6 @@ import {
 } from '@/lib/services'
 import { FormTemplateRequest, FormTemplateResponse } from '@/types/api'
 import { NextRequest, NextResponse } from 'next/server'
-import { logger } from '@/lib/utils/logger'
 
 export class FormTemplateController {
   static async create(
@@ -19,8 +18,8 @@ export class FormTemplateController {
     const clientData = { name: clientName, slug: clientSlug }
 
     try {
-      // First create client
-      const result = await prisma.$transaction(async (tx) => {
+      // Usar withTransaction para manejar reintentos automáticamente
+      const result = await withTransaction(async (tx) => {
         const { client, user } = await ClientsService.create(clientData, tx)
         const template = await RepslyApiService.getFormTemplate(templateId)
         const { dashboard, template: formTemplate } =
@@ -31,9 +30,6 @@ export class FormTemplateController {
             },
             tx,
           )
-        logger.info(
-          `Processing template ${JSON.stringify(formTemplate, null, 2)}`,
-        )
         await ProductTemplateProcessorService.processTemplate(formTemplate, tx)
         return {
           client,
@@ -42,6 +38,7 @@ export class FormTemplateController {
           template: formTemplate,
         }
       })
+
       return NextResponse.json({
         status: ApiStatus.SUCCESS,
         data: result,

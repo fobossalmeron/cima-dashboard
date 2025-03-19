@@ -95,16 +95,20 @@ export interface QuestionGroup {
 }
 
 export interface ProductWithFlavorAndPresentation extends Product {
-  flavor: Flavor
-  presentation: Presentation
+  flavor: Flavor | null
+  presentation: Presentation | null
 }
 
 export interface SubBrandWithProducts extends SubBrand {
   products: ProductWithFlavorAndPresentation[]
 }
 
-export interface BrandWithSubBrands extends Brand {
+export interface BrandWithSubBrandsAndProducts extends Brand {
   subBrands: SubBrandWithProducts[]
+}
+
+export interface BrandWithOnlySubBrands extends Brand {
+  subBrands: SubBrand[]
 }
 
 export interface AnswerWithQuestion extends Answer {
@@ -112,7 +116,7 @@ export interface AnswerWithQuestion extends Answer {
 }
 
 export interface GetAllBrandsWithSubBrandsSuccessResponse {
-  data: BrandWithSubBrands[]
+  data: BrandWithOnlySubBrands[]
   error: null
 }
 

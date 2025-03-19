@@ -1,4 +1,5 @@
-import { Option, SearchConfig } from './types'
+import { Option } from '@/types'
+import { SearchConfig } from './types'
 
 export const localFetch = (searchTerm: string, options: Option[]) => {
   return options.filter((option) =>

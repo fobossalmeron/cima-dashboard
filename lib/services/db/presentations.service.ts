@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { slugify } from '@/lib/utils'
 import { Presentation } from '@prisma/client'
 
 export class PresentationsService {
@@ -20,6 +21,7 @@ export class PresentationsService {
       update: {},
       create: {
         name: data.name,
+        slug: slugify(data.name),
       },
     })
   }

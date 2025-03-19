@@ -1,10 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { FormTemplateService } from '@/lib/services'
 import { FormTemplateController } from '@/lib/controllers/form-template/form-template.controller'
+import { FormTemplateService } from '@/lib/services'
+import { NextRequest, NextResponse } from 'next/server'
+import { runtime } from '@/lib/config/runtime'
 
-export async function POST(request: NextRequest) {
-  return FormTemplateController.create(request)
-}
+// Definir explícitamente los métodos HTTP permitidos
+export const dynamic = 'force-dynamic'
+export { runtime }
+export const revalidate = 0
 
 export async function GET() {
   try {
@@ -17,4 +19,19 @@ export async function GET() {
       { status: 500 },
     )
   }
+}
+
+export async function POST(req: NextRequest) {
+  return FormTemplateController.create(req)
+}
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  })
 }

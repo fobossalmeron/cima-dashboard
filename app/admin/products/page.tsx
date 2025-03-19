@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { AdminHeader } from '@/components/headers'
-import { BrandWithSubBrands } from '@/types/api'
+import { BrandWithSubBrandsAndProducts } from '@/types/api'
 import { toast } from 'sonner'
 import { ProductsTable } from '@/components/tables/products.table'
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<BrandWithSubBrands[]>([])
+  const [products, setProducts] = useState<BrandWithSubBrandsAndProducts[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
