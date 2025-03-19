@@ -1,10 +1,27 @@
 import { prisma } from '@/lib/prisma'
-import { compare } from 'bcryptjs'
-import { sign } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
+import * as jose from 'jose'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 const SESSION_EXPIRY = 7 * 24 * 60 * 60 * 1000 // 7 días
+
+// Función simple de hash compatible con Edge Runtime
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(password + JWT_SECRET)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+// Función para verificar contraseña
+async function verifyPassword(
+  password: string,
+  hashedPassword: string,
+): Promise<boolean> {
+  const hash = await hashPassword(password)
+  return hash === hashedPassword
+}
 
 export class AuthService {
   static async login(email: string, password: string) {
@@ -24,22 +41,22 @@ export class AuthService {
         throw new Error('User not found')
       }
 
-      const isValidPassword = await compare(password, user.password)
+      const isValidPassword = await verifyPassword(password, user.password)
 
       if (!isValidPassword) {
         throw new Error('Incorrect password')
       }
 
-      // Crear token JWT
-      const token = sign(
-        {
-          userId: user.id,
-          email: user.email,
-          role: user.role,
-        },
-        JWT_SECRET,
-        { expiresIn: '7d' },
-      )
+      // Crear token JWT usando jose
+      const secret = new TextEncoder().encode(JWT_SECRET)
+      const token = await new jose.SignJWT({
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+      })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setExpirationTime('7d')
+        .sign(secret)
 
       // Crear sesión en la base de datos
       const session = await prisma.session.create({
@@ -88,32 +105,41 @@ export class AuthService {
   }
 
   static async validateSession(token: string) {
-    const session = await prisma.session.findUnique({
-      where: { token },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            role: true,
+    try {
+      // Verificar el token JWT
+      const secret = new TextEncoder().encode(JWT_SECRET)
+      await jose.jwtVerify(token, secret)
+
+      const session = await prisma.session.findUnique({
+        where: { token },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              role: true,
+            },
           },
         },
-      },
-    })
-
-    if (!session) {
-      throw new Error('Session not found')
-    }
-
-    if (session.expiresAt < new Date()) {
-      await prisma.session.delete({
-        where: { token },
       })
-      throw new Error('Session expired')
-    }
 
-    return session.user
+      if (!session) {
+        throw new Error('Session not found')
+      }
+
+      if (session.expiresAt < new Date()) {
+        await prisma.session.delete({
+          where: { token },
+        })
+        throw new Error('Session expired')
+      }
+
+      return session.user
+    } catch (error) {
+      console.log(`Error validating session: ${error}`)
+      throw new Error('Invalid session')
+    }
   }
 
   static async logoutAll(userId: string) {
@@ -125,5 +151,10 @@ export class AuthService {
     // Eliminar cookie
     const cookieStore = await cookies()
     cookieStore.delete('session')
+  }
+
+  // Método auxiliar para crear hash de contraseña (usado en registro/cambio de contraseña)
+  static async hashPassword(password: string): Promise<string> {
+    return hashPassword(password)
   }
 }
