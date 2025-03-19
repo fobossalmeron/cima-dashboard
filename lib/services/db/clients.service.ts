@@ -8,6 +8,7 @@ import {
   CreateClientResponse,
 } from '@/types/api/clients'
 import { AuthService } from '../auth'
+import { withTransaction } from '@/prisma/prisma'
 
 export class ClientsService {
   static async getAll(): Promise<Client[]> {
@@ -181,7 +182,7 @@ export class ClientsService {
       }
     } else {
       // Crear usuario y cliente en una transacción
-      const result = await prisma.$transaction(async (tx) => {
+      const result = await withTransaction(async (tx) => {
         // Crear el usuario
         const user = await this.createUser(tx, data)
 

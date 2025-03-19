@@ -1,5 +1,5 @@
 import { ApiStatus } from '@/enums/api-status'
-import { prisma } from '@/lib/prisma'
+import { withTransaction } from '@/prisma/prisma'
 import { RepslyApiService } from '@/lib/services/api'
 import {
   ClientsService,
@@ -18,8 +18,8 @@ export class FormTemplateController {
     const clientData = { name: clientName, slug: clientSlug }
 
     try {
-      // First create client
-      const result = await prisma.$transaction(async (tx) => {
+      // Usar withTransaction para manejar reintentos automáticamente
+      const result = await withTransaction(async (tx) => {
         const { client, user } = await ClientsService.create(clientData, tx)
         const template = await RepslyApiService.getFormTemplate(templateId)
         const { dashboard, template: formTemplate } =
@@ -38,6 +38,7 @@ export class FormTemplateController {
           template: formTemplate,
         }
       })
+
       return NextResponse.json({
         status: ApiStatus.SUCCESS,
         data: result,

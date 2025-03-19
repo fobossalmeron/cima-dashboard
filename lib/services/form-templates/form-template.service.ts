@@ -23,6 +23,7 @@ import {
   QuestionOptionWithRelations,
   QuestionWithRelations,
 } from '@/types/api/clients'
+import { withTransaction } from '@/prisma/prisma'
 
 export type FormTemplateWithQuestionsAndOptions = FormTemplate & {
   questions: (Question & {
@@ -509,7 +510,7 @@ export class FormTemplateService {
         },
       }
     } else {
-      return await prisma.$transaction(async (tx) => {
+      return await withTransaction(async (tx) => {
         // Crear el formulario
         const formTemplate = await this.createTemplate(formTemplateObject, tx)
 

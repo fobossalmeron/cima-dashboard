@@ -21,6 +21,7 @@ import { ValidationError, ValidationResult } from '@/types/api'
 import { parseDate } from '@/lib/utils/date'
 import { SyncStatus as SyncStatusEnum } from '@/enums/dashboard-sync'
 import { slugify } from '@/lib/utils'
+import { withTransaction } from '@/prisma/prisma'
 
 export class DashboardSyncService {
   static async sync(
@@ -96,7 +97,7 @@ export class DashboardSyncService {
     questionMap: Map<string, QuestionWithRelations>,
   ): Promise<RowTransactionResult> {
     try {
-      const result = await prisma.$transaction(
+      const result = await withTransaction(
         async (tx: Prisma.TransactionClient) => {
           const {
             dealerData,

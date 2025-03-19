@@ -19,7 +19,6 @@ import {
   formatPresentation,
 } from '@/lib/constants/regex'
 import { TextClusteringService } from '../text-clustering.service'
-import { prisma } from '@/lib/prisma'
 import {
   BrandsService,
   FlavorService,
@@ -33,6 +32,7 @@ import { ProductsService } from './products.service'
 import { PresentationsEnum } from '@/enums/presentations'
 import { SubBrandsEnum } from '@/enums/sub-brands'
 import { PresentationFormatService } from '../presentation-format.service'
+import { withTransaction } from '@/prisma/prisma'
 
 type TransactionClient = Prisma.TransactionClient
 
@@ -385,7 +385,7 @@ export class ProductTemplateProcessorService {
       )
     }
 
-    return await prisma.$transaction(async (tx) => {
+    return await withTransaction(async (tx) => {
       // Process each brand group
       return await ProductTemplateProcessorService.processBrands(
         template,

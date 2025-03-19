@@ -6,6 +6,7 @@ import { ActivatedBrandService } from './activated-brand.service'
 import { SubmissionService } from './submission.service'
 import { ProductSaleService } from './product-sale.service'
 import { SubBrandTemplateService } from '../form-templates'
+import { withTransaction } from '@/prisma/prisma'
 
 export class DashboardService {
   static async getAll(): Promise<DashboardWithClientAndTemplate[]> {
@@ -111,7 +112,7 @@ export class DashboardService {
       throw new Error('Dashboard not found')
     }
     try {
-      await prisma.$transaction(async (tx) => {
+      await withTransaction(async (tx) => {
         // Delete all answers
         await AnswerService.deleteByDashboardId(dashboard.id, tx)
         // Delete all activated brands
