@@ -1,8 +1,8 @@
-import { BrandWithSubBrands } from '@/types/api/products'
+import { BrandWithSubBrandsAndProducts } from '@/types/api'
 import Image from 'next/image'
 
 interface ProductsTableProps {
-  products: BrandWithSubBrands[]
+  products: BrandWithSubBrandsAndProducts[]
 }
 
 export function ProductsTable({ products }: ProductsTableProps) {

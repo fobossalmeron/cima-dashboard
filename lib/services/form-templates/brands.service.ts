@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { BrandWithSubBrands } from '@/types/api'
+import { BrandWithSubBrandsAndProducts } from '@/types/api'
 import { Brand, Prisma } from '@prisma/client'
 
 export class BrandsService {
@@ -10,7 +10,7 @@ export class BrandsService {
 
   static async getAllWithSubBrands(
     tx?: Prisma.TransactionClient,
-  ): Promise<BrandWithSubBrands[]> {
+  ): Promise<BrandWithSubBrandsAndProducts[]> {
     const client = tx || prisma
     return await client.brand.findMany({
       include: {

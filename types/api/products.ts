@@ -103,7 +103,7 @@ export interface SubBrandWithProducts extends SubBrand {
   products: ProductWithFlavorAndPresentation[]
 }
 
-export interface BrandWithSubBrands extends Brand {
+export interface BrandWithSubBrandsAndProducts extends Brand {
   subBrands: SubBrandWithProducts[]
 }
 
