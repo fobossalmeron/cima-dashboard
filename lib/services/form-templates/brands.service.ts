@@ -38,6 +38,14 @@ export class BrandsService {
     })
   }
 
+  static async getBySlug(
+    slug: string,
+    tx?: Prisma.TransactionClient,
+  ): Promise<Brand | null> {
+    const client = tx || prisma
+    return await client.brand.findUnique({ where: { slug } })
+  }
+
   static async createOrUpdate(
     data: {
       name: string

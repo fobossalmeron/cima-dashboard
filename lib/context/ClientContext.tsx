@@ -1,12 +1,13 @@
 'use client'
 
 import { createContext, useContext, ReactNode } from 'react'
-import { Client, Dashboard } from '@prisma/client'
+import { Client } from '@prisma/client'
+import { DashboardWithRelations } from '@/types/api/clients'
 
 // Define la interfaz para el contexto, incluyendo clientName, formID, y un objeto data
 interface ClientContextType {
   clientData: Client
-  dashboardData: Dashboard
+  dashboardData: DashboardWithRelations
 }
 
 // Crea el contexto con un valor inicial indefinido
@@ -20,7 +21,7 @@ export const ClientProvider = ({
 }: {
   children: ReactNode
   clientData: Client
-  dashboardData: Dashboard
+  dashboardData: DashboardWithRelations
 }) => {
   return (
     <ClientContext.Provider value={{ clientData, dashboardData }}>

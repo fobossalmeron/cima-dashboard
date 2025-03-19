@@ -1,4 +1,4 @@
-import { ProductTemplateProcessor } from '@/lib/services'
+import { ProductTemplateProcessorService } from '@/lib/services'
 import {
   LoadProductsFromTemplateErrorResponse,
   LoadProductsFromTemplateResponse,
@@ -19,7 +19,8 @@ export async function GET(
       )
     }
 
-    const dashboard = await ProductTemplateProcessor.processTemplate(id)
+    const dashboard =
+      await ProductTemplateProcessorService.createProductsFromTemplateId(id)
 
     return NextResponse.json<LoadProductsFromTemplateSuccessResponse>({
       data: dashboard,

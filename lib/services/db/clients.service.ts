@@ -3,6 +3,7 @@ import {
   ClientWithRelations,
   CreateClientRequest,
   CreateClientResponse,
+  DashboardWithRelations,
 } from '@/types/api/clients'
 import { Client, Prisma, Role, User } from '@prisma/client'
 import { hash } from 'bcryptjs'
@@ -56,11 +57,58 @@ export class ClientsService {
       where: {
         clientId: client?.id,
       },
+      include: {
+        template: {
+          include: {
+            questionGroups: true,
+            questions: {
+              include: {
+                options: true,
+                attachments: true,
+                triggers: true,
+              },
+            },
+            subBrandTemplates: {
+              include: {
+                subBrand: {
+                  include: {
+                    brand: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        submissions: {
+          include: {
+            answers: true,
+            location: true,
+            representative: true,
+            activatedBrands: {
+              include: {
+                brand: true,
+              },
+            },
+            productSales: {
+              include: {
+                product: {
+                  include: {
+                    presentation: true,
+                    brand: true,
+                    subBrand: true,
+                    flavor: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     })
 
     return {
       ...client,
-      dashboard,
+      dashboard: dashboard as DashboardWithRelations | null,
     }
   }
 

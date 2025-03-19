@@ -27,6 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     validateSession()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function validateSession() {
@@ -34,7 +35,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await fetch('/api/auth/session')
       if (response.ok) {
         const data = await response.json()
-        setUser(data.user)
+        if (data.user) {
+          setUser(data.user)
+        } else {
+          setUser(null)
+          logout()
+        }
       }
     } catch (error) {
       console.error('Error validating session:', error)

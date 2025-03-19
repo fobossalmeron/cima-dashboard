@@ -7,7 +7,6 @@ import { NewDashboardForm } from '@/types/dashboard'
 import { toast } from 'sonner'
 import { NewDashboardDialog } from '@/components/dialogs/dashboard'
 import { DashboardWithClientAndTemplate, ValidationResult } from '@/types/api'
-import { DashboardsApiService } from '@/lib/services/api'
 import { SyncResults } from '@/components/sync/sync-results'
 import { ApiStatus } from '@/enums/api-status'
 
@@ -15,17 +14,24 @@ export default function AdminPage() {
   const [dashboards, setDashboards] = useState<
     DashboardWithClientAndTemplate[]
   >([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [createDashboardLoading, setCreateDashboardLoading] =
+    useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [syncResults, setSyncResults] = useState<ValidationResult | null>(null)
-  const [isSyncing, setIsSyncing] = useState(false)
+  const [isSyncing, setIsSyncing] = useState<boolean>(false)
+  const [isCleaning, setIsCleaning] = useState<boolean>(false)
 
   const loadDashboards = async () => {
     try {
       setIsLoading(true)
-      const data = await DashboardsApiService.getAll()
-      setDashboards(data)
+      const response = await fetch('/api/dashboard')
+      if (!response.ok) {
+        throw new Error('Error al obtener los dashboards')
+      }
+      const data = await response.json()
+      setDashboards(data.data)
     } catch (err) {
       setError('Error al cargar los dashboards')
       console.error('Error al cargar dashboards:', err)
@@ -40,6 +46,7 @@ export default function AdminPage() {
 
   const handleSubmit = async (data: NewDashboardForm) => {
     try {
+      setCreateDashboardLoading(true)
       // Create the dashboard, client and form template
       const response = await fetch(`/api/form-templates`, {
         method: 'POST',
@@ -48,6 +55,7 @@ export default function AdminPage() {
 
       if (!response.ok) {
         const error = await response.json()
+        setCreateDashboardLoading(false)
         throw new Error(error.error || 'Error al crear el dashboard')
       }
 
@@ -56,30 +64,23 @@ export default function AdminPage() {
         toast.success('Dashboard creado exitosamente')
         loadDashboards()
         setIsDialogOpen(false)
+        setCreateDashboardLoading(false)
       } else {
         throw new Error(result.error || 'Error al crear el dashboard')
       }
     } catch (error) {
       console.error('Error al crear dashboard:', error)
       toast.error('Error al crear el dashboard')
+      setCreateDashboardLoading(false)
     }
   }
 
-  const handleSyncDashboard = async (
-    dashboardId: string,
-    templateId: string,
-  ) => {
+  const handleSyncDashboard = async (dashboardId: string) => {
     try {
       setIsSyncing(true)
       setSyncResults(null)
 
-      const response = await fetch('/api/dashboard/sync', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ dashboardId, templateId }),
-      })
+      const response = await fetch(`/api/dashboard/${dashboardId}/sync`)
 
       if (!response.ok) {
         const error = await response.json()
@@ -102,6 +103,28 @@ export default function AdminPage() {
     }
   }
 
+  const handleClearDashboard = async (dashboardId: string) => {
+    try {
+      setIsCleaning(true)
+      const response = await fetch(`/api/dashboard/${dashboardId}/clear`, {
+        method: 'POST',
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Error al limpiar el dashboard')
+      }
+
+      toast.success('Dashboard limpiado exitosamente')
+      loadDashboards()
+    } catch (error) {
+      console.error('Error al limpiar el dashboard:', error)
+      toast.error('Error al limpiar el dashboard')
+    } finally {
+      setIsCleaning(false)
+    }
+  }
+
   return (
     <div>
       <AdminHeader />
@@ -120,6 +143,7 @@ export default function AdminPage() {
             isDialogOpen={isDialogOpen}
             setIsDialogOpen={setIsDialogOpen}
             handleSubmit={handleSubmit}
+            loading={createDashboardLoading}
           />
         </div>
 
@@ -136,7 +160,9 @@ export default function AdminPage() {
             <DashboardsTable
               dashboards={dashboards}
               onSyncDashboard={handleSyncDashboard}
+              onClearDashboard={handleClearDashboard}
               isSyncing={isSyncing}
+              isCleaning={isCleaning}
             />
             {syncResults && (
               <SyncResults

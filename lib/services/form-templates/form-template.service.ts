@@ -9,6 +9,7 @@ import {
   Prisma,
   QuestionGroup,
   Dashboard,
+  QuestionAttachment,
 } from '@prisma/client'
 import {
   DashboardCreateParams,
@@ -18,12 +19,17 @@ import {
   FormTemplateQuestionGroup,
   FormTemplateServiceParams,
 } from '@/types/api/form-template'
+import {
+  QuestionOptionWithRelations,
+  QuestionWithRelations,
+} from '@/types/api/clients'
 
 export type FormTemplateWithQuestionsAndOptions = FormTemplate & {
   questions: (Question & {
-    options: QuestionOption[]
+    options: QuestionOptionWithRelations[]
     triggers: QuestionTrigger[]
   })[]
+  questionGroups: QuestionGroup[]
 }
 
 export class FormTemplateService {
@@ -158,10 +164,16 @@ export class FormTemplateService {
       include: {
         questions: {
           include: {
-            options: true,
+            options: {
+              include: {
+                triggers: true,
+              },
+            },
+            attachments: true,
             triggers: true,
           },
         },
+        questionGroups: true,
       },
     })
   }
@@ -176,10 +188,16 @@ export class FormTemplateService {
       include: {
         questions: {
           include: {
-            options: true,
+            options: {
+              include: {
+                triggers: true,
+              },
+            },
+            attachments: true,
             triggers: true,
           },
         },
+        questionGroups: true,
       },
     })
   }
@@ -328,11 +346,32 @@ export class FormTemplateService {
     )
   }
 
+  private static getQuestionType(type: string): QuestionType {
+    switch (type.toUpperCase()) {
+      case 'CHECKBOX':
+        return QuestionType.CHECKBOX
+      case 'SELECT':
+        return QuestionType.SELECT
+      case 'MULTISELECT':
+        return QuestionType.MULTISELECT
+      case 'DATE':
+        return QuestionType.DATE
+      case 'NUMERIC':
+        return QuestionType.NUMERIC
+      case 'TEXT':
+        return QuestionType.TEXT
+      case 'PHOTO':
+        return QuestionType.PHOTO
+      default:
+        return QuestionType.TEXT
+    }
+  }
+
   private static async createQuestions(
     questions: FormTemplateQuestion[],
     formTemplateId: string,
     tx: Prisma.TransactionClient,
-  ): Promise<Question[]> {
+  ): Promise<QuestionWithRelations[]> {
     return await Promise.all(
       questions.map(async (question) => {
         // Primero creamos la pregunta
@@ -341,9 +380,7 @@ export class FormTemplateService {
             id: question.Id,
             formTemplateId,
             sortOrder: question.SortOrder,
-            type:
-              (question.Type.toUpperCase() as QuestionType) ||
-              QuestionType.TEXT,
+            type: FormTemplateService.getQuestionType(question.Type),
             name: question.Name,
             isMandatory: question.IsMandatory,
             isAutoFill: question.IsAutoFill,
@@ -352,9 +389,12 @@ export class FormTemplateService {
           },
         })
 
+        let options: QuestionOptionWithRelations[] = []
+        let triggers: QuestionTrigger[] = []
+        let attachments: QuestionAttachment[] = []
         // Si hay opciones, las creamos
         if (question.Options && question.Options.length > 0) {
-          await Promise.all(
+          options = await Promise.all(
             question.Options.map(async (option) => {
               const createdOption = await tx.questionOption.create({
                 data: {
@@ -365,14 +405,16 @@ export class FormTemplateService {
                 },
               })
 
+              let localTriggers: QuestionTrigger[] = []
+
               // Si la pregunta tiene triggers, los creamos
               if (question.Triggers) {
-                const triggers = question.Triggers.filter(
+                const questionTriggers = question.Triggers.filter(
                   (trigger) => trigger.QuestionValue === option.Id,
                 )
-                if (triggers.length > 0) {
-                  await Promise.all(
-                    triggers.map((trigger) =>
+                if (questionTriggers.length > 0) {
+                  localTriggers = await Promise.all(
+                    questionTriggers.map((trigger) =>
                       tx.questionTrigger.create({
                         data: {
                           questionId: createdQuestion.id,
@@ -383,16 +425,20 @@ export class FormTemplateService {
                     ),
                   )
                 }
+                triggers = [...triggers, ...localTriggers]
               }
 
-              return createdOption
+              return {
+                ...createdOption,
+                triggers: localTriggers,
+              }
             }),
           )
         }
 
         // Si hay attachments, los creamos
         if (question.Attachments && question.Attachments.length > 0) {
-          await tx.questionAttachment.createMany({
+          attachments = await tx.questionAttachment.createManyAndReturn({
             data: question.Attachments.map((attachment) => ({
               id: attachment.id,
               questionId: createdQuestion.id,
@@ -403,7 +449,12 @@ export class FormTemplateService {
           })
         }
 
-        return createdQuestion
+        return {
+          ...createdQuestion,
+          options,
+          triggers,
+          attachments,
+        }
       }),
     )
   }
@@ -447,7 +498,13 @@ export class FormTemplateService {
         dashboard,
         template: {
           ...formTemplate,
-          questions,
+          questions: questions.map((question) => ({
+            ...question,
+            options: question.options.map((option) => ({
+              ...option,
+              triggers: option.triggers,
+            })),
+          })),
           questionGroups,
         },
       }

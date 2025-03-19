@@ -14,12 +14,14 @@ export interface NewDashboardDialogProps {
   isDialogOpen: boolean
   setIsDialogOpen: (isOpen: boolean) => void
   handleSubmit: (data: NewDashboardForm) => void
+  loading: boolean
 }
 
 export function NewDashboardDialog({
   isDialogOpen,
   setIsDialogOpen,
   handleSubmit,
+  loading,
 }: NewDashboardDialogProps) {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -33,7 +35,7 @@ export function NewDashboardDialog({
         <DialogHeader>
           <DialogTitle>Crear nuevo dashboard</DialogTitle>
         </DialogHeader>
-        <DashboardForm onSubmit={handleSubmit} />
+        <DashboardForm onSubmit={handleSubmit} loading={loading} />
       </DialogContent>
     </Dialog>
   )

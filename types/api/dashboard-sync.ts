@@ -1,5 +1,6 @@
 import {
   Answer,
+  Brand,
   Dealer,
   FormSubmission,
   Location,
@@ -7,10 +8,11 @@ import {
   QuestionGroup,
   QuestionOption,
   Representative,
+  SubBrand,
 } from '@prisma/client'
 import { FormSubmissionEntryData } from './products'
+import { SyncStatus as SyncStatusEnum } from '@/enums/dashboard-sync'
 import { NextResponse } from 'next/server'
-import { SyncStatus } from '@/enums/dashboard-sync'
 
 export interface QuestionWithRelations extends Question {
   options: QuestionOption[]
@@ -52,7 +54,7 @@ export interface SyncRequest {
 }
 
 export interface RowTransactionSuccessResult {
-  status: SyncStatus.SUCCESS
+  status: SyncStatusEnum.SUCCESS
   dashboardId: string
   dealer: Dealer
   representative: Representative
@@ -62,13 +64,13 @@ export interface RowTransactionSuccessResult {
 }
 
 export interface RowTransactionErrorResult {
-  status: SyncStatus.ERROR
+  status: SyncStatusEnum.ERROR
   rowIndex: number
   errors: ValidationError[]
 }
 
 export interface RowTransactionSkippedResult {
-  status: SyncStatus.SKIPPED
+  status: SyncStatusEnum.SKIPPED
   rowIndex: number
   submission: FormSubmission
 }
@@ -97,3 +99,22 @@ export interface SyncResponseBodyError {
 export type SyncResponseBody = SyncResponseBodySuccess | SyncResponseBodyError
 
 export type SyncResponse = NextResponse<SyncResponseBody>
+
+export interface SyncStatus {
+  status: SyncStatusEnum.SUCCESS | SyncStatusEnum.ERROR | SyncStatusEnum.SKIPPED
+  message: string
+  data?: {
+    submissionId: string
+    totalQuantity: number
+    totalAmount: number
+  }
+  error?: Error
+}
+
+export interface BrandWithSubBrands extends Brand {
+  subBrands: SubBrand[]
+}
+
+export interface SubBrandWithBrand extends SubBrand {
+  brand: Brand
+}

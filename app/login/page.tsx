@@ -13,6 +13,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (!isLoading && user) {
       const from = searchParams.get('from') || '/admin'
+      console.log('From', from)
       router.push(from)
     }
   }, [user, isLoading, router, searchParams])

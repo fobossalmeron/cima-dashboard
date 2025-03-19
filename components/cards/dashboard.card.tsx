@@ -1,18 +1,22 @@
 import Link from 'next/link'
-import { Loader2, RefreshCcw } from 'lucide-react'
+import { Loader2, RefreshCcw, Trash } from 'lucide-react'
 import { DashboardWithClientAndTemplate } from '@/types/api'
 import { Button, Card, CardContent } from '@/components/ui'
 
 interface DashboardCardProps {
   dashboard: DashboardWithClientAndTemplate
-  onSyncDashboard: (dashboardId: string, templateId: string) => void
+  onSyncDashboard: (dashboardId: string) => void
+  onClearDashboard: (dashboardId: string) => void
   isSyncing: boolean
+  isCleaning: boolean
 }
 
 export function DashboardCard({
   dashboard,
   onSyncDashboard,
+  onClearDashboard,
   isSyncing,
+  isCleaning,
 }: DashboardCardProps) {
   return (
     <Card>
@@ -25,7 +29,19 @@ export function DashboardCard({
         </div>
         <div className="flex gap-2">
           <Button
-            onClick={() => onSyncDashboard(dashboard.id, dashboard.templateId)}
+            onClick={() => onClearDashboard(dashboard.id)}
+            variant="destructive"
+            disabled={isCleaning}
+          >
+            {isCleaning ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Trash className="mr-2 h-4 w-4" />
+            )}
+            Limpiar
+          </Button>
+          <Button
+            onClick={() => onSyncDashboard(dashboard.id)}
             disabled={isSyncing}
             variant="primary-outline"
           >

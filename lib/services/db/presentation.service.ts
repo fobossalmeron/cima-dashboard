@@ -20,6 +20,7 @@ export class PresentationService {
   static async createOrUpdate(
     data: {
       name: string
+      slug: string
     },
     tx?: Prisma.TransactionClient,
   ): Promise<Presentation> {

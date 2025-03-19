@@ -1,5 +1,7 @@
 import { ApiStatus } from '@/enums/api-status'
+import { SyncStatus } from '@/enums/dashboard-sync'
 import {
+  Answer,
   Brand,
   Flavor,
   Presentation,
@@ -67,6 +69,12 @@ export interface SubBrandAndPresentation {
   presentation: Presentation
 }
 
+export interface ProductNameInfo {
+  brand: string
+  subBrand: string
+  presentation: string
+}
+
 export interface ProductInfo {
   brand: Brand
   subBrand: SubBrand | null
@@ -97,6 +105,10 @@ export interface SubBrandWithProducts extends SubBrand {
 
 export interface BrandWithSubBrands extends Brand {
   subBrands: SubBrandWithProducts[]
+}
+
+export interface AnswerWithQuestion extends Answer {
+  question: Question
 }
 
 export interface GetAllBrandsWithSubBrandsSuccessResponse {
@@ -132,3 +144,14 @@ export interface SyncDashboardErrorResponse {
 export type SyncDashboardResponse =
   | SyncDashboardSuccessResponse
   | SyncDashboardErrorResponse
+
+export interface SyncResult {
+  status: SyncStatus
+  message: string
+  data?: {
+    submissionId: string
+    totalQuantity: number
+    totalAmount: number
+  }
+  error?: Error
+}

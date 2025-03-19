@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { SubBrandWithBrand } from '@/types/api'
 import { SubBrand } from '@prisma/client'
 
 export class SubBrandsService {
@@ -9,6 +10,15 @@ export class SubBrandsService {
   static async getById(id: string): Promise<SubBrand | null> {
     return await prisma.subBrand.findUnique({
       where: { id },
+    })
+  }
+
+  static async getBySlug(slug: string): Promise<SubBrandWithBrand | null> {
+    return await prisma.subBrand.findUnique({
+      where: { slug },
+      include: {
+        brand: true,
+      },
     })
   }
 

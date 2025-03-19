@@ -12,6 +12,9 @@ export async function GET() {
     }
 
     const user = await AuthService.validateSession(token)
+    if (!user) {
+      return NextResponse.json({ user: null })
+    }
     return NextResponse.json({ user })
   } catch (error) {
     console.error('Error validating session:', error)

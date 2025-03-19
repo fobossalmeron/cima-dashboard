@@ -26,8 +26,11 @@ async function main() {
       token: process.env.REPSLY_TOKEN || 'your-token-here',
       refreshToken:
         process.env.REPSLY_REFRESH_TOKEN || 'your-refresh-token-here',
+      serviceClientId: process.env.REPSLY_CLIENT_ID || 'your-client-id-here',
       fingerprint: process.env.REPSLY_FINGERPRINT || 'your-fingerprint-here',
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 horas
+      expiresAt: process.env.REPSLY_EXPIRES_AT
+        ? new Date(parseInt(process.env.REPSLY_EXPIRES_AT) * 1000)
+        : new Date(),
     },
   })
 }

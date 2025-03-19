@@ -1,5 +1,6 @@
 import { ApiStatus } from '@/enums/api-status'
 import { FormTemplateSearchResponse } from './api/form-template-search-response'
+import { Location } from '@prisma/client'
 
 export interface FormTemplate {
   id: string
@@ -50,6 +51,14 @@ export interface FormSearchErrorResponse {
 export type FormSearchResponse =
   | FormSearchSuccessResponse
   | FormSearchErrorResponse
+
+export interface DashboardData {
+  submissions: {
+    id: string
+    submittedAt: string
+    location: Location | null
+  }[]
+}
 
 export interface NewDashboardForm {
   clientName: string

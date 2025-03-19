@@ -1,5 +1,6 @@
 import { capitalizeWords, groupBy, slugify } from '@/lib/utils'
 import {
+  ItemWithGroup,
   ProductsStructure,
   QuestionGroup,
   QuestionWithOptions,
@@ -11,6 +12,7 @@ import {
   QuestionType,
   SubBrand,
   Prisma,
+  FormTemplate,
 } from '@prisma/client'
 import {
   PRESENTATION_PATTERNS,
@@ -22,115 +24,151 @@ import {
   BrandsService,
   FlavorService,
   FormTemplateService,
+  FormTemplateWithQuestionsAndOptions,
   SubBrandService,
+  SubBrandTemplateService,
 } from '../form-templates'
 import { PresentationService } from './presentation.service'
 import { ProductsService } from './products.service'
 import { PresentationsEnum } from '@/enums/presentations'
 import { SubBrandsEnum } from '@/enums/sub-brands'
+import { PresentationFormatService } from '../presentation-format.service'
 
 type TransactionClient = Prisma.TransactionClient
 
-export class ProductTemplateProcessor {
-  static async processTemplate(templateId: string) {
-    return await prisma.$transaction(async (tx) => {
-      const template = await FormTemplateService.getById(templateId)
+interface ItemWithGroupNonNullable extends ItemWithGroup {
+  group: NonNullable<ItemWithGroup['group']>
+}
 
-      if (!template) {
-        throw new Error('Template not found')
-      }
+export class ProductTemplateProcessorService {
+  private static async processBrand(
+    item: ItemWithGroupNonNullable,
+    tx: TransactionClient,
+  ) {
+    return await BrandsService.createOrUpdate(
+      {
+        name: capitalizeWords(item.group.baseName),
+        slug: slugify(item.group.baseName),
+      },
+      tx,
+    )
+  }
 
-      const groups = groupBy<QuestionWithOptions, QuestionGroup>(
-        template.questions as QuestionWithOptions[],
-        'questionGroupId',
-      )
+  private static async processSubBrand(
+    item: ItemWithGroupNonNullable,
+    brand: Brand,
+    tx: TransactionClient,
+  ) {
+    const subBrandName = capitalizeWords(item.item)
+      .replace(capitalizeWords(brand.name), '')
+      .trim()
+    // Check if a new sub brand should be created
+    const shouldCreateSubBrand = item.item !== item.group?.baseName
 
-      const brandQuestion = template.questions.find((q) =>
-        q.name.toUpperCase().includes('MARCA ACTIVADA'),
-      ) as QuestionWithOptions
+    return await SubBrandService.createOrUpdate(
+      {
+        name: shouldCreateSubBrand ? subBrandName : SubBrandsEnum.NOT_SPECIFIED,
+        slug: slugify(
+          `${brand.slug}-${
+            shouldCreateSubBrand ? subBrandName : SubBrandsEnum.NOT_SPECIFIED
+          }`,
+        ),
+        brandId: brand.id,
+      },
+      tx,
+    )
+  }
 
-      if (!brandQuestion) {
-        throw new Error('No se encontró la pregunta de marca')
-      }
+  public static getPresentationName(
+    questionName: string,
+    brandName: string,
+  ): string | null {
+    const cleanName = questionName
+      .replace(/^[-\s]*PRECIO\s+/, '')
+      .replace(/\s*-\s*$/, '')
+      .replace(brandName, '')
+      .trim()
 
-      const productsStructure: ProductsStructure = {}
-
-      // Use the text clustering service to group similar brands
-      const items = await TextClusteringService.groupSimilarTexts(
-        brandQuestion.options.map((opt) => opt.value),
-        0.7, // Similarity threshold
-      )
-
-      // Process each brand group
-      for (const item of items) {
-        if (!item.group || item.group === null) continue
-        // Create or update the base brand
-        const brand = await BrandsService.createOrUpdate(
-          {
-            name: capitalizeWords(item.group.baseName),
-            slug: slugify(item.group.baseName),
-          },
-          tx,
-        )
-
-        // Initialize the structure for this brand
-        if (!productsStructure[brand.slug]) {
-          productsStructure[brand.slug] = {
-            info: brand,
-            subBrands: {},
-          }
-        }
-
-        const subBrandName = capitalizeWords(item.item)
-          .replace(capitalizeWords(brand.name), '')
-          .trim()
-        // Check if a new sub brand should be created
-        const shouldCreateSubBrand = item.item !== item.group?.baseName
-
-        const subBrand = await SubBrandService.createOrUpdate(
-          {
-            name: shouldCreateSubBrand
-              ? subBrandName
-              : SubBrandsEnum.NOT_SPECIFIED,
-            slug: slugify(
-              `${brand.slug}-${
-                shouldCreateSubBrand
-                  ? subBrandName
-                  : SubBrandsEnum.NOT_SPECIFIED
-              }`,
-            ),
-            brandId: brand.id,
-          },
-          tx,
-        )
-
-        const brandOption = brandQuestion.options.find(
-          (opt) => opt.value === item.item,
-        )
-        if (!brandOption) continue
-
-        const brandTriggers = brandQuestion.triggers.filter(
-          (t) => t.optionId === brandOption?.id,
-        )
-
-        for (const trigger of brandTriggers) {
-          if (!trigger.groupId) continue
-          const questionGroup = groups[trigger.groupId ?? 0]
-          if (!questionGroup) continue
-
-          await this.processQuestionGroup(
-            tx,
-            questionGroup,
-            brand,
-            productsStructure,
-            subBrand,
-            groups,
+    for (const [container, pattern] of Object.entries(PRESENTATION_PATTERNS)) {
+      const match = cleanName.match(pattern)
+      if (match) {
+        if (container === 'PACK') {
+          // Para PACK, el primer grupo es la cantidad de packs y el segundo es la cantidad en ml
+          const packAmount = match[1]
+          const size = match[2]
+          const unit = match[3] || 'ml'
+          return formatPresentation(
+            container as keyof typeof PRESENTATION_PATTERNS,
+            packAmount,
+            `${size} ${unit}`,
           )
         }
-      }
 
-      return productsStructure
-    })
+        const amount = match[1]
+        const unit = match[2] || 'ml'
+        return formatPresentation(
+          container as keyof typeof PRESENTATION_PATTERNS,
+          amount,
+          unit,
+        )
+      }
+    }
+    return null
+  }
+
+  private static async createPresentation(
+    tx: TransactionClient,
+    brand: Brand,
+    questionName: string,
+  ): Promise<Presentation> {
+    const presentationName = PresentationFormatService.getPresentationName(
+      questionName,
+      brand.name,
+    )
+    if (presentationName) {
+      return await PresentationService.createOrUpdate(
+        {
+          name: presentationName,
+          slug: slugify(presentationName.toLowerCase()),
+        },
+        tx,
+      )
+    }
+    throw new Error(`Presentation not found for ${questionName}`)
+  }
+
+  private static async createFlavors(
+    tx: TransactionClient,
+    salesQuestion: QuestionWithOptions,
+  ): Promise<Flavor[]> {
+    const flavors: Flavor[] = []
+
+    if (salesQuestion.type === QuestionType.MULTISELECT) {
+      // If it's MULTISELECT, create a product for each flavor
+      for (const option of salesQuestion.options) {
+        const flavor = await FlavorService.createOrUpdate(
+          {
+            name: option.value,
+            slug: slugify(option.value.toLowerCase()),
+          },
+          tx,
+        )
+        flavors.push(flavor)
+      }
+    } else {
+      const notSpecifiedFlavor = PresentationsEnum.NOT_SPECIFIED
+      // If it's not MULTISELECT, create a single product without flavor
+      const flavor = await FlavorService.createOrUpdate(
+        {
+          name: notSpecifiedFlavor,
+          slug: slugify(notSpecifiedFlavor.toLowerCase()),
+        },
+        tx,
+      )
+      flavors.push(flavor)
+    }
+
+    return flavors
   }
 
   private static async processQuestionGroup(
@@ -232,68 +270,130 @@ export class ProductTemplateProcessor {
     }
   }
 
-  private static async createPresentation(
+  private static async processBrands(
+    template: FormTemplate,
+    items: ItemWithGroup[],
+    brandQuestion: QuestionWithOptions,
+    groups: Record<string, QuestionGroup>,
     tx: TransactionClient,
-    brand: Brand,
-    questionName: string,
-  ): Promise<Presentation> {
-    const cleanName = questionName
-      .replace(/^[-\s]*PRECIO\s+/, '')
-      .replace(/\s*-\s*$/, '')
-      .replace(brand.name, '')
-      .trim()
+  ): Promise<ProductsStructure> {
+    const productsStructure: ProductsStructure = {}
 
-    // Detect presentation using regular expressions
-    for (const [container, pattern] of Object.entries(PRESENTATION_PATTERNS)) {
-      const match = cleanName.match(pattern)
-      if (match) {
-        const amount = match.length > 2 ? `${match[1]},${match[2]}` : match[1]
-        const presentationName = formatPresentation(
-          container as keyof typeof PRESENTATION_PATTERNS,
-          amount,
-        )
-        return await PresentationService.createOrUpdate(
-          {
-            name: presentationName,
-          },
-          tx,
-        )
+    for (const item of items) {
+      if (!item.group || item.group === null) continue
+      // Create or update the base brand
+      const brand = await ProductTemplateProcessorService.processBrand(
+        item as ItemWithGroupNonNullable,
+        tx,
+      )
+
+      // Initialize the structure for this brand
+      if (!productsStructure[brand.slug]) {
+        productsStructure[brand.slug] = {
+          info: brand,
+          subBrands: {},
+        }
       }
-    }
-    throw new Error(`Presentation not found for ${questionName}`)
-  }
+      // Create or update the sub brand
+      const subBrand = await ProductTemplateProcessorService.processSubBrand(
+        item as ItemWithGroupNonNullable,
+        brand,
+        tx,
+      )
 
-  private static async createFlavors(
-    tx: TransactionClient,
-    salesQuestion: QuestionWithOptions,
-  ): Promise<Flavor[]> {
-    const flavors: Flavor[] = []
-
-    if (salesQuestion.type === QuestionType.MULTISELECT) {
-      // If it's MULTISELECT, create a product for each flavor
-      for (const option of salesQuestion.options) {
-        const flavor = await FlavorService.createOrUpdate(
-          {
-            name: option.value,
-            slug: slugify(option.value.toLowerCase()),
-          },
-          tx,
-        )
-        flavors.push(flavor)
-      }
-    } else {
-      const notSpecifiedFlavor = PresentationsEnum.NOT_SPECIFIED
-      // If it's not MULTISELECT, create a single product without flavor
-      const flavor = await FlavorService.createOrUpdate(
+      await SubBrandTemplateService.create(
         {
-          name: notSpecifiedFlavor,
-          slug: slugify(notSpecifiedFlavor.toLowerCase()),
+          subBrand,
+          template,
         },
         tx,
       )
-      flavors.push(flavor)
+
+      // Find the corresponding brand option
+      const brandOption = brandQuestion.options.find(
+        (opt) => opt.value === item.item,
+      )
+      if (!brandOption) continue
+      // Find the triggers for this brand option
+      const brandTriggers = brandQuestion.triggers.filter(
+        (t) => t.optionId === brandOption?.id,
+      )
+      // Process each trigger
+      for (const trigger of brandTriggers) {
+        if (!trigger.groupId) continue
+        // Get the question group for this trigger
+        const questionGroup = groups[trigger.groupId ?? 0]
+        if (!questionGroup) continue
+        // Process the question group
+        await ProductTemplateProcessorService.processQuestionGroup(
+          tx,
+          questionGroup,
+          brand,
+          productsStructure,
+          subBrand,
+          groups,
+        )
+      }
     }
 
-    return flavors
+    return productsStructure
+  }
+
+  static async createProductsFromTemplateId(
+    templateId: string,
+    tx?: TransactionClient,
+  ) {
+    const template = await FormTemplateService.getById(templateId)
+    if (!template) {
+      throw new Error('Template not found')
+    }
+    return ProductTemplateProcessorService.processTemplate(template, tx)
+  }
+
+  static async processTemplate(
+    template: FormTemplateWithQuestionsAndOptions,
+    tx?: TransactionClient,
+  ) {
+    // GroupQuestions by questionGroupId
+    const groups = groupBy<QuestionWithOptions, QuestionGroup>(
+      template.questions as QuestionWithOptions[],
+      'questionGroupId',
+    )
+
+    // Find the brand question
+    const brandQuestion = template.questions.find((q) =>
+      q.name.toUpperCase().includes('MARCA ACTIVADA'),
+    ) as QuestionWithOptions
+
+    if (!brandQuestion) {
+      throw new Error('No se encontró la pregunta de marca')
+    }
+
+    // Use the text clustering service to group similar brands
+    const items = await TextClusteringService.groupSimilarTexts(
+      brandQuestion.options.map((opt) => opt.value),
+      0.7, // Similarity threshold
+    )
+
+    if (tx) {
+      return await ProductTemplateProcessorService.processBrands(
+        template,
+        items,
+        brandQuestion,
+        groups,
+        tx,
+      )
+    }
+
+    return await prisma.$transaction(async (tx) => {
+      // Process each brand group
+      return await ProductTemplateProcessorService.processBrands(
+        template,
+        items,
+        brandQuestion,
+        groups,
+        tx,
+      )
+    })
   }
 }

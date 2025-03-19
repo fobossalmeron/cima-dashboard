@@ -1,12 +1,6 @@
 import { ApiStatus } from '@/enums/api-status'
-import {
-  Dashboard,
-  Question,
-  QuestionGroup,
-  FormTemplate as DatabaseFormTemplate,
-  Client,
-  User,
-} from '@prisma/client'
+import { FormTemplateWithQuestionsAndOptions } from '@/lib/services'
+import { Dashboard, Client, User } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
 export interface FormTemplateOption {
@@ -111,12 +105,6 @@ export interface FormTemplateCreateParams {
   version: number
   createdBy: string
   updatedBy: string
-}
-
-export interface FormTemplateWithQuestionsAndOptions
-  extends DatabaseFormTemplate {
-  questions: Question[]
-  questionGroups: QuestionGroup[]
 }
 
 export interface FormTemplateCreateResponse {

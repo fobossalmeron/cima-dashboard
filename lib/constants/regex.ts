@@ -1,12 +1,12 @@
 // Expresiones regulares para detectar presentaciones
 export const PRESENTATION_PATTERNS = {
-  PACK: /(\d+)\s*PACK\s+(?:TETRA|PET)?\s+(\d+(?:\.\d+)?)\s*(?:ml|fl\s+oz)/i,
-  CAN: /CAN\s+(\d+(?:\.\d+)?)\s*(?:ml|fl\s+oz)/i,
-  PET: /PET\s+(\d+(?:\.\d+)?)\s*(?:ml|fl\s+oz)/i,
-  TETRA: /TETRA\s+(\d+(?:\.\d+)?)\s*(?:ml|fl\s+oz)/i,
+  PACK: /(\d+)\s*PACK\s+(?:TETRA|PET)?\s+(\d+(?:\.\d+)?)\s*(ml|fl\s+oz)/i,
+  CAN: /CAN\s+(\d+(?:\.\d+)?)\s*(ml|fl\s+oz)/i,
+  PET: /PET\s+(\d+(?:\.\d+)?)\s*(ml|fl\s+oz)/i,
+  TETRA: /TETRA\s+(\d+(?:\.\d+)?)\s*(ml|fl\s+oz)/i,
   LITER: /(\d+)L|LITER/i,
-  TETRATOP: /TETRATOP\s+(\d+(?:\.\d+)?)\s*(?:ml|fl\s+oz)/i,
-  ULTRAEDGE: /ULTRAEDGE\s+(\d+(?:\.\d+)?)\s*(?:ml|fl\s+oz)/i,
+  TETRATOP: /TETRATOP\s+(\d+(?:\.\d+)?)\s*(ml|fl\s+oz)/i,
+  ULTRAEDGE: /ULTRAEDGE\s+(\d+(?:\.\d+)?)\s*(ml|fl\s+oz)/i,
   HALF_GALLON: /HALF\s+GALLON/i,
 } as const
 
@@ -14,27 +14,27 @@ export const PRESENTATION_PATTERNS = {
 export function formatPresentation(
   container: keyof typeof PRESENTATION_PATTERNS,
   amount: string,
+  unit?: string,
 ): string {
   const formats: Record<
     keyof typeof PRESENTATION_PATTERNS,
-    (amount: string) => string
+    (amount: string, unit?: string) => string
   > = {
-    PACK: (amount) => {
-      // amount será "3,200" donde 3 es la cantidad de elementos y 200 es ml
-      const [quantity, size] = amount.split(',')
-      return `${quantity}Pack TETRA ${size}ml`
+    PACK: (amount, unit) => {
+      // amount será el número de packs
+      return `${amount}Pack TETRA ${unit || 'ml'}`
     },
-    CAN: (amount) => `CAN ${amount}ml`,
-    PET: (amount) => `PET ${amount}ml`,
-    TETRA: (amount) => `TETRA ${amount}ml`,
+    CAN: (amount, unit) => `CAN ${amount} ${unit || 'ml'}`,
+    PET: (amount, unit) => `PET ${amount} ${unit || 'ml'}`,
+    TETRA: (amount, unit) => `TETRA ${amount} ${unit || 'ml'}`,
     LITER: (amount) =>
       `${amount && parseFloat(amount) !== 1 ? `${amount}L` : 'L'}`,
-    TETRATOP: (amount) => `Tetratop ${amount}ml`,
+    TETRATOP: (amount, unit) => `Tetratop ${amount} ${unit || 'ml'}`,
     ULTRAEDGE: (amount) => `Ultraedge ${amount}L`,
     HALF_GALLON: () => `Half gallon`,
   }
 
-  return formats[container](amount)
+  return formats[container](amount, unit)
 }
 
 /**

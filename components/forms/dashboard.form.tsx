@@ -23,9 +23,10 @@ const formSchema = z.object({
 
 interface DashboardFormProps {
   onSubmit: (data: NewDashboardForm) => void
+  loading: boolean
 }
 
-export function DashboardForm({ onSubmit }: DashboardFormProps) {
+export function DashboardForm({ onSubmit, loading }: DashboardFormProps) {
   const form = useForm<NewDashboardForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,26 +55,19 @@ export function DashboardForm({ onSubmit }: DashboardFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Información del Cliente</h3>
-          <FormInput label="Nombre del Cliente" name="clientName" />
-        </div>
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Ruta del Cliente</h3>
-          <FormInput label="Slug del Cliente" name="clientSlug" />
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Información del Dashboard</h3>
-          <FormAutocomplete
-            label="Formulario"
-            name="templateId"
-            searchConfig={formSearchConfig}
-          />
-        </div>
-
-        <Button type="submit" className="w-full">
-          Crear Dashboard
+        <FormInput label="Nombre del Cliente" name="clientName" />
+        <FormInput
+          label="URL del dashboard"
+          description="(Sin espacios ni caracteres especiales)"
+          name="clientSlug"
+        />
+        <FormAutocomplete
+          label="Formulario"
+          name="templateId"
+          searchConfig={formSearchConfig}
+        />
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? 'Creando...' : 'Crear Dashboard'}
         </Button>
       </form>
     </Form>

@@ -1,9 +1,14 @@
 import { ApiStatus } from '@/enums/api-status'
 import { prisma } from '@/lib/prisma'
 import { RepslyApiService } from '@/lib/services/api'
-import { ClientsService, FormTemplateService } from '@/lib/services'
+import {
+  ClientsService,
+  FormTemplateService,
+  ProductTemplateProcessorService,
+} from '@/lib/services'
 import { FormTemplateRequest, FormTemplateResponse } from '@/types/api'
 import { NextRequest, NextResponse } from 'next/server'
+import { logger } from '@/lib/utils/logger'
 
 export class FormTemplateController {
   static async create(
@@ -26,6 +31,10 @@ export class FormTemplateController {
             },
             tx,
           )
+        logger.info(
+          `Processing template ${JSON.stringify(formTemplate, null, 2)}`,
+        )
+        await ProductTemplateProcessorService.processTemplate(formTemplate, tx)
         return {
           client,
           user,

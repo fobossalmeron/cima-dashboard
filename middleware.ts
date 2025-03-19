@@ -20,7 +20,7 @@ export function middleware(request: NextRequest) {
 
   // Si es una ruta pública y hay sesión, redirigir a dashboard
   if (publicRoutes.includes(pathname) && session) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    return NextResponse.redirect(new URL('/admin', request.url))
   }
 
   return NextResponse.next()
