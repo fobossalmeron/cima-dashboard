@@ -8,18 +8,20 @@ import {
   FormSubmission,
   FormTemplate,
   Location,
+  PointOfSale,
   Presentation,
   Product,
+  ProductLocation,
   ProductSale,
   Question,
   QuestionAttachment,
   QuestionGroup,
-  QuestionOption,
   QuestionTrigger,
   Representative,
   SubBrand,
   SubBrandTemplate,
 } from '@prisma/client'
+import { QuestionOptionWithRelations } from './form-template'
 
 export interface CreateClientRequest {
   name: string
@@ -28,10 +30,6 @@ export interface CreateClientRequest {
 
 export interface CreateClientResponse {
   client: Client
-}
-
-export interface QuestionOptionWithRelations extends QuestionOption {
-  triggers: QuestionTrigger[]
 }
 
 export interface QuestionWithRelations extends Question {
@@ -56,21 +54,23 @@ export interface FormTemplateWithRelations extends FormTemplate {
 
 export interface SubmissionWithRelations extends FormSubmission {
   answers: Answer[]
-  location: Location
-  representative: Representative
+  location: Location | null
+  representative: Representative | null
   activatedBrands: ActivatedBrandWithRelations[]
   productSales: ProductSaleWithRelations[]
+  productLocation: ProductLocation | null
+  pointOfSale: PointOfSale | null
+}
+
+export interface ProductWithRelations extends Product {
+  presentation: Presentation | null
+  brand: Brand
+  subBrand: SubBrand | null
+  flavor: Flavor | null
 }
 
 export interface ActivatedBrandWithRelations extends ActivatedBrand {
   brand: Brand
-}
-
-export interface ProductWithRelations extends Product {
-  presentation: Presentation
-  brand: Brand
-  subBrand: SubBrand
-  flavor: Flavor
 }
 
 export interface ProductSaleWithRelations extends ProductSale {
@@ -80,8 +80,6 @@ export interface ProductSaleWithRelations extends ProductSale {
 export interface DashboardWithRelations extends Dashboard {
   template: FormTemplateWithRelations
   submissions: SubmissionWithRelations[]
-  activatedBrands: ActivatedBrandWithRelations[]
-  productSales: ProductSaleWithRelations[]
 }
 
 export interface ClientWithRelations extends Client {

@@ -1,15 +1,18 @@
-import { Header } from "@/components/header";
-import { Content } from "@/components/content";
-import { TrafficDuringActivationChart } from "@/components/sampling/traffic-during-activation-chart";
-import { ActivationHoursHeatmap } from "@/components/sampling/activation-hours-heatmap";
-import { ActivationsHistoryTable } from "@/components/sampling/activations-history-table";
-import { PromoterImages } from "@/components/sampling/promoter-images";
+'use client'
+
+import { Header } from '@/components/header'
+import { Content } from '@/components/content'
+import { TrafficDuringActivationChart } from '@/components/sampling/traffic-during-activation-chart'
+import { ActivationHoursHeatmap } from '@/components/sampling/activation-hours-heatmap'
+import { ActivationsHistoryTable } from '@/components/sampling/activations-history-table'
+import { PromoterImages } from '@/components/sampling/promoter-images'
 import {
   PromoterImageData,
   HeatmapDataStructure,
-} from "@/components/sampling/sampling.types";
-import { ActivationsHistoryDummy } from "@/components/sampling/activations-history-table-dummy";
-import { TrafficDuringActivationChartData } from "@/components/sampling/sampling.types";
+} from '@/components/sampling/sampling.types'
+import { TrafficDuringActivationChartData } from '@/components/sampling/sampling.types'
+import { getActivationsHistory } from '@/lib/utils/dashboard-data/samplings'
+import { useClientContext } from '@/lib/context/ClientContext'
 
 /**
  * VELOCITY POR HORA
@@ -128,32 +131,39 @@ const ActivationHoursHeatmapDummy: HeatmapDataStructure = {
     17: 55,
     18: 40,
   },
-};
+}
 
 const TrafficDuringActivationChartDummy: TrafficDuringActivationChartData[] = [
-  { range: "Medio", value: 37 },
-  { range: "Bajo", value: 18 },
-  { range: "Muy Bajo", value: 8 },
-  { range: "Alto", value: 23 },
-  { range: "Muy Alto", value: 15 },
-];
+  { range: 'Medio', value: 37 },
+  { range: 'Bajo', value: 18 },
+  { range: 'Muy Bajo', value: 8 },
+  { range: 'Alto', value: 23 },
+  { range: 'Muy Alto', value: 15 },
+]
 
 const PromoterImagesDummy: PromoterImageData[] = [
   {
-    url: "/placeholder.svg",
-    name: "Andrea Velazquez",
+    url: '/placeholder.svg',
+    name: 'Andrea Velazquez',
   },
   {
-    url: "/placeholder.svg",
-    name: "María Pérez",
+    url: '/placeholder.svg',
+    name: 'María Pérez',
   },
   {
-    url: "/placeholder.svg",
-    name: "Roberta García",
+    url: '/placeholder.svg',
+    name: 'Roberta García',
   },
-];
+]
 
 export default function Sampling() {
+  const { dashboardData } = useClientContext()
+
+  if (!dashboardData) {
+    return <div>No dashboard data found</div>
+  }
+
+  const activationsHistory = getActivationsHistory(dashboardData)
   return (
     <div className="space-y-6">
       <Header title="Sampling" />
@@ -171,10 +181,10 @@ export default function Sampling() {
             <ActivationHoursHeatmap data={ActivationHoursHeatmapDummy} />
           </div>
           <div className="md:col-span-2 lg:col-span-3 print:col-span-3">
-            <ActivationsHistoryTable data={ActivationsHistoryDummy} />
+            <ActivationsHistoryTable data={activationsHistory} />
           </div>
         </div>
       </Content>
     </div>
-  );
+  )
 }

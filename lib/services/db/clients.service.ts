@@ -101,6 +101,8 @@ export class ClientsService {
                 },
               },
             },
+            productLocation: true,
+            pointOfSale: true,
           },
         },
       },

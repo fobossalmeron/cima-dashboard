@@ -5,13 +5,17 @@ import { Content } from '@/components/content'
 import { ActivationSalesChart } from '@/components/general/activation-sales-chart'
 import { Maps } from '@/components/general/maps/maps'
 import { Kpis } from '@/components/general/kpis'
-import { useClient } from '@/lib/context/ClientContext'
+import { useClientContext } from '@/lib/context/ClientContext'
 import { getChartData } from '@/lib/utils/dashboard-data/activations'
 import { getMapsData } from '@/lib/utils/dashboard-data/maps'
 import { getKpisData } from '@/lib/utils/dashboard-data/kpis'
 
 export default function ClientDashboard() {
-  const { dashboardData } = useClient()
+  const { dashboardData } = useClientContext()
+
+  if (!dashboardData) {
+    return <div>No dashboard data found</div>
+  }
 
   const chartData = getChartData(dashboardData)
   const mapsData = getMapsData(dashboardData)
