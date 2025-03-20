@@ -1,12 +1,9 @@
-import {
-  DashboardErrorResponse,
-  DashboardResponse,
-  DashboardSuccessResponse,
-} from '@/types/api'
-import { DashboardService } from '@/lib/services'
 import { NextResponse } from 'next/server'
+import { DashboardService } from '@/lib/services'
+import { withAuth } from '@/lib/services/auth/decorators/auth.decorator'
+import { DashboardErrorResponse, DashboardSuccessResponse } from '@/types/api'
 
-export async function GET(): Promise<NextResponse<DashboardResponse>> {
+export const GET = withAuth(async () => {
   try {
     const dashboards = await DashboardService.getAll()
 
@@ -21,4 +18,4 @@ export async function GET(): Promise<NextResponse<DashboardResponse>> {
       { status: 500 },
     )
   }
-}
+})

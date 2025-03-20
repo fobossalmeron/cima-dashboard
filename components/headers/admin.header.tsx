@@ -1,8 +1,9 @@
-'use client'
-
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { MoreVertical, LogOut } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { auth } from '@/lib/services'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,10 +11,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import CimaSVG from '@/public/cima_logo_simple.svg'
-import { useAuth } from '@/lib/contexts/auth-context'
 
 export function AdminHeader() {
-  const { logout } = useAuth()
+  const logout = async () => {
+    "use server";
+
+    await auth.api.signOut({
+      headers: await headers(),
+    })
+
+    redirect('/login')
+  }
 
   return (
     <header className="flex w-full items-center border-b bg-background">

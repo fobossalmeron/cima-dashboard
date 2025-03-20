@@ -1,9 +1,9 @@
 import type React from 'react'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
 import Providers from '@/components/providers/providers'
+import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,6 +21,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={inter.className}>
+        <Toaster />
         <Providers>
           <div className="flex h-screen">
             <main className="flex-1 overflow-y-auto">{children}</main>

@@ -20,7 +20,6 @@ import {
   Representative,
   SubBrand,
   SubBrandTemplate,
-  User,
 } from '@prisma/client'
 import { QuestionOptionWithRelations } from './form-template'
 
@@ -30,7 +29,6 @@ export interface CreateClientRequest {
 }
 
 export interface CreateClientResponse {
-  user: User
   client: Client
 }
 
@@ -85,7 +83,6 @@ export interface DashboardWithRelations extends Dashboard {
 }
 
 export interface ClientWithRelations extends Client {
-  user: Pick<User, 'name' | 'email'>
   dashboard: DashboardWithRelations | null
 }
 

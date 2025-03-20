@@ -1,33 +1,56 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from "next/server";
 
-// Rutas que requieren autenticación
-// const protectedRoutes: string[] = []
+const DEFAULT_REDIRECT_PATH = "/admin";
+const LOGIN_PATH = "/login";
+const SIGN_UP_PATH = "/sign-up";
+const AUTH_PATHS = [LOGIN_PATH, SIGN_UP_PATH];
+const PUBLIC_PATHS = [...AUTH_PATHS];
 
-// Rutas públicas
-// const publicRoutes = ['/login']
+async function getSession(request: NextRequest) {
+  try {
+    const response = await fetch(
+      `${request.nextUrl.origin}/api/auth/get-session`,
+      {
+        headers: {
+          cookie: request.headers.get("cookie") || "",
+        },
+      },
+    );
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function middleware(request: NextRequest) {
-  // const { pathname } = request.nextUrl
-  // const session = request.cookies.get('session')
+    if (!response.ok) return null;
 
-  // // Si es una ruta protegida y no hay sesión, redirigir a login
-  // if (protectedRoutes.some((route) => pathname.startsWith(route)) && !session) {
-  //   const loginUrl = new URL('/login', request.url)
-  //   loginUrl.searchParams.set('from', pathname)
-  //   return NextResponse.redirect(loginUrl)
-  // }
-
-  // // Si es una ruta pública y hay sesión, redirigir a dashboard
-  // if (publicRoutes.includes(pathname) && session) {
-  //   return NextResponse.redirect(new URL('/admin', request.url))
-  // }
-
-  return NextResponse.next()
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching session:", error);
+    return null;
+  }
 }
 
-// Configurar las rutas que el middleware debe procesar
+export async function middleware(request: NextRequest) {
+  const isAuthPath = AUTH_PATHS.some((path) =>
+    request.nextUrl.pathname.startsWith(path),
+  );
+  const session = await getSession(request);
+
+  if (session && isAuthPath) {
+    return NextResponse.redirect(new URL(DEFAULT_REDIRECT_PATH, request.url));
+  }
+
+  // Rutas públicas que no requieren autenticación
+  const isPublicPath = PUBLIC_PATHS.some((path) =>
+    request.nextUrl.pathname.startsWith(path),
+  );
+
+  // Redirigir al login si no hay sesión y la ruta no es pública
+  if (!session && !isPublicPath) {
+    const signInUrl = new URL(LOGIN_PATH, request.url);
+    signInUrl.searchParams.set("callbackUrl", request.nextUrl.pathname);
+    return NextResponse.redirect(signInUrl);
+  }
+
+  return NextResponse.next();
+}
+
 export const config = {
   matcher: [
     /*
@@ -36,8 +59,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public folder
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
-}
+};
