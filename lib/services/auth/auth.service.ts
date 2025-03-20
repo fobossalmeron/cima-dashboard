@@ -1,5 +1,4 @@
 import { prisma } from '@/lib/prisma'
-import { cookies } from 'next/headers'
 import * as jose from 'jose'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
@@ -67,15 +66,6 @@ export class AuthService {
         },
       })
 
-      // Establecer cookie
-      const cookieStore = await cookies()
-      cookieStore.set('session', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: SESSION_EXPIRY / 1000, // Convertir a segundos
-      })
-
       return {
         user: {
           id: user.id,
@@ -98,10 +88,6 @@ export class AuthService {
     await prisma.session.delete({
       where: { token },
     })
-
-    // Eliminar cookie
-    const cookieStore = await cookies()
-    cookieStore.delete('session')
   }
 
   static async validateSession(token: string) {
@@ -147,10 +133,6 @@ export class AuthService {
     await prisma.session.deleteMany({
       where: { userId },
     })
-
-    // Eliminar cookie
-    const cookieStore = await cookies()
-    cookieStore.delete('session')
   }
 
   // Método auxiliar para crear hash de contraseña (usado en registro/cambio de contraseña)

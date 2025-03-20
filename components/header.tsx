@@ -7,10 +7,10 @@ import CimaSVG from '@/public/cima_logo_simple.svg'
 import Image from 'next/image'
 import { MobileNav } from '@/components/mobile-nav'
 import { MobileFilters } from '@/components/mobile-filters'
-import { useClient } from '@/lib/context/ClientContext'
+import { useClientContext } from '@/lib/context/ClientContext'
 
 export const Header = ({ title }: { title: string }) => {
-  const { clientData: client } = useClient()
+  const { clientData: client } = useClientContext()
 
   return (
     <div className="flex flex-col justify-between items-start w-full gap-8">

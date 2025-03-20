@@ -3,6 +3,7 @@ import { RepslyApiService } from '@/lib/services/api'
 import { NextRequest, NextResponse } from 'next/server'
 import { SyncDashboardSuccessResponse } from '@/types/api'
 import { ApiStatus } from '@/enums/api-status'
+import { DashboardFilters } from '@/types/services/dashboard.types'
 
 export class DashboardController {
   static async syncDashboard(request: NextRequest, params: { id: string }) {
@@ -70,5 +71,27 @@ export class DashboardController {
         { status: 500 },
       )
     }
+  }
+
+  static async getDashboard(request: NextRequest, params: { id: string }) {
+    const { id: dashboardId } = params
+    const { searchParams } = new URL(request.url)
+
+    // Leer los parámetros individuales
+    const dateRange = searchParams.get('dateRange')
+    const brandIds = searchParams.get('brandIds')
+    const city = searchParams.get('city')
+    const locationId = searchParams.get('locationId')
+
+    // Parsear los valores si es necesario
+    const parsedFilters: DashboardFilters = {
+      dateRange: dateRange ? JSON.parse(dateRange) : undefined,
+      brandIds: brandIds ? brandIds.split(',') : [],
+      city: city || undefined,
+      locationId: locationId || undefined,
+    }
+
+    const dashboard = await DashboardService.getById(dashboardId, parsedFilters)
+    return NextResponse.json(dashboard)
   }
 }

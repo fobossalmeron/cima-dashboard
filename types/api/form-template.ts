@@ -1,7 +1,18 @@
 import { ApiStatus } from '@/enums/api-status'
 import { FormTemplateWithQuestionsAndOptions } from '@/lib/services'
-import { Dashboard, Client, User } from '@prisma/client'
+import {
+  Dashboard,
+  Client,
+  User,
+  QuestionGroup,
+  SubBrandTemplate,
+  QuestionOption,
+  QuestionTrigger,
+  Brand,
+  SubBrand,
+} from '@prisma/client'
 import { NextResponse } from 'next/server'
+import { QuestionWithRelations } from './dashboard-sync'
 
 export interface FormTemplateOption {
   Id: string
@@ -119,4 +130,20 @@ export interface FormTemplateBodyResponse extends FormTemplateCreateResponse {
 
 export interface NextResponseFormTemplate extends Omit<NextResponse, 'body'> {
   body: FormTemplateBodyResponse
+}
+
+export interface QuestionOptionWithRelations extends QuestionOption {
+  triggers: QuestionTrigger[]
+}
+
+export interface SubBrandTemplateWithRelations extends SubBrandTemplate {
+  subBrand: SubBrand & {
+    brand: Brand
+  }
+}
+
+export interface FormTemplateWithRelations extends FormTemplate {
+  questionGroups: QuestionGroup[]
+  questions: QuestionWithRelations[]
+  subBrandTemplates: SubBrandTemplateWithRelations[]
 }
