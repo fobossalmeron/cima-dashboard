@@ -19,10 +19,8 @@ import {
   FormTemplateQuestionGroup,
   FormTemplateServiceParams,
 } from '@/types/api/form-template'
-import {
-  QuestionOptionWithRelations,
-  QuestionWithRelations,
-} from '@/types/api/clients'
+import { QuestionWithRelations } from '@/types/api/clients'
+import { QuestionOptionWithRelations } from '@/types/api'
 import { withTransaction } from '@/prisma/prisma'
 
 export type FormTemplateWithQuestionsAndOptions = FormTemplate & {
