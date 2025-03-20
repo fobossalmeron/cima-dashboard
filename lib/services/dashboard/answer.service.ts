@@ -38,6 +38,9 @@ export class AnswerService {
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx || prisma
+    await client.answerOption.deleteMany({
+      where: { answer: { submission: { dashboardId } } },
+    })
     return await client.answer.deleteMany({
       where: { submission: { dashboardId } },
     })

@@ -123,6 +123,7 @@ model QuestionOption {
   answers    Answer[]
   question   Question          @relation(fields: [questionId], references: [id])
   triggers   QuestionTrigger[]
+  answerOptions AnswerOption[]
 
   @@index([questionId])
   @@map("question_options")
@@ -319,34 +320,69 @@ model Dealer {
   @@map("dealers")
 }
 
+model PointOfSale {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  formSubmissions FormSubmission[]
+
+  @@map("points_of_sale")
+}
+
+model ProductLocation {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  formSubmissions FormSubmission[]
+
+  @@map("product_locations")
+}
+
 model FormSubmission {
-  id               String          @id @default(cuid())
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  dashboardId      String
-  email            String?
-  locationId       String?
-  mobilePhone      String?         @map("mobile_phone")
-  notes            String?
-  phone            String?
-  registered       Boolean         @default(false)
-  representativeId String?
-  status           String?
-  tags             String[]
-  endDate          DateTime        @map("end_date")
-  legalName        String?         @map("legal_name")
-  startDate        DateTime        @map("start_date")
-  submittedAt      DateTime        @map("submitted_at")
-  formLink         String          @map("form_link")
-  totalQuantity    Int            @default(0) @map("total_quantity")
-  totalAmount      Float          @default(0) @map("total_amount")
+  id                  String            @id @default(cuid())
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  dashboardId         String
+  email               String?
+  locationId          String?
+  mobilePhone         String?           @map("mobile_phone")
+  notes               String?
+  phone               String?
+  registered          Boolean           @default(false)
+  representativeId    String?
+  status              String?
+  tags                String[]
+  endDate             DateTime          @map("end_date")
+  legalName           String?           @map("legal_name")
+  startDate           DateTime          @map("start_date")
+  submittedAt         DateTime          @map("submitted_at")
+  formLink            String            @map("form_link")
+  totalQuantity       Int               @default(0) @map("total_quantity")
+  totalAmount         Float             @default(0) @map("total_amount")
+  samplesDelivered    Int               @default(0) @map("samples_delivered")
+  pointOfSaleId       String?           @map("point_of_sale_id")
+  productLocationId   String?           @map("product_location_id")
+  productInPromotion  Boolean           @default(false) @map("product_in_promotion")
+  riskZone            Boolean           @default(false) @map("risk_zone")
+
+  // Relations
   answers          Answer[]
   dealer           Dealer?
-  dashboard        Dashboard       @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
-  location         Location?       @relation(fields: [locationId], references: [id])
-  representative   Representative? @relation(fields: [representativeId], references: [id])
+  dashboard        Dashboard          @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  location         Location?          @relation(fields: [locationId], references: [id])
+  representative   Representative?    @relation(fields: [representativeId], references: [id])
   productSales     ProductSale[]
   activatedBrands  ActivatedBrand[]
+  pointOfSale      PointOfSale?       @relation(fields: [pointOfSaleId], references: [id])
+  productLocation  ProductLocation?   @relation(fields: [productLocationId], references: [id])
 
   @@unique([dashboardId, locationId, representativeId, submittedAt])
   @@index([locationId])
@@ -399,12 +435,28 @@ model Answer {
   selectedOption QuestionOption? @relation(fields: [optionId], references: [id])
   question       Question        @relation(fields: [questionId], references: [id])
   submission     FormSubmission  @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  selectedOptions AnswerOption[]
 
   @@index([submissionId])
   @@index([questionId])
   @@index([optionId])
   @@index([questionKey])
   @@map("answers")
+}
+
+model AnswerOption {
+  id        String   @id @default(cuid())
+  answerId  String   @map("answer_id")
+  optionId  String   @map("option_id")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  answer    Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  option    QuestionOption @relation(fields: [optionId], references: [id])
+
+  @@unique([answerId, optionId])
+  @@index([answerId])
+  @@index([optionId])
+  @@map("answer_options")
 }
 
 enum Role {

@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
-import { AuthProvider } from '@/lib/contexts/auth-context'
+import Providers from '@/components/providers/providers'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,15 +21,13 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={inter.className}>
-        <AuthProvider>
+        <Providers>
           <div className="flex h-screen">
             <main className="flex-1 overflow-y-auto">{children}</main>
           </div>
-        </AuthProvider>
-        <Toaster />
+          <Toaster />
+        </Providers>
       </body>
     </html>
   )
 }
-
-import './globals.css'

@@ -38,6 +38,25 @@ export function formatPresentation(
 }
 
 /**
+ * Extracts the presentation name from the text
+ * @param text - The text to extract the presentation name from
+ * @returns The presentation name or null if it is not found
+ */
+export function getPresentationName(text?: string): string | null {
+  if (!text) return null
+  for (const [container, pattern] of Object.entries(PRESENTATION_PATTERNS)) {
+    const match = text.match(pattern)
+    if (match) {
+      if (container === 'PACK') {
+        return `${match[1]} ${container}`
+      }
+      return container
+    }
+  }
+  return null
+}
+
+/**
  * Extracts the subbrand from the text
  * @param text - The text to extract the subbrand from
  * @returns The subbrand or null if it is not found

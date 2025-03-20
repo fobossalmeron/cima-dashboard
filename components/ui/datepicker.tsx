@@ -1,22 +1,26 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { Calendar } from "@/components/ui/calendar"
-import { Button } from "@/components/ui/button"
-import { CalendarIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { format, subDays, subMonths, startOfYear } from "date-fns"
-import { es } from "date-fns/locale"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import * as React from 'react'
+import { Calendar } from '@/components/ui/calendar'
+import { Button } from '@/components/ui/button'
+import { CalendarIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { format, subDays, subMonths, startOfYear } from 'date-fns'
+import { es } from 'date-fns/locale'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from '@/components/ui/select'
 
-type DateRange = {
+export type DateRange = {
   from: Date
   to: Date
 }
@@ -39,28 +43,28 @@ function DatePicker({
 
   const presets: PresetRange[] = [
     {
-      label: "Últimos 7 días",
+      label: 'Últimos 7 días',
       value: {
         from: subDays(today, 7),
         to: today,
       },
     },
     {
-      label: "Último mes",
+      label: 'Último mes',
       value: {
         from: subMonths(today, 1),
         to: today,
       },
     },
     {
-      label: "Últimos 3 meses",
+      label: 'Últimos 3 meses',
       value: {
         from: subMonths(today, 3),
         to: today,
       },
     },
     {
-      label: "Lo que va del año",
+      label: 'Lo que va del año',
       value: {
         from: startOfYear(today),
         to: today,
@@ -69,7 +73,7 @@ function DatePicker({
   ]
 
   const [selectedRange, setSelectedRange] = React.useState<DateRange>(
-    value || presets[0].value
+    value || presets[0].value,
   )
   const [month, setMonth] = React.useState<Date>(selectedRange.from)
 
@@ -87,16 +91,16 @@ function DatePicker({
         <Button
           variant="outline"
           className={cn(
-            "w-[240px] justify-start text-left font-normal",
-            !selectedRange && "text-muted-foreground",
-            className
+            'w-[240px] justify-start text-left font-normal',
+            !selectedRange && 'text-muted-foreground',
+            className,
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
           {selectedRange ? (
             <>
-              {format(selectedRange.from, "dd MMM yyyy", { locale: es })} -{" "}
-              {format(selectedRange.to, "dd MMM yyyy", { locale: es })}
+              {format(selectedRange.from, 'dd MMM yyyy', { locale: es })} -{' '}
+              {format(selectedRange.to, 'dd MMM yyyy', { locale: es })}
             </>
           ) : (
             <span>Selecciona un rango</span>

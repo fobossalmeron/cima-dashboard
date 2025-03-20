@@ -36,6 +36,7 @@ export interface AnswerValue {
   value: string | number | null
   questionId: string
   optionId: string | null
+  selectedOptionIds?: string[]
 }
 
 export interface ProcessAnswersResponse {

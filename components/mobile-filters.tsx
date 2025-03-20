@@ -1,19 +1,19 @@
-"use client";
+'use client'
 
-import { useState } from "react";
+import { useState } from 'react'
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { SlidersHorizontal } from "lucide-react";
-import { Filters } from "@/components/filters";
+} from '@/components/ui/sheet'
+import { Button } from '@/components/ui/button'
+import { SlidersHorizontal } from 'lucide-react'
+import { Filters } from '@/components/filters'
 
 export function MobileFilters() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -32,9 +32,12 @@ export function MobileFilters() {
           <SheetTitle>Filtros</SheetTitle>
         </SheetHeader>
         <div className="mt-4">
-          <Filters className="flex-col items-start justify-start" mobile />
+          <Filters
+            className="flex-col items-start justify-start gap-4"
+            mobile
+          />
         </div>
       </SheetContent>
     </Sheet>
-  );
+  )
 }
