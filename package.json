@@ -10,15 +10,11 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "db:seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
     "db:migrate:dev": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:reset": "prisma migrate reset",
     "test": "jest",
     "test:watch": "jest --watch"
-  },
-  "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.0",
@@ -47,8 +43,7 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "@react-google-maps/api": "^2.20.6",
     "@tanstack/react-table": "^8.21.2",
-    "@types/jsonwebtoken": "^9.0.9",
-    "bcryptjs": "^3.0.2",
+    "better-auth": "1.1.14",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.0",
@@ -57,8 +52,6 @@
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.5.2",
     "input-otp": "^1.4.2",
-    "jose": "^6.0.10",
-    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.475.0",
     "next": "15.2.0-canary.65",
     "next-themes": "^0.4.4",
@@ -79,7 +72,6 @@
     "@eslint/eslintrc": "^3",
     "@prisma/client": "^6.4.1",
     "@tailwindcss/postcss": "^4",
-    "@types/bcryptjs": "^3.0.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^20",
     "@types/react": "^19",

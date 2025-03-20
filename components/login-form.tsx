@@ -3,8 +3,10 @@
 // React and external libraries
 import type React from 'react'
 import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 
 // UI Components (shadcn)
 import {
@@ -15,25 +17,20 @@ import {
   CardHeader,
   CardTitle,
   FormInput,
-  FormError,
 } from '@/components/ui'
-
-// Hooks and contexts
-import { useAuth } from '@/lib/contexts/auth-context'
 
 // Utilities and types
 import { cn } from '@/lib/utils'
 import { loginSchema, type LoginFormValues } from '@/lib/schemas/auth'
-
-//#endregion
+import { authClient } from '@/lib/auth/auth-client'
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<'div'>) {
-  const { login } = useAuth()
-  const [error, setError] = useState<string | null>(null)
+  const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -43,21 +40,33 @@ export function LoginForm({
     },
   })
 
-  async function onSubmit(data: LoginFormValues) {
-    setError(null)
-    setIsLoading(true)
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
+    const { email, password } = values
+    const callbackUrl = searchParams.get('callbackUrl') || '/'
 
-    try {
-      await login(data.email, data.password)
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message)
-      } else {
-        setError('Error al iniciar sesión')
-      }
-    } finally {
-      setIsLoading(false)
-    }
+    // Limpiar el mensaje de error al intentar nuevamente
+    setErrorMessage(null)
+
+    await authClient.signIn.email(
+      {
+        email,
+        password,
+        callbackURL: callbackUrl,
+      },
+      {
+        onRequest: () => {
+          setIsLoading(true)
+        },
+        onSuccess: () => {
+          form.reset()
+          setIsLoading(false)
+        },
+        onError: (ctx) => {
+          setIsLoading(false)
+          setErrorMessage(ctx.error.error.message)
+        },
+      },
+    )
   }
 
   return (
@@ -72,7 +81,6 @@ export function LoginForm({
         <CardContent>
           <FormProvider {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormError message={error} />
               <FormInput<LoginFormValues>
                 name="email"
                 label="Email"
@@ -85,6 +93,11 @@ export function LoginForm({
                 type="password"
                 placeholder="••••••••"
               />
+              {errorMessage && (
+                <div className="text-sm text-red-500 font-medium">
+                  {errorMessage}
+                </div>
+              )}
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
               </Button>

@@ -1,13 +1,11 @@
 import { prisma } from '@/lib/prisma'
-import { Role } from '@/enums/role'
-import { Client, Prisma, User } from '@prisma/client'
+import { Client, Prisma } from '@prisma/client'
 import {
   CreateClientRequest,
   ClientWithRelations,
   DashboardWithRelations,
   CreateClientResponse,
 } from '@/types/api/clients'
-import { AuthService } from '../auth'
 import { withTransaction } from '@/prisma/prisma'
 
 export class ClientsService {
@@ -139,31 +137,14 @@ export class ClientsService {
     })
   }
 
-  private static async createUser(
-    tx: Prisma.TransactionClient,
-    data: CreateClientRequest,
-  ): Promise<User> {
-    const password = Math.random().toString(36).slice(-8)
-    const hashedPassword = await AuthService.hashPassword(password)
-    return tx.user.create({
-      data: {
-        email: `${data.slug}@example.com`,
-        password: hashedPassword,
-        role: Role.CLIENT,
-      },
-    })
-  }
-
   private static async createClient(
     tx: Prisma.TransactionClient,
     data: CreateClientRequest,
-    user: User,
   ): Promise<Client> {
     return tx.client.create({
       data: {
         name: data.name,
         slug: data.slug,
-        userId: user.id,
       },
     })
   }
@@ -173,24 +154,19 @@ export class ClientsService {
     tx?: Prisma.TransactionClient,
   ): Promise<CreateClientResponse> {
     if (tx) {
-      const user = await this.createUser(tx, data)
-      const client = await this.createClient(tx, data, user)
+      const client = await this.createClient(tx, data)
 
       return {
-        user,
         client,
       }
     } else {
       // Crear usuario y cliente en una transacción
       const result = await withTransaction(async (tx) => {
-        // Crear el usuario
-        const user = await this.createUser(tx, data)
 
         // Crear el cliente
-        const client = await this.createClient(tx, data, user)
+        const client = await this.createClient(tx, data)
 
         return {
-          user,
           client,
         }
       })

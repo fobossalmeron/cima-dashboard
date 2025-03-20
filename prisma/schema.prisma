@@ -1,6 +1,7 @@
+
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native", "rhel-openssl-3.0.x"]
   previewFeatures = ["driverAdapters"]
 }
 
@@ -10,31 +11,64 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  name      String?
-  password  String
-  role      Role      @default(SUPER_ADMIN)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  client    Client?
-  sessions  Session[]
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  emailVerified Boolean
+  image         String?
+  role          Role      @default(SUPER_ADMIN)
+  client        Client?
+  sessions      Session[]
+  accounts      Account[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@map("users")
 }
 
 model Session {
-  id        String   @id @default(cuid())
-  token     String   @unique
+  id        String   @id
   expiresAt DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  token     String
+  ipAddress String?
+  userAgent String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime
+  updatedAt DateTime
 
-  @@index([userId])
-  @@index([token])
+  @@unique([token])
   @@map("sessions")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("accounts")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verifications")
 }
 
 model Client {
@@ -44,8 +78,8 @@ model Client {
   active     Boolean     @default(true)
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
-  userId     String      @unique
-  user       User        @relation(fields: [userId], references: [id])
+  userId     String?     @unique
+  user       User?       @relation(fields: [userId], references: [id])
   dashboards Dashboard[]
 
   @@index([userId])
@@ -69,21 +103,21 @@ model Dashboard {
 }
 
 model FormTemplate {
-  id             String           @id @default(cuid())
-  name           String
-  description    String?
-  active         Boolean          @default(true)
-  sortOrder      Int
-  version        Int              @default(1)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  createdBy      String
-  updatedBy      String
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  active      Boolean  @default(true)
+  sortOrder   Int
+  version     Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  updatedBy   String
 
   // Relations
-  dashboards     Dashboard[]
-  questionGroups QuestionGroup[]
-  questions      Question[]
+  dashboards        Dashboard[]
+  questionGroups    QuestionGroup[]
+  questions         Question[]
   subBrandTemplates SubBrandTemplate[]
 
   @@map("form_templates")
@@ -187,29 +221,29 @@ model ServiceToken {
 }
 
 model Brand {
-  id              String           @id @default(cuid())
-  name            String          @unique
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  slug            String          @unique
-  products        Product[]
-  subBrands       SubBrand[]
-  activations     ActivatedBrand[]
+  id          String           @id @default(cuid())
+  name        String           @unique
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  slug        String           @unique
+  products    Product[]
+  subBrands   SubBrand[]
+  activations ActivatedBrand[]
 
   @@map("brands")
 }
 
 model SubBrand {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   name      String
   brandId   String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  slug      String    @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  slug      String   @unique
 
   // Relations
   products  Product[]
-  brand     Brand     @relation(fields: [brandId], references: [id])
+  brand     Brand              @relation(fields: [brandId], references: [id])
   templates SubBrandTemplate[]
 
   @@unique([slug, brandId])
@@ -219,7 +253,7 @@ model SubBrand {
 model SubBrandTemplate {
   subBrandId String
   templateId String
-  subBrand   SubBrand @relation(fields: [subBrandId], references: [id])
+  subBrand   SubBrand     @relation(fields: [subBrandId], references: [id])
   template   FormTemplate @relation(fields: [templateId], references: [id])
 
   @@id([subBrandId, templateId])
@@ -251,19 +285,19 @@ model Flavor {
 }
 
 model Product {
-  id             String           @id @default(cuid())
+  id             String        @id @default(cuid())
   name           String
   brandId        String
   subBrandId     String?
   presentationId String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   flavorId       String?
-  imageUrl       String?          @map("image_url")
-  brand          Brand            @relation(fields: [brandId], references: [id])
-  flavor         Flavor?          @relation(fields: [flavorId], references: [id])
-  presentation   Presentation?    @relation(fields: [presentationId], references: [id])
-  subBrand       SubBrand?        @relation(fields: [subBrandId], references: [id])
+  imageUrl       String?       @map("image_url")
+  brand          Brand         @relation(fields: [brandId], references: [id])
+  flavor         Flavor?       @relation(fields: [flavorId], references: [id])
+  presentation   Presentation? @relation(fields: [presentationId], references: [id])
+  subBrand       SubBrand?     @relation(fields: [subBrandId], references: [id])
   sales          ProductSale[]
 
   @@unique([name, brandId])
@@ -320,31 +354,31 @@ model Dealer {
 }
 
 model FormSubmission {
-  id               String          @id @default(cuid())
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+  id               String           @id @default(cuid())
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
   dashboardId      String
   email            String?
   locationId       String?
-  mobilePhone      String?         @map("mobile_phone")
+  mobilePhone      String?          @map("mobile_phone")
   notes            String?
   phone            String?
-  registered       Boolean         @default(false)
+  registered       Boolean          @default(false)
   representativeId String?
   status           String?
   tags             String[]
-  endDate          DateTime        @map("end_date")
-  legalName        String?         @map("legal_name")
-  startDate        DateTime        @map("start_date")
-  submittedAt      DateTime        @map("submitted_at")
-  formLink         String          @map("form_link")
-  totalQuantity    Int            @default(0) @map("total_quantity")
-  totalAmount      Float          @default(0) @map("total_amount")
+  endDate          DateTime         @map("end_date")
+  legalName        String?          @map("legal_name")
+  startDate        DateTime         @map("start_date")
+  submittedAt      DateTime         @map("submitted_at")
+  formLink         String           @map("form_link")
+  totalQuantity    Int              @default(0) @map("total_quantity")
+  totalAmount      Float            @default(0) @map("total_amount")
   answers          Answer[]
   dealer           Dealer?
-  dashboard        Dashboard       @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
-  location         Location?       @relation(fields: [locationId], references: [id])
-  representative   Representative? @relation(fields: [representativeId], references: [id])
+  dashboard        Dashboard        @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  location         Location?        @relation(fields: [locationId], references: [id])
+  representative   Representative?  @relation(fields: [representativeId], references: [id])
   productSales     ProductSale[]
   activatedBrands  ActivatedBrand[]
 
@@ -356,16 +390,16 @@ model FormSubmission {
 }
 
 model ProductSale {
-  id            String         @id @default(cuid())
-  submissionId  String        @map("submission_id")
-  productId     String        @map("product_id")
-  quantity      Int
-  price         Float
-  total         Float
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  submission    FormSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  product       Product       @relation(fields: [productId], references: [id])
+  id           String         @id @default(cuid())
+  submissionId String         @map("submission_id")
+  productId    String         @map("product_id")
+  quantity     Int
+  price        Float
+  total        Float
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  submission   FormSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  product      Product        @relation(fields: [productId], references: [id])
 
   @@index([submissionId])
   @@index([productId])
@@ -373,13 +407,13 @@ model ProductSale {
 }
 
 model ActivatedBrand {
-  id            String         @id @default(cuid())
-  submissionId  String        @map("submission_id")
-  brandId       String        @map("brand_id")
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  submission    FormSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  brand         Brand         @relation(fields: [brandId], references: [id])
+  id           String         @id @default(cuid())
+  submissionId String         @map("submission_id")
+  brandId      String         @map("brand_id")
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  submission   FormSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  brand        Brand          @relation(fields: [brandId], references: [id])
 
   @@unique([submissionId, brandId])
   @@index([submissionId])
