@@ -31,35 +31,34 @@ export function DashboardCard({
         </div>
         <div className="flex gap-2">
           {debugMode && (
-            <div className="flex gap-2">
-              <Button
-                onClick={() => onClearDashboard(dashboard.id)}
-                variant="destructive"
-                disabled={isCleaning}
-              >
-                {isCleaning ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash className="mr-2 h-4 w-4" />
-                )}
-                Limpiar
-              </Button>
-              <Button
-                onClick={() => onSyncDashboard(dashboard.id)}
-                disabled={isSyncing}
-                variant="primary-outline"
-              >
-                <div className="flex items-center">
-                  {isSyncing ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <RefreshCcw className="mr-2 h-4 w-4" />
-                  )}
-                  {isSyncing ? 'Sincronizando...' : 'Resync'}
-                </div>
-              </Button>
-            </div>
+            <Button
+              onClick={() => onClearDashboard(dashboard.id)}
+              variant="destructive"
+              disabled={isCleaning}
+            >
+              {isCleaning ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Trash className="mr-2 h-4 w-4" />
+              )}
+              Limpiar
+            </Button>
           )}
+          <Button
+            onClick={() => onSyncDashboard(dashboard.id)}
+            disabled={isSyncing}
+            variant="primary-outline"
+          >
+            <div className="flex items-center">
+              {isSyncing ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCcw className="mr-2 h-4 w-4" />
+              )}
+              {isSyncing ? 'Sincronizando...' : 'Resync'}
+            </div>
+          </Button>
+
           <Button asChild variant="outline">
             <Link href={`/${dashboard.client.slug}`}>Ir a dashboard</Link>
           </Button>
