@@ -85,6 +85,13 @@ function DatePicker({
     }
   }
 
+  React.useEffect(() => {
+    if (value && value !== selectedRange) {
+      setSelectedRange(value)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
+
   return (
     <Popover>
       <PopoverTrigger asChild>

@@ -29,6 +29,10 @@ export function Filters({
     undefined,
   )
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
+  const [
+    firstNonNullDashboardDataLoading,
+    setFirstNonNullDashboardDataLoading,
+  ] = useState<boolean>(false)
 
   // Obtener las marcas
   const { data } = useQuery({
@@ -146,6 +150,22 @@ export function Filters({
       setDashboardData(dashboardResponse)
     }
   }, [dashboardResponse, setDashboardData])
+
+  useEffect(() => {
+    if (dashboardData !== null && !firstNonNullDashboardDataLoading) {
+      setFirstNonNullDashboardDataLoading(true)
+      const minDate = dashboardData.submissions.reduce((min, submission) => {
+        return Math.min(min, new Date(submission.submittedAt).getTime())
+      }, Infinity)
+      if (minDate !== Infinity) {
+        setDateRange({
+          from: new Date(minDate),
+          to: new Date(),
+        })
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dashboardData])
 
   useEffect(() => {
     // Cuando cambien los filtros, activamos la carga del dashboard

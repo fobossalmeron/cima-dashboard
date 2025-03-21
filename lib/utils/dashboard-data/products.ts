@@ -104,19 +104,32 @@ export function getOldAndNewActivationsChartData(
         previous_location_activations: 0,
         new_locations: 0,
         previous_locations: 0,
+        previousLocations: [],
+        newLocations: [],
       }
     }
 
     // Contar activaciones en tiendas nuevas y anteriores
-    if (submission.firstActivation) {
+    if (
+      submission.firstActivation &&
+      !monthlyData[month].newLocations.includes(submission.location?.id ?? '')
+    ) {
       monthlyData[month].new_location_activations++
-      if (submission.location) {
+      if (
+        submission.location &&
+        !monthlyData[month].newLocations.includes(submission.location.id)
+      ) {
         monthlyData[month].new_locations++
+        monthlyData[month].newLocations.push(submission.location.id)
       }
     } else {
       monthlyData[month].previous_location_activations++
-      if (submission.location) {
+      if (
+        submission.location &&
+        !monthlyData[month].previousLocations.includes(submission.location.id)
+      ) {
         monthlyData[month].previous_locations++
+        monthlyData[month].previousLocations.push(submission.location.id)
       }
     }
   })

@@ -8,6 +8,7 @@ interface DashboardsTableProps {
   onClearDashboard: (dashboardId: string) => void
   isSyncing: boolean
   isCleaning: boolean
+  debugMode: boolean
 }
 
 export function DashboardsTable({
@@ -16,6 +17,7 @@ export function DashboardsTable({
   onClearDashboard,
   isSyncing,
   isCleaning,
+  debugMode,
 }: DashboardsTableProps) {
   return (
     <div className="grid gap-4">
@@ -27,6 +29,7 @@ export function DashboardsTable({
           onClearDashboard={onClearDashboard}
           isSyncing={isSyncing}
           isCleaning={isCleaning}
+          debugMode={debugMode}
         />
       ))}
     </div>

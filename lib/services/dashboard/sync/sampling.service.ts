@@ -151,7 +151,6 @@ export class SamplingService {
       ...rest,
       submissionId,
     }
-    console.log('Data to create sampling:', JSON.stringify(data, null, 2))
     const sampling = await client.sampling.create({ data })
     await client.purchaseIntentionSampling.createMany({
       data: purchaseIntentions.map((purchaseIntention) => ({

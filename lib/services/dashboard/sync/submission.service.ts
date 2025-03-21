@@ -41,6 +41,7 @@ export class SubmissionSyncService {
             productInPromotion,
             riskZone,
             samplesDelivered,
+            firstActivation,
           } = await GeneralFieldsService.processGeneralFields(row, dashboardId)
 
           const pointOfSale = await this.processPointOfSale(
@@ -101,6 +102,7 @@ export class SubmissionSyncService {
               productInPromotion,
               samplesDelivered,
               riskZone,
+              firstActivation,
             },
           })
 

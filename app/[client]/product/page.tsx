@@ -33,6 +33,7 @@ export default function ProductInfo() {
   const oldAndNewActivationsChartData =
     getOldAndNewActivationsChartData(dashboardData)
   const pdvProductImages = getPDVProductImages(dashboardData)
+
   return (
     <div className="space-y-6">
       <Header title="Información del producto" />

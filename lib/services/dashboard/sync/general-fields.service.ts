@@ -1,7 +1,8 @@
 import { FormSubmissionEntryData } from '@/types/api'
 import { GeneralFieldsEnum } from '@/enums/general-fields'
-import { DataFieldsEnum } from '@/enums/data-fields'
+import { DataFieldSearchType, DataFieldsEnum } from '@/enums/data-fields'
 import { parseDate } from '@/lib/utils/date'
+import { DataFieldsTagsValues } from '@/types/services'
 
 export class GeneralFieldsService {
   static async processGeneralFields(
@@ -88,6 +89,18 @@ export class GeneralFieldsService {
     const riskZone =
       row[DataFieldsEnum.RISK_ZONE]?.toString()?.toLowerCase() === 'Yes'
 
+    const firstActivation =
+      Object.entries(row).find(([key]) => {
+        const { tags, searchType } =
+          DataFieldsTagsValues[DataFieldsEnum.FIRST_ACTIVATION]
+        switch (searchType) {
+          case DataFieldSearchType.OR:
+            return tags.some((tag) => key.includes(tag))
+          case DataFieldSearchType.AND:
+            return tags.every((tag) => key.includes(tag))
+        }
+      })?.[1] === 'Yes'
+
     // Filtrar los campos que son preguntas
     const questionAnswers = Object.fromEntries(
       Object.entries(row).filter(
@@ -106,6 +119,7 @@ export class GeneralFieldsService {
       pointOfSale,
       productInPromotion,
       riskZone,
+      firstActivation,
     }
   }
 }

@@ -8,8 +8,12 @@ import { NewDashboardDialog } from '@/components/dialogs/dashboard'
 import { DashboardWithClientAndTemplate, ValidationResult } from '@/types/api'
 import { SyncResults } from '@/components/sync/sync-results'
 import { ApiStatus } from '@/enums/api-status'
+import { useSearchParams } from 'next/navigation'
 
 export default function AdminPageContent() {
+  const searchParams = useSearchParams()
+  const debugMode =
+    searchParams.get('debug') !== null && searchParams.get('debug') === 'true'
   const [dashboards, setDashboards] = useState<
     DashboardWithClientAndTemplate[]
   >([])
@@ -158,6 +162,7 @@ export default function AdminPageContent() {
             onClearDashboard={handleClearDashboard}
             isSyncing={isSyncing}
             isCleaning={isCleaning}
+            debugMode={debugMode}
           />
           {syncResults && (
             <SyncResults

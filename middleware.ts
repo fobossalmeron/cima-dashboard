@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse, type NextRequest } from 'next/server'
 
 const DEFAULT_REDIRECT_PATH = '/admin'
@@ -27,16 +28,33 @@ async function getSession(request: NextRequest) {
   }
 }
 
-export async function middleware(request: NextRequest) {
+async function tryToRedirectToDefaultAuthPath(
+  request: NextRequest,
+  session: any,
+) {
   const isAuthPath = AUTH_PATHS.some((path) =>
     request.nextUrl.pathname.startsWith(path),
   )
-  const session = await getSession(request)
-
   if (session && isAuthPath) {
-    return NextResponse.redirect(new URL(DEFAULT_REDIRECT_PATH, request.url))
+    return new URL(DEFAULT_REDIRECT_PATH, request.url)
   }
 
+  return null
+}
+
+async function tryToRedirectToBasePath(request: NextRequest, session: any) {
+  const isBasePath = request.nextUrl.pathname === '/'
+  if (isBasePath) {
+    if (session) {
+      return new URL(DEFAULT_REDIRECT_PATH, request.url)
+    } else {
+      return new URL(LOGIN_PATH, request.url)
+    }
+  }
+  return null
+}
+
+async function tryToRedirectToLogin(request: NextRequest, session: any) {
   // Rutas públicas que no requieren autenticación
   const isPublicPath = PUBLIC_PATHS.some((path) =>
     request.nextUrl.pathname.startsWith(path),
@@ -50,7 +68,28 @@ export async function middleware(request: NextRequest) {
   if (!session && !isPublicPath && isPrivatePath) {
     const signInUrl = new URL(LOGIN_PATH, request.url)
     signInUrl.searchParams.set('callbackUrl', request.nextUrl.pathname)
-    return NextResponse.redirect(signInUrl)
+    return signInUrl
+  }
+  return null
+}
+
+export async function middleware(request: NextRequest) {
+  const session = await getSession(request)
+
+  const redirectAuthUrl = await tryToRedirectToDefaultAuthPath(request, session)
+
+  if (redirectAuthUrl) {
+    return NextResponse.redirect(redirectAuthUrl)
+  }
+
+  const redirectBaseUrl = await tryToRedirectToBasePath(request, session)
+  if (redirectBaseUrl) {
+    return NextResponse.redirect(redirectBaseUrl)
+  }
+
+  const redirectLoginUrl = await tryToRedirectToLogin(request, session)
+  if (redirectLoginUrl) {
+    return NextResponse.redirect(redirectLoginUrl)
   }
 
   return NextResponse.next()

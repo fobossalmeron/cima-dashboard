@@ -114,22 +114,32 @@ export function getConsumptionMomentsChartData(
 export function getNetPromoterScoreChartData(
   dashboard: DashboardWithRelations,
 ): NetPromoterScoreChartData[] {
-  const netPromoterScore = dashboard.submissions.reduce((acc, submission) => {
+  const promoterScore = {
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0,
+    7: 0,
+    8: 0,
+    9: 0,
+    10: 0,
+  }
+  dashboard.submissions.forEach((submission) => {
     const netPromoterScore = submission.sampling?.netPromoterScore
-    if (!netPromoterScore) return acc
-    if (acc[netPromoterScore]) {
-      acc[netPromoterScore] += 1
-    } else {
-      acc[netPromoterScore] = 1
+    if (
+      netPromoterScore &&
+      Number(netPromoterScore) in Object.keys(promoterScore)
+    ) {
+      promoterScore[netPromoterScore as keyof typeof promoterScore] += 1
     }
-    return acc
-  }, {} as Record<string, number>)
-  return Object.entries(netPromoterScore).map(
-    ([netPromoterScore, quantity]) => ({
-      vote: parseInt(netPromoterScore),
-      quantity,
-    }),
-  )
+  })
+  return Object.entries(promoterScore).map(([netPromoterScore, quantity]) => ({
+    vote: parseInt(netPromoterScore),
+    quantity,
+  }))
 }
 
 export function getConsumerFeedbackData(
