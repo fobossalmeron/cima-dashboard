@@ -1,11 +1,12 @@
+import { Suspense } from 'react'
 import { AdminHeader } from '@/components/headers'
 import AdminPageContent from './page-content'
 
 export default function AdminPage() {
   return (
-    <div>
+    <Suspense fallback={<div>Loading...</div>}>
       <AdminHeader />
       <AdminPageContent />
-    </div>
+    </Suspense>
   )
 }
