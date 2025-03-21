@@ -1,23 +1,32 @@
 import {
   ActivatedBrand,
+  AgeRange,
   Answer,
   Brand,
   Client,
+  ConsumptionMoment,
   Dashboard,
+  Ethnicity,
   Flavor,
   FormSubmission,
   FormTemplate,
+  Gender,
   Location,
+  Photo,
+  PhotoType,
   PointOfSale,
   Presentation,
   Product,
   ProductLocation,
   ProductSale,
+  PurchaseIntention,
   Question,
   QuestionAttachment,
   QuestionGroup,
   QuestionTrigger,
   Representative,
+  Sampling,
+  SamplingTraffic,
   SubBrand,
   SubBrandTemplate,
 } from '@prisma/client'
@@ -52,6 +61,23 @@ export interface FormTemplateWithRelations extends FormTemplate {
   subBrandTemplates: SubBrandTemplateWithRelations[]
 }
 
+interface SamplingWithRelations extends Sampling {
+  consumptionMoments: {
+    consumptionMoment: ConsumptionMoment
+  }[]
+  purchaseIntentions: {
+    purchaseIntention: PurchaseIntention
+  }[]
+  traffic: SamplingTraffic
+  gender: Gender
+  ageRange: AgeRange
+  ethnicity: Ethnicity
+}
+
+export interface PhotoWithRelations extends Photo {
+  type: PhotoType
+}
+
 export interface SubmissionWithRelations extends FormSubmission {
   answers: Answer[]
   location: Location | null
@@ -60,6 +86,8 @@ export interface SubmissionWithRelations extends FormSubmission {
   productSales: ProductSaleWithRelations[]
   productLocation: ProductLocation | null
   pointOfSale: PointOfSale | null
+  sampling: SamplingWithRelations | null
+  photos: PhotoWithRelations[]
 }
 
 export interface ProductWithRelations extends Product {

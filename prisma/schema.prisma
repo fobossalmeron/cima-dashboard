@@ -14,7 +14,7 @@ model User {
   id            String    @id @default(cuid())
   email         String    @unique
   name          String?
-  emailVerified Boolean
+  emailVerified Boolean   @default(false)
   image         String?
   role          Role      @default(SUPER_ADMIN)
   client        Client?
@@ -406,17 +406,20 @@ model FormSubmission {
   productLocationId   String?           @map("product_location_id")
   productInPromotion  Boolean           @default(false) @map("product_in_promotion")
   riskZone            Boolean           @default(false) @map("risk_zone")
+  firstActivation     Boolean           @default(false) @map("first_activation")
 
   // Relations
-  answers          Answer[]
-  dealer           Dealer?
-  dashboard        Dashboard          @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
-  location         Location?          @relation(fields: [locationId], references: [id])
-  representative   Representative?    @relation(fields: [representativeId], references: [id])
-  productSales     ProductSale[]
-  activatedBrands  ActivatedBrand[]
-  pointOfSale      PointOfSale?       @relation(fields: [pointOfSaleId], references: [id])
-  productLocation  ProductLocation?   @relation(fields: [productLocationId], references: [id])
+  answers             Answer[]
+  dealer              Dealer?
+  dashboard           Dashboard          @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  location            Location?          @relation(fields: [locationId], references: [id])
+  representative      Representative?    @relation(fields: [representativeId], references: [id])
+  productSales        ProductSale[]
+  activatedBrands     ActivatedBrand[]
+  pointOfSale         PointOfSale?       @relation(fields: [pointOfSaleId], references: [id])
+  productLocation     ProductLocation?   @relation(fields: [productLocationId], references: [id])
+  sampling            Sampling?
+  photos              Photo[]
 
   @@unique([dashboardId, locationId, representativeId, submittedAt])
   @@index([locationId])
@@ -493,6 +496,134 @@ model AnswerOption {
   @@map("answer_options")
 }
 
+model SamplingTraffic {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  description   String
+
+  samplings     Sampling[]
+
+  @@map("sampling_traffic")
+}
+
+model Ethnicity {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  description   String
+
+  samplings     Sampling[]
+
+  @@map("ethnicity")
+}
+
+model AgeRange {
+  id            String @id @default(cuid())
+  slug          String @unique
+  description   String
+
+  samplings     Sampling[]
+
+  @@map("age_range")
+}
+
+model Gender {
+  id            String @id @default(cuid())
+  slug          String @unique
+  description   String
+
+  samplings     Sampling[]
+}
+
+model PurchaseIntention {
+  id            String @id @default(cuid())
+  slug          String @unique
+  description   String
+
+  purchaseIntentionsSampling PurchaseIntentionSampling[]
+}
+
+model ConsumptionMoment {
+  id String @id @default(cuid())
+  slug String @unique
+  description String
+
+  consumptionMomentsSampling ConsumptionMomentSampling[]
+
+  @@map("consumption_moments")
+}
+
+model PurchaseIntentionSampling {
+  purchaseIntentionId String
+  samplingId          String
+
+  purchaseIntention   PurchaseIntention @relation(fields: [purchaseIntentionId], references: [id])
+  sampling            Sampling          @relation(fields: [samplingId], references: [id], onDelete: Cascade)
+
+  @@id([purchaseIntentionId, samplingId])
+
+  @@map("purchase_intention_sampling")
+}
+
+model ConsumptionMomentSampling {
+  consumptionMomentId String
+  samplingId          String
+
+  consumptionMoment   ConsumptionMoment @relation(fields: [consumptionMomentId], references: [id])
+  sampling            Sampling          @relation(fields: [samplingId], references: [id], onDelete: Cascade)
+
+  @@id([consumptionMomentId, samplingId])
+
+  @@map("consumption_moment_sampling")
+}
+
+model Sampling {
+  id                  String    @id @default(cuid())
+  submissionId        String    @unique @map("submission_id")
+  trafficId           String    @map("traffic_id")
+  ethnicityId         String    @map("ethnicity_id")
+  ageRangeId          String    @map("age_range_id")
+  genderId            String    @map("gender_id")
+  netPromoterScore    Int?      @map("net_promoter_score")
+  followUp            Boolean   @default(false) @map("follow_up")
+  clientComments      String?   @map("client_comments")
+  promotorComments    String?   @map("promotor_comments")
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  // Relations
+  submission          FormSubmission                @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  traffic             SamplingTraffic               @relation(fields: [trafficId], references: [id])
+  ethnicity           Ethnicity                     @relation(fields: [ethnicityId], references: [id])
+  ageRange            AgeRange                      @relation(fields: [ageRangeId], references: [id])
+  gender              Gender                        @relation(fields: [genderId], references: [id])
+  purchaseIntentions  PurchaseIntentionSampling[]
+  consumptionMoments  ConsumptionMomentSampling[]
+
+  @@map("sampling")
+}
+
+model PhotoType {
+  id String @id @default(cuid())
+  slug String @unique
+  description String
+
+  photos Photo[]
+
+  @@map("photo_types")
+}
+
+model Photo {
+  id              String @id @default(cuid())
+  url             String
+  typeId          String
+  submissionId    String
+  // Relations
+  type            PhotoType @relation(fields: [typeId], references: [id])
+  submission      FormSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@map("photos")
+}
 enum Role {
   CLIENT
   SUPER_ADMIN

@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { QuestionGroupType, QuestionType } from '@prisma/client'
-import { DashboardSyncService } from '../lib/services'
+import { BrandSyncService, DashboardSyncService } from '../lib/services'
 import answersData from './mocks/answers.json'
 import questionsData from './mocks/questions.json'
 import { QuestionWithRelations } from '@/types/api'
@@ -193,15 +194,17 @@ describe('DashboardSyncService', () => {
       expect(errors.length).toBeLessThanOrEqual(4)
 
       // Verificar respuesta MULTISELECT (MARCA Activada)
-      const marcaAnswer = answers.find((a) => a.questionId === marcaId)
+      const marcaAnswer = answers.find((a: any) => a.questionId === marcaId)
       expect(marcaAnswer?.value).toBe("NATURA'S NECTAR")
 
       // Verificar respuesta NUMERIC (PRECIO)
-      const precioAnswer = answers.find((a) => a.questionId === precioId)
+      const precioAnswer = answers.find((a: any) => a.questionId === precioId)
       expect(precioAnswer?.value).toBe(0.99)
 
       // Verificar respuesta MULTISELECT (UNIDADES VENDIDAS)
-      const unidadesAnswer = answers.find((a) => a.questionId === unidadesId)
+      const unidadesAnswer = answers.find(
+        (a: any) => a.questionId === unidadesId,
+      )
       expect(unidadesAnswer?.value).toBe(
         'Banana-Strawberry | Apple | Pear | Peach | Pineapple | Mango | Guava',
       )
@@ -242,7 +245,7 @@ describe('DashboardSyncService', () => {
       expect(errors.length).toBeGreaterThan(0)
       expect(
         errors.some(
-          (e) => e.column === "- PRECIO Natura's NECTAR CAN 350 ml -",
+          (e: any) => e.column === "- PRECIO Natura's NECTAR CAN 350 ml -",
         ),
       ).toBe(true)
     })
@@ -259,7 +262,7 @@ describe('DashboardSyncService', () => {
       }
 
       const selectedBrands = mockAnswers[brandQuestion.name]
-      const selectedBrandsArray = DashboardSyncService.getSelectedBrands(
+      const selectedBrandsArray = BrandSyncService.getSelectedBrands(
         selectedBrands,
         brandQuestion,
       )

@@ -7,11 +7,11 @@ import { ActivationHoursHeatmap } from '@/components/sampling/activation-hours-h
 import { ActivationsHistoryTable } from '@/components/sampling/activations-history-table'
 import { PromoterImages } from '@/components/sampling/promoter-images'
 import {
-  PromoterImageData,
-  HeatmapDataStructure,
-} from '@/components/sampling/sampling.types'
-import { TrafficDuringActivationChartData } from '@/components/sampling/sampling.types'
-import { getActivationsHistory } from '@/lib/utils/dashboard-data/samplings'
+  getActivationsHistory,
+  getHeatmapData,
+  getPromoterImagesData,
+  getTrafficDuringActivationChartData,
+} from '@/lib/utils/dashboard-data/samplings'
 import { useClientContext } from '@/lib/context/ClientContext'
 
 /**
@@ -25,137 +25,6 @@ import { useClientContext } from '@/lib/context/ClientContext'
  *     a las 2pm, 3pm, 4pm) lo que hará que los datos sean más precisos
  */
 
-const ActivationHoursHeatmapDummy: HeatmapDataStructure = {
-  Lunes: {
-    6: 0,
-    7: 15,
-    8: 30,
-    9: 60,
-    10: 75,
-    11: 85,
-    12: 90,
-    13: 80,
-    14: 50,
-    15: 70,
-    16: 65,
-    17: 55,
-    18: 40,
-  },
-  Martes: {
-    6: 15,
-    7: 25,
-    8: 45,
-    9: 75,
-    10: 85,
-    11: 95,
-    12: 100,
-    13: 90,
-    14: 60,
-    15: 80,
-    16: 75,
-    17: 65,
-    18: 45,
-  },
-  Miércoles: {
-    6: 15,
-    7: 25,
-    8: 45,
-    9: 75,
-    10: 85,
-    11: 90,
-    12: 85,
-    13: 80,
-    14: 60,
-    15: 70,
-    16: 65,
-    17: 55,
-    18: 40,
-  },
-  Jueves: {
-    6: 15,
-    7: 25,
-    8: 45,
-    9: 75,
-    10: 85,
-    11: 90,
-    12: 85,
-    13: 80,
-    14: 60,
-    15: 70,
-    16: 75,
-    17: 85,
-    18: 90,
-  },
-  Viernes: {
-    6: 15,
-    7: 25,
-    8: 45,
-    9: 75,
-    10: 85,
-    11: 90,
-    12: 85,
-    13: 80,
-    14: 60,
-    15: 70,
-    16: 65,
-    17: 55,
-    18: 0,
-  },
-  Sábado: {
-    6: 0,
-    7: 0,
-    8: 13,
-    9: 75,
-    10: 85,
-    11: 90,
-    12: 85,
-    13: 80,
-    14: 60,
-    15: 70,
-    16: 65,
-    17: 55,
-    18: 40,
-  },
-  Domingo: {
-    6: 15,
-    7: 25,
-    8: 45,
-    9: 75,
-    10: 85,
-    11: 90,
-    12: 85,
-    13: 80,
-    14: 60,
-    15: 70,
-    16: 65,
-    17: 55,
-    18: 40,
-  },
-}
-
-const TrafficDuringActivationChartDummy: TrafficDuringActivationChartData[] = [
-  { range: 'Medio', value: 37 },
-  { range: 'Bajo', value: 18 },
-  { range: 'Muy Bajo', value: 8 },
-  { range: 'Alto', value: 23 },
-  { range: 'Muy Alto', value: 15 },
-]
-
-const PromoterImagesDummy: PromoterImageData[] = [
-  {
-    url: '/placeholder.svg',
-    name: 'Andrea Velazquez',
-  },
-  {
-    url: '/placeholder.svg',
-    name: 'María Pérez',
-  },
-  {
-    url: '/placeholder.svg',
-    name: 'Roberta García',
-  },
-]
-
 export default function Sampling() {
   const { dashboardData } = useClientContext()
 
@@ -164,6 +33,10 @@ export default function Sampling() {
   }
 
   const activationsHistory = getActivationsHistory(dashboardData)
+  const trafficDuringActivationChartData =
+    getTrafficDuringActivationChartData(dashboardData)
+  const promoterImagesData = getPromoterImagesData(dashboardData)
+  const heatmapData = getHeatmapData(dashboardData)
   return (
     <div className="space-y-6">
       <Header title="Sampling" />
@@ -171,14 +44,14 @@ export default function Sampling() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-6">
           <div className="lg:col-span-1 md:col-span-2">
             <TrafficDuringActivationChart
-              data={TrafficDuringActivationChartDummy}
+              data={trafficDuringActivationChartData}
             />
           </div>
           <div className="md:col-span-2 lg:col-span-2 print:col-span-2">
-            <PromoterImages data={PromoterImagesDummy} />
+            <PromoterImages data={promoterImagesData} />
           </div>
           <div className="md:col-span-2 lg:col-span-3 print:col-span-3">
-            <ActivationHoursHeatmap data={ActivationHoursHeatmapDummy} />
+            <ActivationHoursHeatmap data={heatmapData} />
           </div>
           <div className="md:col-span-2 lg:col-span-3 print:col-span-3">
             <ActivationsHistoryTable data={activationsHistory} />

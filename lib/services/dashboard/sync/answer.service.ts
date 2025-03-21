@@ -53,32 +53,37 @@ export class AnswerSyncService {
     submissionId: string,
     validAnswers: AnswerValue[],
   ) {
-    // Crear las respuestas en la base de datos
-    const answers = await tx.answer.createManyAndReturn({
-      data: validAnswers.map((answer) => ({
-        value: answer.value?.toString() ?? '',
-        questionId: answer.questionId,
-        optionId: answer.optionId,
-        submissionId,
-        questionKey: answer.questionKey,
-      })),
-    })
+    try {
+      // Crear las respuestas en la base de datos
+      const answers = await tx.answer.createManyAndReturn({
+        data: validAnswers.map((answer) => ({
+          value: answer.value?.toString() ?? '',
+          questionId: answer.questionId,
+          optionId: answer.optionId,
+          submissionId,
+          questionKey: answer.questionKey,
+        })),
+      })
 
-    // Crear las relaciones de opciones múltiples
-    for (const answer of answers) {
-      const answerValue = validAnswers.find(
-        (va) => va.questionId === answer.questionId,
-      )
-      if (answerValue?.selectedOptionIds?.length) {
-        await tx.answerOption.createMany({
-          data: answerValue.selectedOptionIds.map((optionId) => ({
-            answerId: answer.id,
-            optionId,
-          })),
-        })
+      // Crear las relaciones de opciones múltiples
+      for (const answer of answers) {
+        const answerValue = validAnswers.find(
+          (va) => va.questionId === answer.questionId,
+        )
+        if (answerValue?.selectedOptionIds?.length) {
+          await tx.answerOption.createMany({
+            data: answerValue.selectedOptionIds.map((optionId) => ({
+              answerId: answer.id,
+              optionId,
+            })),
+          })
+        }
       }
-    }
 
-    return answers
+      return answers
+    } catch (error) {
+      console.error('Answers creation failed:', error)
+      throw error
+    }
   }
 }

@@ -1,0 +1,174 @@
+import { SamplingFieldsEnum } from '@/enums/sampling-fields'
+import { FormSubmissionEntryData } from '@/types/api'
+import { extractNumber, slugify } from '@/lib/utils'
+import {
+  AgeRange,
+  ConsumptionMoment,
+  Ethnicity,
+  Gender,
+  Prisma,
+  PurchaseIntention,
+  SamplingTraffic,
+} from '@prisma/client'
+import {
+  SamplingAgeRangeService,
+  SamplingConsumptionMomentService,
+  SamplingEthnicityService,
+  SamplingGenderService,
+  SamplingPurchaseIntentionService,
+  SamplingTrafficService,
+} from '@/lib/services/form-templates/sampling'
+import { SamplingProcessingResult } from '@/types/services'
+import { prisma } from '@/lib/prisma'
+import { SamplingWithRelations } from '@/types/services/sampling.types'
+
+export class SamplingService {
+  private static async processTraffic(
+    value?: string,
+  ): Promise<SamplingTraffic> {
+    if (!value) throw new Error('Traffic value is required')
+    const traffic = await SamplingTrafficService.getBySlug(slugify(value))
+    if (!traffic) throw new Error(`Traffic not found for value: ${value}`)
+    return traffic
+  }
+
+  private static async processEthnicity(value?: string): Promise<Ethnicity> {
+    if (!value) throw new Error('Ethnicity value is required')
+    const ethnicity = await SamplingEthnicityService.getBySlug(slugify(value))
+    if (!ethnicity) throw new Error(`Ethnicity not found for value: ${value}`)
+    return ethnicity
+  }
+
+  private static async processAgeRange(value?: string): Promise<AgeRange> {
+    if (!value) throw new Error('Age range value is required')
+    const ageRange = await SamplingAgeRangeService.getBySlug(slugify(value))
+    if (!ageRange) throw new Error(`Age range not found for value: ${value}`)
+    return ageRange
+  }
+
+  private static async processGender(value?: string): Promise<Gender> {
+    if (!value) throw new Error('Gender value is required')
+    const gender = await SamplingGenderService.getBySlug(slugify(value))
+    if (!gender) throw new Error(`Gender not found for value: ${value}`)
+    return gender
+  }
+
+  private static async processPurchaseIntentions(
+    value?: string,
+  ): Promise<PurchaseIntention[]> {
+    if (!value) throw new Error('Purchase intention value is required')
+    const values = value.split(' | ')
+    const purchaseIntentions = await Promise.all(
+      values.map(async (value) => {
+        const purchaseIntention =
+          await SamplingPurchaseIntentionService.getBySlug(slugify(value))
+        if (!purchaseIntention)
+          throw new Error(`Purchase intention not found for value: ${value}`)
+        return purchaseIntention
+      }),
+    )
+    return purchaseIntentions
+  }
+
+  private static async processConsumptionMoments(
+    value?: string,
+  ): Promise<ConsumptionMoment[]> {
+    if (!value) throw new Error('Consumption moment value is required')
+    const values = value.split(' | ')
+    const consumptionMoments = await Promise.all(
+      values.map(async (value) => {
+        const consumptionMoment =
+          await SamplingConsumptionMomentService.getBySlug(slugify(value))
+        if (!consumptionMoment)
+          throw new Error(`Consumption moment not found for value: ${value}`)
+        return consumptionMoment
+      }),
+    )
+    return consumptionMoments
+  }
+
+  static async processSampling(
+    row: FormSubmissionEntryData,
+  ): Promise<SamplingProcessingResult> {
+    const trafficQuestion = row[SamplingFieldsEnum.TRAFFIC]
+    const ethnicityQuestion = row[SamplingFieldsEnum.ETHNICITY]
+    const ageRangeQuestion = row[SamplingFieldsEnum.AGE_RANGE]
+    const genderQuestion = row[SamplingFieldsEnum.GENDER]
+    const purchaseIntentionQuestion = row[SamplingFieldsEnum.PURCHASE_INTENTION]
+    const consumptionMomentQuestion = row[SamplingFieldsEnum.CONSUMPTION_MOMENT]
+    const netPromoterScoreQuestion = row[SamplingFieldsEnum.NET_PROMOTER_SCORE]
+    const followUpQuestion = row[SamplingFieldsEnum.FOLLOW_UP]
+    const clientCommentsQuestion = row[SamplingFieldsEnum.CLIENTS_COMMENTS]
+    const promotorCommentsQuestion = row[SamplingFieldsEnum.PROMOTOR_COMMENTS]
+
+    const traffic = await this.processTraffic(trafficQuestion?.toString())
+    const ethnicity = await this.processEthnicity(ethnicityQuestion?.toString())
+    const ageRange = await this.processAgeRange(ageRangeQuestion?.toString())
+    const gender = await this.processGender(genderQuestion?.toString())
+    const purchaseIntentions = await this.processPurchaseIntentions(
+      purchaseIntentionQuestion?.toString(),
+    )
+
+    const consumptionMoments = await this.processConsumptionMoments(
+      consumptionMomentQuestion?.toString(),
+    )
+
+    const netPromoterScore = extractNumber(netPromoterScoreQuestion)
+
+    const followUp = followUpQuestion
+      ? followUpQuestion.toString() === 'Yes'
+      : false
+    const clientComments = clientCommentsQuestion
+      ? clientCommentsQuestion.toString()
+      : undefined
+    const promotorComments = promotorCommentsQuestion
+      ? promotorCommentsQuestion.toString()
+      : undefined
+
+    return {
+      trafficId: traffic.id,
+      ethnicityId: ethnicity.id,
+      ageRangeId: ageRange.id,
+      genderId: gender?.id,
+      purchaseIntentions,
+      consumptionMoments,
+      netPromoterScore,
+      followUp,
+      clientComments,
+      promotorComments,
+    }
+  }
+
+  static async create(
+    row: FormSubmissionEntryData,
+    submissionId: string,
+    tx?: Prisma.TransactionClient,
+  ): Promise<SamplingWithRelations> {
+    const client = tx || prisma
+    const samplingData = await this.processSampling(row)
+    const { purchaseIntentions, consumptionMoments, ...rest } = samplingData
+    const data = {
+      ...rest,
+      submissionId,
+    }
+    console.log('Data to create sampling:', JSON.stringify(data, null, 2))
+    const sampling = await client.sampling.create({ data })
+    await client.purchaseIntentionSampling.createMany({
+      data: purchaseIntentions.map((purchaseIntention) => ({
+        purchaseIntentionId: purchaseIntention.id,
+        samplingId: sampling.id,
+      })),
+    })
+    await client.consumptionMomentSampling.createMany({
+      data: consumptionMoments.map((consumptionMoment) => ({
+        consumptionMomentId: consumptionMoment.id,
+        samplingId: sampling.id,
+      })),
+    })
+    return {
+      ...sampling,
+      purchaseIntentions,
+      consumptionMoments,
+    }
+  }
+}

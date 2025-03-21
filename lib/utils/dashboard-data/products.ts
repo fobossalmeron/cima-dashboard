@@ -4,7 +4,11 @@ import {
   ProductLocationInPDVChartData,
   AveragePriceInPDVChartData,
   ProductStatusInPDVChartData,
+  OldAndNewActivationsChartData,
+  PDVProductImagesData,
 } from '@/components/product/product.types'
+import { MONTHS } from './months'
+import { PhotoTypesEnum } from '@/enums/photos-fields'
 
 export function getPDVTypeData(
   dashboard: DashboardWithRelations,
@@ -81,4 +85,60 @@ export function getProductStatusInPDVChartData(
     { type: 'En promoción', quantity: discountCount },
     { type: 'Precio regular', quantity: regularCount },
   ]
+}
+
+export function getOldAndNewActivationsChartData(
+  dashboard: DashboardWithRelations,
+): OldAndNewActivationsChartData[] {
+  const monthlyData: Record<string, OldAndNewActivationsChartData> = {}
+
+  dashboard.submissions.forEach((submission) => {
+    const date = new Date(submission.submittedAt)
+    const month = date.toLocaleString('es-MX', { month: 'long' }) // Obtener el nombre del mes
+
+    // Inicializar el objeto para el mes si no existe
+    if (!monthlyData[month]) {
+      monthlyData[month] = {
+        month,
+        new_location_activations: 0,
+        previous_location_activations: 0,
+        new_locations: 0,
+        previous_locations: 0,
+      }
+    }
+
+    // Contar activaciones en tiendas nuevas y anteriores
+    if (submission.firstActivation) {
+      monthlyData[month].new_location_activations++
+      if (submission.location) {
+        monthlyData[month].new_locations++
+      }
+    } else {
+      monthlyData[month].previous_location_activations++
+      if (submission.location) {
+        monthlyData[month].previous_locations++
+      }
+    }
+  })
+
+  // Convertir el objeto a un array y ordenar por mes
+  return Object.values(monthlyData).sort((a, b) => {
+    return MONTHS.indexOf(a.month) - MONTHS.indexOf(b.month)
+  })
+}
+
+export function getPDVProductImages(
+  dashboard: DashboardWithRelations,
+): PDVProductImagesData[] {
+  return dashboard.submissions
+    .map((submission) => {
+      return submission.photos
+        .filter((photo) => photo.type.slug === PhotoTypesEnum.PRODUCT)
+        .map((photo) => ({
+          locationName: submission.location?.name ?? '',
+          address: submission.location?.address ?? '',
+          url: photo.url,
+        }))
+    })
+    .flat()
 }

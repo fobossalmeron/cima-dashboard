@@ -103,6 +103,29 @@ export class ClientsService {
             },
             productLocation: true,
             pointOfSale: true,
+            sampling: {
+              include: {
+                consumptionMoments: {
+                  include: {
+                    consumptionMoment: true,
+                  },
+                },
+                purchaseIntentions: {
+                  include: {
+                    purchaseIntention: true,
+                  },
+                },
+                traffic: true,
+                gender: true,
+                ageRange: true,
+                ethnicity: true,
+              },
+            },
+            photos: {
+              include: {
+                type: true,
+              },
+            },
           },
         },
       },
@@ -164,7 +187,6 @@ export class ClientsService {
     } else {
       // Crear usuario y cliente en una transacción
       const result = await withTransaction(async (tx) => {
-
         // Crear el cliente
         const client = await this.createClient(tx, data)
 

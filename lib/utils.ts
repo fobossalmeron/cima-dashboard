@@ -43,3 +43,10 @@ export function groupBy<T, K extends { key: string; items: T[] }>(
     return acc
   }, {} as Record<string, K>)
 }
+
+export function extractNumber(text: string | number | null): number | null {
+  if (!text) return null
+  const textString = text.toString()
+  const match = textString.match(/^(\d+)(?:\s*-\s*)?/)
+  return match ? Number(match[1]) : null
+}

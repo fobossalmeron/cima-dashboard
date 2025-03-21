@@ -1,12 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { Dashboard, Prisma } from '@prisma/client'
 import { DashboardWithClientAndTemplate } from '@/types/api'
-import { AnswerService } from './answer.service'
-import { ActivatedBrandService } from './activated-brand.service'
 import { SubmissionService } from './submission.service'
-import { ProductSaleService } from './product-sale.service'
-import { SubBrandTemplateService } from '../form-templates'
-import { withTransaction } from '@/prisma/prisma'
 import { DashboardFilters } from '@/types/services/dashboard.types'
 import { DashboardWithRelations } from '@/types/api/clients'
 
@@ -111,6 +106,29 @@ export class DashboardService {
             },
             productLocation: true,
             pointOfSale: true,
+            sampling: {
+              include: {
+                consumptionMoments: {
+                  include: {
+                    consumptionMoment: true,
+                  },
+                },
+                purchaseIntentions: {
+                  include: {
+                    purchaseIntention: true,
+                  },
+                },
+                traffic: true,
+                gender: true,
+                ageRange: true,
+                ethnicity: true,
+              },
+            },
+            photos: {
+              include: {
+                type: true,
+              },
+            },
           },
         },
       },
@@ -186,21 +204,8 @@ export class DashboardService {
       throw new Error('Dashboard not found')
     }
     try {
-      await withTransaction(async (tx) => {
-        // Delete all answers
-        await AnswerService.deleteByDashboardId(dashboard.id, tx)
-        // Delete all activated brands
-        await ActivatedBrandService.deleteByDashboardId(dashboard.id, tx)
-        // Delete the submissions
-        await SubmissionService.deleteByDashboardId(dashboard.id, tx)
-        // Delete all product sales
-        await ProductSaleService.deleteByDashboardId(dashboard.id, tx)
-        // Delete all sub brand templates
-        await SubBrandTemplateService.deleteByTemplateId(
-          dashboard.templateId,
-          tx,
-        )
-      })
+      // Delete the submissions, all the related data will be deleted in cascade
+      await SubmissionService.deleteByDashboardId(dashboard.id)
     } catch (error) {
       console.error('Error clearing dashboard:', error)
     }

@@ -3,7 +3,6 @@ import { FormTemplateWithQuestionsAndOptions } from '@/lib/services'
 import {
   Dashboard,
   Client,
-  User,
   QuestionGroup,
   SubBrandTemplate,
   QuestionOption,
@@ -125,7 +124,6 @@ export interface FormTemplateCreateResponse {
 
 export interface FormTemplateBodyResponse extends FormTemplateCreateResponse {
   client: Client
-  user: User
 }
 
 export interface NextResponseFormTemplate extends Omit<NextResponse, 'body'> {

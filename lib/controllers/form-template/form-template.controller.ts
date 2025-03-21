@@ -20,7 +20,7 @@ export class FormTemplateController {
     try {
       // Usar withTransaction para manejar reintentos automáticamente
       const result = await withTransaction(async (tx) => {
-        const { client, user } = await ClientsService.create(clientData, tx)
+        const { client } = await ClientsService.create(clientData, tx)
         const template = await RepslyApiService.getFormTemplate(templateId)
         const { dashboard, template: formTemplate } =
           await FormTemplateService.createFromTemplate(
@@ -33,7 +33,6 @@ export class FormTemplateController {
         await ProductTemplateProcessorService.processTemplate(formTemplate, tx)
         return {
           client,
-          user,
           dashboard,
           template: formTemplate,
         }

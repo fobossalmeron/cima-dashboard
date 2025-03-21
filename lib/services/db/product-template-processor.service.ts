@@ -32,7 +32,14 @@ import { ProductsService } from './products.service'
 import { PresentationsEnum } from '@/enums/presentations'
 import { SubBrandsEnum } from '@/enums/sub-brands'
 import { PresentationFormatService } from '../presentation-format.service'
-import { withTransaction } from '@/prisma/prisma'
+import {
+  SamplingEthnicityService,
+  SamplingAgeRangeService,
+  SamplingTrafficService,
+  SamplingGenderService,
+  SamplingPurchaseIntentionService,
+} from '@/lib/services/form-templates/sampling'
+import { SamplingConsumptionMomentService } from '../form-templates/sampling/sampling-consumption-moment.service'
 
 type TransactionClient = Prisma.TransactionClient
 
@@ -341,7 +348,7 @@ export class ProductTemplateProcessorService {
 
   static async createProductsFromTemplateId(
     templateId: string,
-    tx?: TransactionClient,
+    tx: TransactionClient,
   ) {
     const template = await FormTemplateService.getById(templateId)
     if (!template) {
@@ -352,7 +359,7 @@ export class ProductTemplateProcessorService {
 
   static async processTemplate(
     template: FormTemplateWithQuestionsAndOptions,
-    tx?: TransactionClient,
+    tx: TransactionClient,
   ) {
     // GroupQuestions by questionGroupId
     const groups = groupBy<QuestionWithOptions, QuestionGroup>(
@@ -375,25 +382,21 @@ export class ProductTemplateProcessorService {
       0.7, // Similarity threshold
     )
 
-    if (tx) {
-      return await ProductTemplateProcessorService.processBrands(
-        template,
-        items,
-        brandQuestion,
-        groups,
-        tx,
-      )
-    }
+    const result = await ProductTemplateProcessorService.processBrands(
+      template,
+      items,
+      brandQuestion,
+      groups,
+      tx,
+    )
 
-    return await withTransaction(async (tx) => {
-      // Process each brand group
-      return await ProductTemplateProcessorService.processBrands(
-        template,
-        items,
-        brandQuestion,
-        groups,
-        tx,
-      )
-    })
+    await SamplingTrafficService.processOptions(template, tx)
+    await SamplingEthnicityService.processOptions(template, tx)
+    await SamplingAgeRangeService.processOptions(template, tx)
+    await SamplingGenderService.processOptions(template, tx)
+    await SamplingPurchaseIntentionService.processOptions(template, tx)
+    await SamplingConsumptionMomentService.processOptions(template, tx)
+
+    return result
   }
 }

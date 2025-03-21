@@ -1,5 +1,6 @@
 import { KpisData } from '@/components/general/general.types'
 import { DashboardWithRelations } from '@/types/api/clients'
+import { getNetPromoterScoreChartData } from './consumer'
 
 export function getKpisData(dashboard?: DashboardWithRelations): KpisData {
   if (!dashboard?.submissions) {
@@ -48,19 +49,25 @@ export function getKpisData(dashboard?: DashboardWithRelations): KpisData {
       .reduce((total, current) => total + current, 0) /
     dashboard.submissions.length
 
+  const followings = dashboard.submissions.reduce(
+    (total, submission) => total + (submission.sampling?.followUp ? 1 : 0),
+    0,
+  )
+
+  const nps =
+    getNetPromoterScoreChartData(dashboard).reduce(
+      (total, current) => total + current.vote * current.quantity,
+      0,
+    ) / dashboard.submissions.length
+
   return {
-    // Total de submissions
     activations: dashboard.submissions.length,
-    // Total de ubicaciones únicas visitadas
     locationsVisited: uniqueLocations.size,
-    // Total de unidades vendidas
     unitsSold,
-    // Total de muestras entregadas
     samplesDelivered,
-    // Estos valores requieren información adicional que no tenemos por ahora
     conversion: Number(conversion.toFixed(2)),
     velocity: Number(velocity.toFixed(2)),
-    nps: 0,
-    followings: 0,
+    nps: Number(nps.toFixed(2)),
+    followings,
   }
 }

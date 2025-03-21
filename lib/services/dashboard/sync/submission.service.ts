@@ -17,6 +17,8 @@ import { DealerService } from './dealer.service'
 import { PointOfSaleService } from '../point-of-sale.service'
 import { ProductLocationService } from '../product-location.service'
 import { slugify } from '@/lib/utils'
+import { SamplingService } from './sampling.service'
+import { PhotosService } from './photos.service'
 
 export class SubmissionSyncService {
   static async processRow(
@@ -101,6 +103,10 @@ export class SubmissionSyncService {
               riskZone,
             },
           })
+
+          await SamplingService.create(row, submission.id, tx)
+
+          await PhotosService.processPhotos(row, submission.id, tx)
 
           // Obtener las preguntas activas basadas en las respuestas
           const activeQuestions = QuestionSyncService.getActiveQuestions(
