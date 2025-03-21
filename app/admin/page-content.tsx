@@ -66,6 +66,7 @@ export default function AdminPageContent() {
       if (result.status === ApiStatus.SUCCESS) {
         toast.success('Dashboard creado exitosamente')
         loadDashboards()
+        await handleSyncDashboard(result.data.id)
         setIsDialogOpen(false)
         setCreateDashboardLoading(false)
       } else {
