@@ -40,6 +40,7 @@ import {
   SamplingPurchaseIntentionService,
 } from '@/lib/services/form-templates/sampling'
 import { SamplingConsumptionMomentService } from '../form-templates/sampling/sampling-consumption-moment.service'
+import { prisma } from '@/lib/prisma'
 
 type TransactionClient = Prisma.TransactionClient
 
@@ -348,13 +349,14 @@ export class ProductTemplateProcessorService {
 
   static async createProductsFromTemplateId(
     templateId: string,
-    tx: TransactionClient,
+    tx?: TransactionClient,
   ) {
+    const client = tx ?? prisma
     const template = await FormTemplateService.getById(templateId)
     if (!template) {
       throw new Error('Template not found')
     }
-    return ProductTemplateProcessorService.processTemplate(template, tx)
+    return ProductTemplateProcessorService.processTemplate(template, client)
   }
 
   static async processTemplate(
