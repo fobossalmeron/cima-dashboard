@@ -48,7 +48,6 @@ export const prisma =
 
     return new PrismaClient({
       ...prismaConfig,
-      // @ts-expect-error - El tipo adapter no está en los tipos públicos pero es válido
       adapter,
     })
   })()
