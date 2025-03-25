@@ -1,24 +1,25 @@
-"use client";
+'use client'
 
-import React from "react";
+import React from 'react'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { HeatmapDataStructure, WeekDay } from "./sampling.types";
+} from '@/components/ui/card'
+import { HeatmapDataStructure, WeekDay } from './sampling.types'
 
 const days: WeekDay[] = [
-  "Lunes",
-  "Martes",
-  "Miércoles",
-  "Jueves",
-  "Viernes",
-  "Sábado",
-];
-const hours = Array.from({ length: 13 }, (_, i) => i + 6);
+  'Lunes',
+  'Martes',
+  'Miércoles',
+  'Jueves',
+  'Viernes',
+  'Sábado',
+  'Domingo',
+]
+const hours = Array.from({ length: 13 }, (_, i) => i + 6)
 
 /**
  * Componente que muestra un mapa de calor de las horas de activación.
@@ -33,7 +34,7 @@ const hours = Array.from({ length: 13 }, (_, i) => i + 6);
 export function ActivationHoursHeatmap({
   data,
 }: {
-  data: HeatmapDataStructure;
+  data: HeatmapDataStructure
 }) {
   return (
     <Card className="w-full">
@@ -50,7 +51,7 @@ export function ActivationHoursHeatmap({
             className="grid"
             style={{
               gridTemplateColumns: `auto repeat(${days.length}, 1fr)`,
-              gap: "2px",
+              gap: '2px',
             }}
           >
             {/* Celda vacía en la esquina superior izquierda */}
@@ -76,7 +77,7 @@ export function ActivationHoursHeatmap({
 
                 {/* Celdas de datos para esta hora */}
                 {days.map((day) => {
-                  const value = data[day]?.[hour] || 0;
+                  const value = data[day]?.[hour] || 0
                   return (
                     <div
                       key={`${hour}-${day}`}
@@ -91,7 +92,7 @@ export function ActivationHoursHeatmap({
                         {value}
                       </span>
                     </div>
-                  );
+                  )
                 })}
               </React.Fragment>
             ))}
@@ -99,5 +100,5 @@ export function ActivationHoursHeatmap({
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

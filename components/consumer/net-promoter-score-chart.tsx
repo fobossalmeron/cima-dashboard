@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   BarChart,
   Bar,
@@ -10,27 +10,28 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-} from "recharts";
-import { Badge } from "@/components/ui/badge";
-import { NetPromoterScoreChartData } from "./consumer.types";
+} from 'recharts'
+import { Badge } from '@/components/ui/badge'
+import { NetPromoterScoreChartData } from './consumer.types'
+import { getRealNetPromoterScores } from '@/lib/utils/dashboard-data/consumer'
 
 // Color de la barra según la puntuación del NPS
 const getBarColor = (vote: number): string => {
   if (vote >= 9) {
-    return "hsl(142, 76%, 36%)"; // Verde para promotores (9-10)
+    return 'hsl(142, 76%, 36%)' // Verde para promotores (9-10)
   } else if (vote >= 7) {
-    return "hsl(38, 92%, 50%)"; // Amarillo para pasivos (7-8)
+    return 'hsl(38, 92%, 50%)' // Amarillo para pasivos (7-8)
   } else {
-    return "hsl(0, 84%, 60%)"; // Rojo para detractores (0-6)
+    return 'hsl(0, 84%, 60%)' // Rojo para detractores (0-6)
   }
-};
+}
 
 // Datos para la leyenda del gráfico
 const legendItems = [
-  { value: "Promotores", color: "hsl(142, 76%, 36%)" },
-  { value: "Pasivos", color: "hsl(38, 92%, 50%)" },
-  { value: "Detractores", color: "hsl(0, 84%, 60%)" },
-];
+  { value: 'Promotores', color: 'hsl(142, 76%, 36%)' },
+  { value: 'Pasivos', color: 'hsl(38, 92%, 50%)' },
+  { value: 'Detractores', color: 'hsl(0, 84%, 60%)' },
+]
 
 /**
  * Componente que muestra un gráfico de barras con la distribución de puntuaciones NPS (Net Promoter Score).
@@ -44,57 +45,31 @@ const legendItems = [
 export function NetPromoterScoreChart({
   data,
 }: {
-  data: NetPromoterScoreChartData[];
+  data: NetPromoterScoreChartData[]
 }) {
-  const totalVotes = data.reduce((acc, item) => acc + item.quantity, 0);
-
-  const dataWithPercentages = data.map((item) => ({
-    vote: item.vote,
-    quantity: item.quantity,
-    porcentaje:
-      totalVotes > 0
-        ? parseFloat(((item.quantity / totalVotes) * 100).toFixed(1))
-        : 0,
-  }));
-
-  // Calcular el total de votos para cada categoría
-  const promotores = data
-    .filter((item) => item.vote >= 9)
-    .reduce((acc, item) => acc + item.quantity, 0);
-
-  const pasivos = data
-    .filter((item) => item.vote >= 7 && item.vote <= 8)
-    .reduce((acc, item) => acc + item.quantity, 0);
-
-  const detractores = data
-    .filter((item) => item.vote <= 6)
-    .reduce((acc, item) => acc + item.quantity, 0);
-
-  // Calcular el porcentaje de cada categoría
-  const porcentajePromotores =
-    totalVotes > 0 ? (promotores / totalVotes) * 100 : 0;
-  const porcentajePasivos = totalVotes > 0 ? (pasivos / totalVotes) * 100 : 0;
-  const porcentajeDetractores =
-    totalVotes > 0 ? (detractores / totalVotes) * 100 : 0;
-
-  // Calcular el NPS real
-  const npsReal = porcentajePromotores - porcentajeDetractores;
+  const {
+    realNps,
+    dataWithPercentages,
+    porcentajePromotores,
+    porcentajePasivos,
+    porcentajeDetractores,
+  } = getRealNetPromoterScores(data)
 
   return (
     <Card>
       <CardHeader className="p-6">
         <CardTitle className="flex items-center gap-2">
-          Net Promoter Score{" "}
+          Net Promoter Score{' '}
           <Badge
             className={`rounded-sm text-white font-medium text-sm ${
-              npsReal < 0
-                ? "bg-[hsl(0,84%,60%)]"
-                : npsReal >= 0 && npsReal < 30
-                ? "bg-[hsl(38,92%,50%)]"
-                : "bg-[hsl(142,76%,36%)]"
+              realNps < 0
+                ? 'bg-[hsl(0,84%,60%)]'
+                : realNps >= 0 && realNps < 30
+                ? 'bg-[hsl(38,92%,50%)]'
+                : 'bg-[hsl(142,76%,36%)]'
             }`}
           >
-            {npsReal.toFixed(0)}
+            {realNps.toFixed(0)}
           </Badge>
         </CardTitle>
       </CardHeader>
@@ -107,29 +82,29 @@ export function NetPromoterScoreChart({
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="vote"
-              style={{ fontSize: "12px" }}
+              style={{ fontSize: '12px' }}
               tickFormatter={(value) => value.toString()}
             />
             <YAxis
-              style={{ fontSize: "12px" }}
-              domain={[0, "dataMax"]}
+              style={{ fontSize: '12px' }}
+              domain={[0, 'dataMax']}
               tickFormatter={(value) => value.toLocaleString()}
             />
             <Tooltip
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
                   const entry = dataWithPercentages.find(
-                    (item) => item.vote === label
-                  );
+                    (item) => item.vote === label,
+                  )
                   return (
                     <div className="bg-white p-3 border shadow-sm">
                       <p>Calificación: {entry?.vote}</p>
                       <p>Votos: {entry?.quantity.toLocaleString()}</p>
                       <p>Porcentaje: {entry?.porcentaje}%</p>
                     </div>
-                  );
+                  )
                 }
-                return null;
+                return null
               }}
             />
             <Bar dataKey="quantity" name="Votos">
@@ -170,5 +145,5 @@ export function NetPromoterScoreChart({
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

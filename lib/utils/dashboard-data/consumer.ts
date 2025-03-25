@@ -7,6 +7,7 @@ import {
   GenderDistributionChartData,
   NetPromoterScoreChartData,
   PurchaseFactorsChartData,
+  RealNetPromoterScoresResult,
 } from '@/components/consumer/consumer.types'
 import { PhotoTypesEnum } from '@/enums/photos-fields'
 import { DashboardWithRelations } from '@/types/api/clients'
@@ -111,6 +112,53 @@ export function getConsumptionMomentsChartData(
   )
 }
 
+export function getRealNetPromoterScores(
+  data: NetPromoterScoreChartData[],
+): RealNetPromoterScoresResult {
+  const totalVotes = data.reduce((acc, item) => acc + item.quantity, 0)
+  const dataWithPercentages = data.map((item) => ({
+    vote: item.vote,
+    quantity: item.quantity,
+    porcentaje:
+      totalVotes > 0
+        ? parseFloat(((item.quantity / totalVotes) * 100).toFixed(1))
+        : 0,
+  }))
+  const promotores = data
+    .filter((item) => item.vote >= 9)
+    .reduce((acc, item) => acc + item.quantity, 0)
+
+  const pasivos = data
+    .filter((item) => item.vote >= 7 && item.vote <= 8)
+    .reduce((acc, item) => acc + item.quantity, 0)
+
+  const detractores = data
+    .filter((item) => item.vote <= 6)
+    .reduce((acc, item) => acc + item.quantity, 0)
+
+  // Calcular el porcentaje de cada categoría
+  const porcentajePromotores =
+    totalVotes > 0 ? (promotores / totalVotes) * 100 : 0
+  const porcentajePasivos = totalVotes > 0 ? (pasivos / totalVotes) * 100 : 0
+  const porcentajeDetractores =
+    totalVotes > 0 ? (detractores / totalVotes) * 100 : 0
+
+  // Calcular el NPS real
+  const realNps = porcentajePromotores - porcentajeDetractores
+
+  return {
+    realNps,
+    totalVotes,
+    promotores,
+    pasivos,
+    detractores,
+    porcentajePromotores,
+    porcentajePasivos,
+    porcentajeDetractores,
+    dataWithPercentages,
+  }
+}
+
 export function getNetPromoterScoreChartData(
   dashboard: DashboardWithRelations,
 ): NetPromoterScoreChartData[] {
@@ -136,10 +184,12 @@ export function getNetPromoterScoreChartData(
       promoterScore[netPromoterScore as keyof typeof promoterScore] += 1
     }
   })
-  return Object.entries(promoterScore).map(([netPromoterScore, quantity]) => ({
-    vote: parseInt(netPromoterScore),
-    quantity,
-  }))
+  return Object.entries(promoterScore)
+    .map(([netPromoterScore, quantity]) => ({
+      vote: parseInt(netPromoterScore),
+      quantity,
+    }))
+    .sort((a, b) => b.vote - a.vote)
 }
 
 export function getConsumerFeedbackData(

@@ -1,6 +1,9 @@
 import { KpisData } from '@/components/general/general.types'
 import { DashboardWithRelations } from '@/types/api/clients'
-import { getNetPromoterScoreChartData } from './consumer'
+import {
+  getNetPromoterScoreChartData,
+  getRealNetPromoterScores,
+} from './consumer'
 
 export function getKpisData(dashboard?: DashboardWithRelations): KpisData {
   if (!dashboard?.submissions) {
@@ -41,24 +44,22 @@ export function getKpisData(dashboard?: DashboardWithRelations): KpisData {
           (submission.totalQuantity / submission.samplesDelivered) * 100,
       )
       .reduce((total, current) => total + current, 0) /
-    dashboard.submissions.length
+    (dashboard.submissions.length || 1)
 
   const velocity =
     dashboard.submissions
       .map((submission) => submission.totalQuantity / 4)
       .reduce((total, current) => total + current, 0) /
-    dashboard.submissions.length
+    (dashboard.submissions.length || 1)
 
   const followings = dashboard.submissions.reduce(
     (total, submission) => total + (submission.sampling?.followUp ? 1 : 0),
     0,
   )
 
-  const nps =
-    getNetPromoterScoreChartData(dashboard).reduce(
-      (total, current) => total + current.vote * current.quantity,
-      0,
-    ) / dashboard.submissions.length
+  const { realNps } = getRealNetPromoterScores(
+    getNetPromoterScoreChartData(dashboard),
+  )
 
   return {
     activations: dashboard.submissions.length,
@@ -67,7 +68,7 @@ export function getKpisData(dashboard?: DashboardWithRelations): KpisData {
     samplesDelivered,
     conversion: Number(conversion.toFixed(2)),
     velocity: Number(velocity.toFixed(2)),
-    nps: Number(nps.toFixed(2)),
+    nps: Number(realNps.toFixed(2)),
     followings,
   }
 }

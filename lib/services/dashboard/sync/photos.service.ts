@@ -24,7 +24,7 @@ export class PhotosService {
     row: FormSubmissionEntryData,
     submissionId: string,
     tx?: Prisma.TransactionClient,
-  ): Promise<Photo[]> {
+  ): Promise<(Photo | null)[]> {
     const productPhotoValue = row[PhotosFieldsEnum.PRODUCT]
     const promotorPhotoValue = row[PhotosFieldsEnum.PROMOTOR]
     const clientsPhotoValues = Object.entries(row).filter(([key]) =>
@@ -39,23 +39,29 @@ export class PhotosService {
       return acc
     }, {} as Record<string, string>)
 
-    const productPhoto = await this.processPhoto(
-      {
-        url: productPhotoValue?.toString() ?? '',
-        typeId: types[PhotoTypesEnum.PRODUCT],
-        submissionId,
-      },
-      tx,
-    )
+    let productPhoto: Photo | null = null
+    if (productPhotoValue) {
+      productPhoto = await this.processPhoto(
+        {
+          url: productPhotoValue?.toString() ?? '',
+          typeId: types[PhotoTypesEnum.PRODUCT],
+          submissionId,
+        },
+        tx,
+      )
+    }
 
-    const promotorPhoto = await this.processPhoto(
-      {
-        url: promotorPhotoValue?.toString() ?? '',
-        typeId: types[PhotoTypesEnum.PROMOTOR],
-        submissionId,
-      },
-      tx,
-    )
+    let promotorPhoto: Photo | null = null
+    if (promotorPhotoValue) {
+      promotorPhoto = await this.processPhoto(
+        {
+          url: promotorPhotoValue?.toString() ?? '',
+          typeId: types[PhotoTypesEnum.PROMOTOR],
+          submissionId,
+        },
+        tx,
+      )
+    }
 
     const clientsPhotos = await Promise.all(
       clientsPhotoValues.map(async ([_, value]) => {

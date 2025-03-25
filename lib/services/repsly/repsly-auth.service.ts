@@ -112,10 +112,20 @@ export class RepslyAuthService {
 
     await RepslyAuthService.saveRefreshToken(data)
 
+    // Ordenar las claves del objeto de respuesta
+    const orderedData = {
+      token_type: data.token_type,
+      expires_in: data.expires_in,
+      access_token: data.access_token,
+      scope: data.scope,
+      refresh_token: data.refresh_token,
+      id_token: data.id_token,
+    }
+
     return {
       status: ApiStatus.SUCCESS,
       statusCode: 200,
-      data,
+      data: orderedData,
     }
   }
 

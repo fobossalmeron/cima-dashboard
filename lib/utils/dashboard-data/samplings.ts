@@ -17,7 +17,7 @@ export function getActivationsHistory(
     .map((submission) => {
       const velocity =
         submission.productSales.reduce((acc, sale) => acc + sale.quantity, 0) /
-        submission.productSales.length
+        (submission.productSales.length || 1)
       return {
         date: new Date(submission.submittedAt).toLocaleDateString('es-MX', {
           year: 'numeric',
