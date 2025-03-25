@@ -82,6 +82,16 @@ export class SubmissionSyncService {
 
           if (submissionExists) {
             console.log('Updating submission', submissionExists.id)
+            return {
+              status: SyncStatusEnum.SKIPPED,
+              dashboardId,
+              dealer,
+              representative,
+              location,
+              submission: submissionExists,
+              answers: [],
+              productSales: [],
+            }
           }
 
           const submission = await tx.formSubmission.create({
