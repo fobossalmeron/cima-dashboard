@@ -1,5 +1,4 @@
 import {
-  ApiResponse,
   FormTemplateResponse,
   ImportProductsResponse,
   SyncDashboardResponse,
@@ -10,7 +9,7 @@ import { RepslyAuthService } from './repsly-auth.service'
 export class RepslyService {
   static async searchForms(
     searchTerm: string = '',
-  ): Promise<ApiResponse<FormSearchResponse>> {
+  ): Promise<FormSearchResponse> {
     return RepslyAuthService.makeAuthenticatedRequest<FormSearchResponse>(
       '/api/repsly/forms',
       {
@@ -20,9 +19,7 @@ export class RepslyService {
     )
   }
 
-  static async getFormTemplate(
-    id: string,
-  ): Promise<ApiResponse<FormTemplateResponse>> {
+  static async getFormTemplate(id: string): Promise<FormTemplateResponse> {
     return RepslyAuthService.makeAuthenticatedRequest<FormTemplateResponse>(
       `/api/repsly/forms/${id}`,
       {
@@ -31,7 +28,7 @@ export class RepslyService {
     )
   }
 
-  static async importProducts(): Promise<ApiResponse<ImportProductsResponse>> {
+  static async importProducts(): Promise<ImportProductsResponse> {
     return RepslyAuthService.makeAuthenticatedRequest<ImportProductsResponse>(
       '/api/repsly/products/import',
       {
@@ -40,7 +37,7 @@ export class RepslyService {
     )
   }
 
-  static async exportForm(id: string): Promise<ApiResponse<string>> {
+  static async exportForm(id: string): Promise<string> {
     const exportUrl = process.env.REPSLY_EXPORT_URL ?? ''
 
     const currentDate = new Date()
@@ -64,9 +61,7 @@ export class RepslyService {
     })
   }
 
-  static async syncDashboard(
-    id: string,
-  ): Promise<ApiResponse<SyncDashboardResponse>> {
+  static async syncDashboard(id: string): Promise<SyncDashboardResponse> {
     return RepslyAuthService.makeAuthenticatedRequest<SyncDashboardResponse>(
       `/api/repsly/forms/${id}/export`,
       {

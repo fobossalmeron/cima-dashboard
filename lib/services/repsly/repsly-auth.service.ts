@@ -1,11 +1,12 @@
 import { ApiStatus } from '@/enums/api-status'
 import { prisma } from '@/lib/prisma'
-import { ApiResponse } from '@/types/api'
+import { ServiceToken } from '@prisma/client'
 
 interface TokenData {
   access_token: string
   expires_in: number
   token_type: string
+  refresh_token: string
 }
 
 export class RepslyAuthService {
@@ -56,7 +57,7 @@ export class RepslyAuthService {
       }
     }
 
-    const { refreshToken, serviceClientId } = serviceToken
+    const { refreshToken, serviceClientId, fingerprint } = serviceToken
 
     if (!serviceClientId) {
       return {
@@ -76,23 +77,32 @@ export class RepslyAuthService {
       }
     }
 
-    const formData = new FormData()
-    formData.append('client_id', serviceClientId)
-    formData.append('grant_type', 'refresh_token')
-    formData.append('scope', 'email offline_access openid profile')
-    formData.append('refresh_token', refreshToken)
+    const params = new URLSearchParams()
+    params.append('client_id', serviceClientId)
+    params.append('grant_type', 'refresh_token')
+    params.append('scope', 'email offline_access openid profile')
+    params.append('refresh_token', refreshToken)
 
-    const response = await fetch(refreshTokenUrl, {
+    const requestInit = {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
         Accept: 'application/json',
+        'Accept-Language': 'es-ES,es;q=0.9',
+        Connection: 'keep-alive',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Fingerprint: fingerprint || '',
       },
-      body: formData,
-    })
+      body: params.toString(),
+    }
+
+    console.log('refreshTokenUrl', refreshTokenUrl)
+    console.log('requestInit', requestInit)
+
+    const response = await fetch(refreshTokenUrl, requestInit)
 
     if (!response.ok) {
       const error = await response.json()
+      console.error('Error refreshing token:', error)
       throw new Error(
         `Error al actualizar el token: ${error.error || 'Unknown error'}`,
       )
@@ -118,49 +128,86 @@ export class RepslyAuthService {
       },
       update: {
         token: data.access_token,
+        refreshToken: data.refresh_token,
+        expiresIn: data.expires_in,
         expiresAt,
       },
       create: {
         service: 'repsly',
         token: data.access_token,
+        refreshToken: data.refresh_token,
+        expiresIn: data.expires_in,
         expiresAt,
       },
     })
   }
 
+  private static async makeRequest(
+    url: string,
+    options: RequestInit & {
+      headers?: HeadersInit
+    },
+    tokenData: ServiceToken,
+  ): Promise<Response> {
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${tokenData.token}`,
+      Fingerprint: tokenData.fingerprint || '',
+      ...options.headers,
+    }
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
+      ...options,
+      headers,
+    })
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('TOKEN_INVALID')
+      }
+      throw new Error(`Error en la petición: ${response.statusText}`)
+    }
+
+    return response
+  }
+
+  private static async handleResponse<T>(response: Response): Promise<T> {
+    const contentType = response.headers.get('content-type')
+
+    if (contentType?.includes('application/json')) {
+      return response.json()
+    }
+
+    if (
+      contentType?.includes('text/csv') ||
+      contentType?.includes('text/plain')
+    ) {
+      const buffer = await response.arrayBuffer()
+      const text = new TextDecoder('utf-8').decode(buffer)
+      return text as unknown as T
+    }
+
+    throw new Error(`Tipo de contenido no soportado: ${contentType}`)
+  }
+
   static async makeAuthenticatedRequest<T>(
     url: string,
     options: RequestInit = {},
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
+    const tokenData = await RepslyAuthService.getToken()
+
+    if (RepslyAuthService.isTokenExpiringSoon(tokenData)) {
+      await RepslyAuthService.refreshToken()
+    }
+
     try {
-      const tokenData = await RepslyAuthService.getToken()
-
-      if (RepslyAuthService.isTokenExpiringSoon(tokenData)) {
-        await RepslyAuthService.refreshToken()
-      }
-
-      const response = await fetch(url, {
-        ...options,
-        headers: {
-          ...options.headers,
-          Authorization: `Bearer ${tokenData.token}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error(`Error en la petición: ${response.statusText}`)
-      }
-
-      const data = await response.json()
-      return {
-        status: ApiStatus.SUCCESS,
-        data,
-      }
+      const response = await this.makeRequest(url, options, tokenData)
+      return await this.handleResponse<T>(response)
     } catch (error) {
-      return {
-        status: ApiStatus.ERROR,
-        error: error instanceof Error ? error.message : 'Error desconocido',
+      if (error instanceof Error && error.message === 'TOKEN_INVALID') {
+        console.log('Token inválido')
       }
+      throw error
     }
   }
 }

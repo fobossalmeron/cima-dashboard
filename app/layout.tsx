@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   title: 'Cima Sampling Dashboard',
   description: 'Dashboard for sampling activations',
   generator: 'v0.dev',
+  icons: {
+    icon: '/favicon.ico?v=2',
+  },
 }
 
 export default function RootLayout({

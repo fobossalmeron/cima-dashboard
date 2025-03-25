@@ -19,6 +19,8 @@ import { ProductLocationService } from '../product-location.service'
 import { slugify } from '@/lib/utils'
 import { SamplingService } from './sampling.service'
 import { PhotosService } from './photos.service'
+import { RepresentativeService } from './representative.service'
+import { LocationService } from './location.service'
 
 export class SubmissionSyncService {
   static async processRow(
@@ -57,21 +59,15 @@ export class SubmissionSyncService {
 
           const dealer = await DealerService.create(dealerData, tx)
 
-          const representative = await tx.representative.upsert({
-            where: { id: representativeData.id },
-            update: {
-              name: representativeData.name,
-            },
-            create: representativeData,
-          })
+          const representative = await RepresentativeService.createOrUpdate(
+            representativeData,
+            tx,
+          )
 
-          const { id, ...locationDataWithoutId } = locationData
-
-          const location = await tx.location.upsert({
-            where: { id },
-            update: locationDataWithoutId,
-            create: locationData,
-          })
+          const location = await LocationService.createOrUpdate(
+            locationData,
+            tx,
+          )
 
           const submissionExists = await tx.formSubmission.findUnique({
             where: {
@@ -85,11 +81,7 @@ export class SubmissionSyncService {
           })
 
           if (submissionExists) {
-            return {
-              status: SyncStatusEnum.SKIPPED,
-              rowIndex: rowIndex + 1,
-              submission: submissionExists,
-            }
+            console.log('Updating submission', submissionExists.id)
           }
 
           const submission = await tx.formSubmission.create({

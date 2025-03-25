@@ -1,4 +1,4 @@
-import { RepslyApiService } from '@/lib/services/api'
+import { RepslyAuthService } from '@/lib/services'
 import { ServiceTokenService } from '@/lib/services/db'
 import { SyncStatus } from '@prisma/client'
 import { NextRequest, NextResponse } from 'next/server'
@@ -12,17 +12,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   try {
-    const tokenData = await ServiceTokenService.findByService('repsly')
-    if (!tokenData?.expiresAt) {
-      return Response.json({ error: 'No token data found' }, { status: 404 })
-    }
-
-    const refreshTokenData = {
-      client_id: tokenData.serviceClientId || '',
-      refresh_token: tokenData.refreshToken || '',
-    }
-
-    await RepslyApiService.refreshToken(refreshTokenData)
+    await RepslyAuthService.refreshToken()
     await ServiceTokenService.createLog(
       'repsly',
       SyncStatus.SUCCESS,
