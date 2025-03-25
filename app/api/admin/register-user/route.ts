@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
     const user = await AuthService.register({ name, email, password })
     return NextResponse.json(user)
   } catch (error) {
+    console.error('Error registering user:', error)
     return NextResponse.json(
       { error: 'Failed to register user' },
       { status: 500 },

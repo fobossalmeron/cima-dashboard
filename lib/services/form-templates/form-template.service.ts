@@ -420,10 +420,10 @@ export class FormTemplateService {
           forImageRecognition: question.ForImageRecognition ?? false,
           formTemplateId,
         }
-        const { id, ...rest } = questionData
+        const { id: questionId, ...rest } = questionData
 
         const createdQuestion = await tx.question.upsert({
-          where: { id: question.Id },
+          where: { id: questionId },
           update: rest,
           create: questionData,
         })
@@ -441,9 +441,9 @@ export class FormTemplateService {
                 value: option.Value,
                 sortOrder: option.SortOrder,
               }
-              const { id, ...rest } = optionData
+              const { id: optionId, ...rest } = optionData
               const createdOption = await tx.questionOption.upsert({
-                where: { id: option.Id },
+                where: { id: optionId },
                 update: rest,
                 create: optionData,
               })
@@ -498,9 +498,9 @@ export class FormTemplateService {
                 type: attachment.type,
                 name: attachment.name,
               }
-              const { id, ...rest } = attachmentData
+              const { id: attachmentId, ...rest } = attachmentData
               return await tx.questionAttachment.upsert({
-                where: { id: attachment.id },
+                where: { id: attachmentId },
                 update: rest,
                 create: attachmentData,
               })
