@@ -143,11 +143,19 @@ export class ClientsService {
       name: string
       slug: string
     }>,
+    tx?: Prisma.TransactionClient,
   ): Promise<Client> {
-    return await prisma.client.update({
-      where: { id },
-      data,
-    })
+    if (tx) {
+      return await tx.client.update({
+        where: { id },
+        data,
+      })
+    } else {
+      return await prisma.client.update({
+        where: { id },
+        data,
+      })
+    }
   }
 
   static async remove(id: string): Promise<Client> {
@@ -196,6 +204,21 @@ export class ClientsService {
       })
 
       return result
+    }
+  }
+
+  static async createOrUpdate(
+    data: CreateClientRequest,
+    tx?: Prisma.TransactionClient,
+  ): Promise<CreateClientResponse> {
+    const client = await this.findBySlug(data.slug)
+    if (client) {
+      const clientUpdated = await this.update(client.id, data)
+      return {
+        client: clientUpdated,
+      }
+    } else {
+      return await this.create(data, tx)
     }
   }
 }

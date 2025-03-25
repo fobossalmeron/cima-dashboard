@@ -238,7 +238,7 @@ export class ProductTemplateProcessorService {
         const flavors = await this.createFlavors(tx, salesQuestion)
 
         for (const flavor of flavors) {
-          const product = await ProductsService.create(
+          const product = await ProductsService.createOrUpdate(
             {
               name: ProductsService.generateProductName(
                 brand.name,
@@ -309,13 +309,22 @@ export class ProductTemplateProcessorService {
         tx,
       )
 
-      await SubBrandTemplateService.create(
-        {
-          subBrand,
-          template,
-        },
-        tx,
-      )
+      const subBrandTemplate =
+        await SubBrandTemplateService.getByTemplateAndSubBrand(
+          template.id,
+          subBrand.id,
+          tx,
+        )
+
+      if (!subBrandTemplate) {
+        await SubBrandTemplateService.create(
+          {
+            subBrand,
+            template,
+          },
+          tx,
+        )
+      }
 
       // Find the corresponding brand option
       const brandOption = brandQuestion.options.find(

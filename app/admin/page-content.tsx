@@ -5,7 +5,11 @@ import { DashboardsTable } from '@/components/tables'
 import { NewDashboardForm } from '@/types/dashboard'
 import { toast } from 'sonner'
 import { NewDashboardDialog } from '@/components/dialogs/dashboard'
-import { DashboardWithClientAndTemplate, ValidationResult } from '@/types/api'
+import {
+  DashboardWithClientAndTemplate,
+  FormTemplateResponse,
+  ValidationResult,
+} from '@/types/api'
 import { SyncResults } from '@/components/sync/sync-results'
 import { ApiStatus } from '@/enums/api-status'
 import { useSearchParams } from 'next/navigation'
@@ -25,6 +29,7 @@ export default function AdminPageContent() {
   const [syncResults, setSyncResults] = useState<ValidationResult | null>(null)
   const [isSyncing, setIsSyncing] = useState<boolean>(false)
   const [isCleaning, setIsCleaning] = useState<boolean>(false)
+  const [isDeleting, setIsDeleting] = useState<boolean>(false)
 
   const loadDashboards = async () => {
     try {
@@ -62,11 +67,11 @@ export default function AdminPageContent() {
         throw new Error(error.error || 'Error al crear el dashboard')
       }
 
-      const result = await response.json()
+      const result = (await response.json()) as FormTemplateResponse
       if (result.status === ApiStatus.SUCCESS) {
         toast.success('Dashboard creado exitosamente')
         loadDashboards()
-        await handleSyncDashboard(result.data.id)
+        await handleSyncDashboard(result.data.dashboard.id)
         setIsDialogOpen(false)
         setCreateDashboardLoading(false)
       } else {
@@ -129,6 +134,28 @@ export default function AdminPageContent() {
     }
   }
 
+  const handleDeleteDashboard = async (dashboardId: string) => {
+    try {
+      setIsDeleting(true)
+      const response = await fetch(`/api/dashboard/${dashboardId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Error al eliminar el dashboard')
+      }
+
+      toast.success('Dashboard eliminado exitosamente')
+      loadDashboards()
+    } catch (error) {
+      console.error('Error al eliminar el dashboard:', error)
+      toast.error('Error al eliminar el dashboard')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-8">
@@ -163,7 +190,9 @@ export default function AdminPageContent() {
             onClearDashboard={handleClearDashboard}
             isSyncing={isSyncing}
             isCleaning={isCleaning}
+            isDeleting={isDeleting}
             debugMode={debugMode}
+            onDeleteDashboard={handleDeleteDashboard}
           />
           {syncResults && (
             <SyncResults

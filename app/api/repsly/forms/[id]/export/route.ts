@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { parse } from 'csv-parse/sync'
 import {
   SyncDashboardErrorResponse,
@@ -52,13 +52,16 @@ function parseCSV(csv: string): RepslyExportData[] {
 }
 
 export async function GET(
-  _: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse<SyncDashboardResponse>> {
   try {
     const { id } = await params
+    const { searchParams } = new URL(request.url)
+    const start = searchParams.get('start')
+    const end = searchParams.get('end')
 
-    const csvText = await RepslyApiService.exportForm(id)
+    const csvText = await RepslyApiService.exportForm(id, start, end)
 
     // Verificar que tenemos datos
     if (!csvText || csvText.trim().length === 0) {

@@ -16,6 +16,7 @@ import {
 import { ServiceToken } from '@prisma/client'
 import { ServiceTokenService } from '../db'
 import { RepslyAuthService } from '../repsly/repsly-auth.service'
+import { DateRange } from '@/types/services'
 
 export class RepslyApiService {
   private static getBaseUrl() {
@@ -255,12 +256,21 @@ export class RepslyApiService {
    * @param id - The ID of the form to export
    * @returns The CSV text of the form
    */
-  static async exportForm(id: string): Promise<string> {
+  static async exportForm(
+    id: string,
+    start?: string | null,
+    end?: string | null,
+  ): Promise<string> {
     const exportUrl = process.env.REPSLY_EXPORT_URL ?? ''
     const { token, fingerprint } = await RepslyAuthService.getToken()
 
-    const currentDate = new Date()
-    const dateBegin = new Date(new Date().setDate(currentDate.getDate() - 120))
+    // If end is not provided, use the current date
+    const currentDate = end ? new Date(end) : new Date()
+    // If start is not provided, use the date 120 days ago
+    const dateBegin = start
+      ? new Date(start)
+      : new Date(new Date().setDate(currentDate.getDate() - 120))
+
     const headers = {
       Accept: 'text/plain,text/csv',
       'Accept-Encoding': 'identity',
@@ -288,9 +298,17 @@ export class RepslyApiService {
     return new TextDecoder('utf-8').decode(buffer)
   }
 
-  static async syncDashboard(id: string): Promise<SyncDashboardResponse> {
+  static async syncDashboard(
+    id: string,
+    dateRange: DateRange | null,
+  ): Promise<SyncDashboardResponse> {
+    const params = new URLSearchParams()
+    if (dateRange) {
+      params.set('start', dateRange.startDate.toISOString())
+      params.set('end', dateRange.endDate.toISOString())
+    }
     return this.makeAuthenticatedRequest<SyncDashboardResponse>(
-      `/api/repsly/forms/${id}/export`,
+      `/api/repsly/forms/${id}/export?${params.toString()}`,
       {
         method: 'GET',
       },
@@ -309,6 +327,8 @@ export class RepslyApiService {
     formData.append('scope', 'email offline_access openid profile')
     formData.append('refresh_token', refresh_token)
 
+    console.log('Refreshing token with data:', formData)
+
     const response = await fetch(refreshTokenUrl, {
       method: 'POST',
       headers: {
@@ -320,7 +340,8 @@ export class RepslyApiService {
 
     if (!response.ok) {
       const error = await response.json()
-      throw new Error(`Error al actualizar el token: ${error.error}`)
+      console.error('Error from repsly:', error)
+      throw new Error(`${JSON.stringify(error, null, 2)}`)
     }
 
     const tokenResponse = (await response.json()) as RefreshTokenApiResponse

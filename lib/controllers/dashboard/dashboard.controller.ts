@@ -1,4 +1,9 @@
-import { DashboardService, DashboardSyncService } from '@/lib/services'
+import {
+  ClientsService,
+  DashboardService,
+  DashboardSyncService,
+  FormTemplateService,
+} from '@/lib/services'
 import { RepslyApiService } from '@/lib/services/api'
 import { NextRequest, NextResponse } from 'next/server'
 import { SyncDashboardSuccessResponse } from '@/types/api'
@@ -18,9 +23,19 @@ export class DashboardController {
         )
       }
 
+      const lastSyncLog =
+        dashboard.syncLogs.length > 0 ? dashboard.syncLogs[0] : null
+      const dateRange = lastSyncLog
+        ? {
+            startDate: new Date(lastSyncLog.createdAt),
+            endDate: new Date(),
+          }
+        : null
+
       // Obtener datos de Repsly
       const repslyResponse = await RepslyApiService.syncDashboard(
         dashboard.templateId,
+        dateRange,
       )
 
       if (repslyResponse.status === ApiStatus.ERROR) {
@@ -93,5 +108,29 @@ export class DashboardController {
 
     const dashboard = await DashboardService.getById(dashboardId, parsedFilters)
     return NextResponse.json(dashboard)
+  }
+
+  static async deleteDashboard(request: NextRequest, params: { id: string }) {
+    const { id: dashboardId } = params
+    try {
+      const dashboard = await DashboardService.remove(dashboardId)
+      await ClientsService.remove(dashboard.clientId)
+      const template = await FormTemplateService.getByIdWithDashboardsCount(
+        dashboard.templateId,
+      )
+      if (template && template._count.dashboards === 0) {
+        await FormTemplateService.remove(template.id)
+      }
+      return NextResponse.json(
+        { message: 'Dashboard deleted' },
+        { status: 200 },
+      )
+    } catch (error) {
+      console.error('Error deleting dashboard:', error)
+      return NextResponse.json(
+        { error: 'Error deleting dashboard' },
+        { status: 500 },
+      )
+    }
   }
 }

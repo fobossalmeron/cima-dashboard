@@ -6,8 +6,10 @@ interface DashboardsTableProps {
   dashboards: DashboardWithClientAndTemplate[]
   onSyncDashboard: (dashboardId: string) => void
   onClearDashboard: (dashboardId: string) => void
+  onDeleteDashboard: (dashboardId: string) => void
   isSyncing: boolean
   isCleaning: boolean
+  isDeleting: boolean
   debugMode: boolean
 }
 
@@ -15,8 +17,10 @@ export function DashboardsTable({
   dashboards,
   onSyncDashboard,
   onClearDashboard,
+  onDeleteDashboard,
   isSyncing,
   isCleaning,
+  isDeleting,
   debugMode,
 }: DashboardsTableProps) {
   return (
@@ -27,8 +31,10 @@ export function DashboardsTable({
           dashboard={dashboard}
           onSyncDashboard={onSyncDashboard}
           onClearDashboard={onClearDashboard}
+          onDeleteDashboard={onDeleteDashboard}
           isSyncing={isSyncing}
           isCleaning={isCleaning}
+          isDeleting={isDeleting}
           debugMode={debugMode}
         />
       ))}

@@ -1,6 +1,6 @@
 import { Prisma, QuestionType } from '@prisma/client'
 import { BrandWithSubBrands, QuestionWithRelations } from '@/types/api'
-import { SubBrandsService } from '@/lib/services'
+import { BrandsService, SubBrandsService } from '@/lib/services'
 import { slugify } from '@/lib/utils'
 
 export class BrandSyncService {
@@ -25,7 +25,20 @@ export class BrandSyncService {
     const brands: BrandWithSubBrands[] = []
 
     for (const brandName of selectedBrands) {
-      const subBrand = await SubBrandsService.getBySlug(slugify(brandName))
+      let subBrand = await SubBrandsService.getBySlug(slugify(brandName))
+
+      if (!subBrand) {
+        const brandCreated = await BrandsService.createOrUpdate({
+          name: brandName,
+          slug: slugify(brandName),
+        })
+
+        subBrand = await SubBrandsService.createOrUpdate({
+          name: brandName,
+          slug: slugify(brandName),
+          brandId: brandCreated.id,
+        })
+      }
 
       if (!subBrand) {
         throw new Error(`Marca no encontrada: ${slugify(brandName)}`)

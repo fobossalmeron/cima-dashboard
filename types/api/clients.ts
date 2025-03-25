@@ -29,6 +29,7 @@ import {
   SamplingTraffic,
   SubBrand,
   SubBrandTemplate,
+  SyncLog,
 } from '@prisma/client'
 import { QuestionOptionWithRelations } from './form-template'
 
@@ -108,6 +109,7 @@ export interface ProductSaleWithRelations extends ProductSale {
 export interface DashboardWithRelations extends Dashboard {
   template: FormTemplateWithRelations
   submissions: SubmissionWithRelations[]
+  syncLogs: SyncLog[]
 }
 
 export interface ClientWithRelations extends Client {

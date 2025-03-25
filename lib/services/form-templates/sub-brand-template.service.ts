@@ -2,6 +2,17 @@ import { prisma } from '@/lib/prisma'
 import { FormTemplate, Prisma, SubBrand } from '@prisma/client'
 
 export class SubBrandTemplateService {
+  static async getByTemplateAndSubBrand(
+    templateId: string,
+    subBrandId: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || prisma
+    return await client.subBrandTemplate.findUnique({
+      where: { subBrandId_templateId: { subBrandId, templateId } },
+    })
+  }
+
   static async create(
     data: {
       subBrand: SubBrand

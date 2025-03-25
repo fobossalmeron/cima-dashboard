@@ -9,3 +9,12 @@ export async function GET(
 
   return await DashboardController.getDashboard(request, { id })
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params
+
+  return await DashboardController.deleteDashboard(request, { id })
+}

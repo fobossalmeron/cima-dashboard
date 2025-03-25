@@ -96,6 +96,7 @@ model Dashboard {
   client      Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
   template    FormTemplate     @relation(fields: [templateId], references: [id], onDelete: Cascade)
   submissions FormSubmission[]
+  syncLogs    SyncLog[]
 
   @@index([clientId])
   @@index([templateId])
@@ -216,6 +217,9 @@ model ServiceToken {
   serviceClientId String?   @map("service_client_id")
   expiresIn       Int?
   expiresAt       DateTime? @map("expires_at")
+
+  // Relations
+  refreshTokenLogs ServiceRefreshTokenLog[]
 
   @@index([service])
   @@map("service_tokens")
@@ -624,6 +628,37 @@ model Photo {
 
   @@map("photos")
 }
+
+model SyncLog {
+  id String @id @default(cuid())
+  dashboardId String
+  status   SyncStatus
+  error    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  dashboard Dashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+
+  @@map("sync_logs")
+}
+
+model ServiceRefreshTokenLog {
+  id String @id @default(cuid())
+  serviceTokenId String
+  status   SyncStatus
+  error    Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  serviceToken ServiceToken @relation(fields: [serviceTokenId], references: [id], onDelete: Cascade)
+
+  @@map("service_refresh_token_logs")
+}
+
 enum Role {
   CLIENT
   SUPER_ADMIN
@@ -642,4 +677,9 @@ enum QuestionType {
   NUMERIC
   TEXT
   PHOTO
+}
+
+enum SyncStatus {
+  SUCCESS
+  ERROR
 }

@@ -22,7 +22,6 @@ export class SubBrandService {
     tx?: Prisma.TransactionClient,
   ): Promise<SubBrand> {
     const client = tx || prisma
-    console.log('Creating or updating sub-brand:', data)
     return await client.subBrand.upsert({
       where: {
         slug_brandId: {

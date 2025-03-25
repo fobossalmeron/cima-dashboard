@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'repsly.s3.amazonaws.com',
       },
+      {
+        protocol: 'https',
+        hostname: '8ptjrbbvvzwalxfe.public.blob.vercel-storage.com',
+      },
     ],
   },
 }

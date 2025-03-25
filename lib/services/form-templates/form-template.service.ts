@@ -22,6 +22,7 @@ import {
 import { QuestionWithRelations } from '@/types/api/clients'
 import { QuestionOptionWithRelations } from '@/types/api'
 import { withTransaction } from '@/prisma/prisma'
+import { FormTemplateWithDashboardsCount } from '@/types/services/form-template.types'
 
 export type FormTemplateWithQuestionsAndOptions = FormTemplate & {
   questions: (Question & {
@@ -96,6 +97,31 @@ export class FormTemplateService {
         dashboards: {
           include: {
             client: true,
+          },
+        },
+      },
+    })
+  }
+
+  static async getByIdWithDashboardsCount(
+    id: string,
+  ): Promise<FormTemplateWithDashboardsCount | null> {
+    return await prisma.formTemplate.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        sortOrder: true,
+        active: true,
+        version: true,
+        createdBy: true,
+        updatedBy: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            dashboards: true,
           },
         },
       },
@@ -310,8 +336,10 @@ export class FormTemplateService {
     data: FormTemplateCreateParams,
     tx: Prisma.TransactionClient,
   ): Promise<FormTemplate> {
-    return await tx.formTemplate.create({
-      data,
+    return await tx.formTemplate.upsert({
+      where: { id: data.id },
+      update: data,
+      create: data,
     })
   }
 
@@ -331,14 +359,21 @@ export class FormTemplateService {
   ): Promise<QuestionGroup[]> {
     return await Promise.all(
       questionGroups.map((group) =>
-        tx.questionGroup.create({
-          data: {
-            id: group.Id,
-            formTemplateId,
+        tx.questionGroup.upsert({
+          where: { id: group.Id },
+          update: {
             name: group.Name,
             type:
               (group.Type.toUpperCase() as QuestionGroupType) ||
               QuestionGroupType.BASIC,
+          },
+          create: {
+            id: group.Id,
+            name: group.Name,
+            type:
+              (group.Type.toUpperCase() as QuestionGroupType) ||
+              QuestionGroupType.BASIC,
+            formTemplateId,
           },
         }),
       ),
@@ -374,18 +409,23 @@ export class FormTemplateService {
     return await Promise.all(
       questions.map(async (question) => {
         // Primero creamos la pregunta
-        const createdQuestion = await tx.question.create({
-          data: {
-            id: question.Id,
-            formTemplateId,
-            sortOrder: question.SortOrder,
-            type: FormTemplateService.getQuestionType(question.Type),
-            name: question.Name,
-            isMandatory: question.IsMandatory,
-            isAutoFill: question.IsAutoFill,
-            questionGroupId: question.QuestionGroupId,
-            forImageRecognition: question.ForImageRecognition ?? false,
-          },
+        const questionData = {
+          id: question.Id,
+          sortOrder: question.SortOrder,
+          type: FormTemplateService.getQuestionType(question.Type),
+          name: question.Name,
+          isMandatory: question.IsMandatory,
+          isAutoFill: question.IsAutoFill,
+          questionGroupId: question.QuestionGroupId,
+          forImageRecognition: question.ForImageRecognition ?? false,
+          formTemplateId,
+        }
+        const { id, ...rest } = questionData
+
+        const createdQuestion = await tx.question.upsert({
+          where: { id: question.Id },
+          update: rest,
+          create: questionData,
         })
 
         let options: QuestionOptionWithRelations[] = []
@@ -395,13 +435,17 @@ export class FormTemplateService {
         if (question.Options && question.Options.length > 0) {
           options = await Promise.all(
             question.Options.map(async (option) => {
-              const createdOption = await tx.questionOption.create({
-                data: {
-                  id: option.Id,
-                  questionId: createdQuestion.id,
-                  value: option.Value,
-                  sortOrder: option.SortOrder,
-                },
+              const optionData = {
+                id: option.Id,
+                questionId: createdQuestion.id,
+                value: option.Value,
+                sortOrder: option.SortOrder,
+              }
+              const { id, ...rest } = optionData
+              const createdOption = await tx.questionOption.upsert({
+                where: { id: option.Id },
+                update: rest,
+                create: optionData,
               })
 
               let localTriggers: QuestionTrigger[] = []
@@ -413,15 +457,23 @@ export class FormTemplateService {
                 )
                 if (questionTriggers.length > 0) {
                   localTriggers = await Promise.all(
-                    questionTriggers.map((trigger) =>
-                      tx.questionTrigger.create({
-                        data: {
-                          questionId: createdQuestion.id,
-                          optionId: createdOption.id,
-                          groupId: trigger.GroupId,
-                        },
-                      }),
-                    ),
+                    questionTriggers.map(async (trigger) => {
+                      const triggerData = {
+                        questionId: createdQuestion.id,
+                        optionId: createdOption.id,
+                        groupId: trigger.GroupId,
+                      }
+                      const { groupId, optionId, questionId } = triggerData
+                      const triggerExists = await tx.questionTrigger.findFirst({
+                        where: { groupId, optionId, questionId },
+                      })
+                      if (triggerExists) {
+                        return triggerExists
+                      }
+                      return tx.questionTrigger.create({
+                        data: triggerData,
+                      })
+                    }),
                   )
                 }
                 triggers = [...triggers, ...localTriggers]
@@ -437,15 +489,23 @@ export class FormTemplateService {
 
         // Si hay attachments, los creamos
         if (question.Attachments && question.Attachments.length > 0) {
-          attachments = await tx.questionAttachment.createManyAndReturn({
-            data: question.Attachments.map((attachment) => ({
-              id: attachment.id,
-              questionId: createdQuestion.id,
-              url: attachment.url,
-              type: attachment.type,
-              name: attachment.name,
-            })),
-          })
+          attachments = await Promise.all(
+            question.Attachments.map(async (attachment) => {
+              const attachmentData = {
+                id: attachment.id,
+                questionId: createdQuestion.id,
+                url: attachment.url,
+                type: attachment.type,
+                name: attachment.name,
+              }
+              const { id, ...rest } = attachmentData
+              return await tx.questionAttachment.upsert({
+                where: { id: attachment.id },
+                update: rest,
+                create: attachmentData,
+              })
+            }),
+          )
         }
 
         return {

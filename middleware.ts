@@ -4,9 +4,10 @@ import { NextResponse, type NextRequest } from 'next/server'
 const DEFAULT_REDIRECT_PATH = '/admin'
 const LOGIN_PATH = '/login'
 const SIGN_UP_PATH = '/sign-up'
-const AUTH_PATHS = [LOGIN_PATH, SIGN_UP_PATH]
+const AUTH_PATHS = [LOGIN_PATH]
 const PUBLIC_PATHS = [...AUTH_PATHS]
 const PRIVATE_PATHS = ['/admin']
+const FORBIDDEN_PATHS = [SIGN_UP_PATH]
 
 async function getSession(request: NextRequest) {
   try {
@@ -55,17 +56,21 @@ async function tryToRedirectToBasePath(request: NextRequest, session: any) {
 }
 
 async function tryToRedirectToLogin(request: NextRequest, session: any) {
+  const isForbiddenPath = FORBIDDEN_PATHS.some((path) =>
+    request.nextUrl.pathname.startsWith(path),
+  )
+
   // Rutas públicas que no requieren autenticación
   const isPublicPath = PUBLIC_PATHS.some((path) =>
     request.nextUrl.pathname.startsWith(path),
   )
 
-  const isPrivatePath = PRIVATE_PATHS.some((path) =>
-    request.nextUrl.pathname.startsWith(path),
-  )
+  const isPrivatePath =
+    PRIVATE_PATHS.some((path) => request.nextUrl.pathname.startsWith(path)) &&
+    !isPublicPath
 
   // Redirigir al login si no hay sesión y la ruta no es pública y es privada
-  if (!session && !isPublicPath && isPrivatePath) {
+  if (isForbiddenPath || (!session && isPrivatePath)) {
     const signInUrl = new URL(LOGIN_PATH, request.url)
     signInUrl.searchParams.set('callbackUrl', request.nextUrl.pathname)
     return signInUrl

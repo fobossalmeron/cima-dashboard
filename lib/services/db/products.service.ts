@@ -55,6 +55,40 @@ export class ProductsService {
     })
   }
 
+  static async createOrUpdate(
+    data: {
+      name: string
+      brandId: string
+      subBrandId: string | null
+      presentationId: string
+      flavorId: string
+      imageUrl: string | null
+    },
+    tx?: Prisma.TransactionClient,
+  ): Promise<Product> {
+    const client = tx || prisma
+    const product = await client.product.findFirst({
+      where: {
+        brandId: data.brandId,
+        subBrandId: data.subBrandId,
+        presentationId: data.presentationId,
+        flavorId: data.flavorId,
+        name: data.name,
+      },
+    })
+
+    if (product) {
+      return await client.product.update({
+        where: { id: product.id },
+        data,
+      })
+    }
+
+    return await client.product.create({
+      data,
+    })
+  }
+
   static async update(
     id: string,
     data: Partial<Product>,

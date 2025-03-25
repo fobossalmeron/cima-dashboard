@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
-import { Dashboard, Prisma } from '@prisma/client'
-import { DashboardWithClientAndTemplate } from '@/types/api'
+import { Dashboard, Prisma, SyncStatus } from '@prisma/client'
+import { DashboardWithClientAndTemplate, DashboardWithLogs } from '@/types/api'
 import { SubmissionService } from './submission.service'
 import { DashboardFilters } from '@/types/services/dashboard.types'
 import { DashboardWithRelations } from '@/types/api/clients'
@@ -20,6 +20,23 @@ export class DashboardService {
           },
         },
         template: true,
+      },
+    })
+  }
+
+  // Get all dashboards with the last successful sync log
+  static async getAllWithLogs(): Promise<DashboardWithLogs[]> {
+    return await prisma.dashboard.findMany({
+      include: {
+        syncLogs: {
+          where: {
+            status: SyncStatus.SUCCESS,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+        client: true,
       },
     })
   }
@@ -80,7 +97,6 @@ export class DashboardService {
             },
           },
         },
-        // Incluimos las submissions con los filtros aplicados
         submissions: {
           where: submissionsWhere,
           include: {
@@ -131,6 +147,7 @@ export class DashboardService {
             },
           },
         },
+        syncLogs: true,
       },
     })
 

@@ -1,5 +1,9 @@
 import { prisma } from '@/lib/prisma'
-import { ServiceToken } from '@prisma/client'
+import {
+  ServiceRefreshTokenLog,
+  ServiceToken,
+  SyncStatus,
+} from '@prisma/client'
 
 export class ServiceTokenService {
   static async getAll(): Promise<ServiceToken[]> {
@@ -59,6 +63,20 @@ export class ServiceTokenService {
   static async findByService(service: string): Promise<ServiceToken | null> {
     return await prisma.serviceToken.findUnique({
       where: { service },
+    })
+  }
+
+  static async createLog(
+    service: string,
+    status: SyncStatus,
+    error?: string,
+  ): Promise<ServiceRefreshTokenLog> {
+    const serviceToken = await this.findByService(service)
+    if (!serviceToken) {
+      throw new Error('Service token not found')
+    }
+    return await prisma.serviceRefreshTokenLog.create({
+      data: { serviceTokenId: serviceToken.id, status, error },
     })
   }
 }

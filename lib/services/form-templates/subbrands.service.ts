@@ -26,7 +26,7 @@ export class SubBrandsService {
     name: string
     slug: string
     brandId: string
-  }): Promise<SubBrand> {
+  }): Promise<SubBrandWithBrand> {
     return await prisma.subBrand.upsert({
       where: {
         slug_brandId: {
@@ -38,6 +38,9 @@ export class SubBrandsService {
         name: data.name,
       },
       create: data,
+      include: {
+        brand: true,
+      },
     })
   }
 
