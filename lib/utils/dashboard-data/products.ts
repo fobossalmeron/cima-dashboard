@@ -93,7 +93,7 @@ export function getOldAndNewActivationsChartData(
   const monthlyData: Record<string, OldAndNewActivationsChartData> = {}
 
   dashboard.submissions.forEach((submission) => {
-    const date = new Date(submission.submittedAt)
+    const date = new Date(submission.startDate)
     const month = date.toLocaleString('es-MX', { month: 'long' }) // Obtener el nombre del mes
 
     // Inicializar el objeto para el mes si no existe

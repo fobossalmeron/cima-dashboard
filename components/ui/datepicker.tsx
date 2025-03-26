@@ -135,9 +135,35 @@ function DatePicker({
             onMonthChange={setMonth}
             onSelect={(range) => {
               if (range?.from && range?.to) {
-                const newRange = { from: range.from, to: range.to }
-                setSelectedRange(newRange)
-                onChange?.(newRange)
+                const currentFrom = new Date(selectedRange.from).setHours(
+                  0,
+                  0,
+                  0,
+                  0,
+                )
+                const currentTo = new Date(selectedRange.to).setHours(
+                  0,
+                  0,
+                  0,
+                  0,
+                )
+                const newFrom = new Date(range.from).setHours(0, 0, 0, 0)
+
+                if (currentFrom !== currentTo) {
+                  // Si el rango actual tiene fechas diferentes, usar la fecha que seleccionó el usuario
+                  // Si la fecha seleccionada es menor que el rango actual, usar range.from
+                  // Si la fecha seleccionada es mayor que el rango actual, usar range.to
+                  const selectedDate =
+                    newFrom < currentFrom ? range.from : range.to
+                  const newRange = { from: selectedDate, to: selectedDate }
+                  setSelectedRange(newRange)
+                  onChange?.(newRange)
+                } else {
+                  // Si el nuevo rango es del mismo día, permitir seleccionar un nuevo rango
+                  const newRange = { from: range.from, to: range.to }
+                  setSelectedRange(newRange)
+                  onChange?.(newRange)
+                }
               }
             }}
             initialFocus

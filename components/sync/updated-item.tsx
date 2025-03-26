@@ -28,7 +28,7 @@ export function UpdatedItem({
         </p>
         <p>
           <span className="font-medium">Fecha:</span>{' '}
-          {formatDate(submission.submission.submittedAt)}
+          {formatDate(submission.submission.startDate)}
         </p>
       </div>
     </div>

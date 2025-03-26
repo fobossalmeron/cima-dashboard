@@ -19,7 +19,7 @@ export function getActivationsHistory(
         submission.productSales.reduce((acc, sale) => acc + sale.quantity, 0) /
         (submission.productSales.length || 1)
       return {
-        date: new Date(submission.submittedAt).toLocaleDateString('es-MX', {
+        date: new Date(submission.startDate).toLocaleDateString('es-MX', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
@@ -34,7 +34,7 @@ export function getActivationsHistory(
           0,
         ),
         velocity: Number(velocity.toFixed(2)),
-        time: new Date(submission.submittedAt),
+        time: new Date(submission.startDate),
       }
     })
     .sort((a, b) => b.time.getTime() - a.time.getTime())
@@ -114,28 +114,22 @@ export function getHeatmapData(
       .map(() => []),
   }
   dashboard.submissions.forEach((submission) => {
-    console.log('--------------------------------')
-    console.log('Submission', submission.id)
     const startDate = new Date(submission.startDate)
     const day = startDate.toLocaleString('es-MX', {
       weekday: 'long',
     })
     const dayCapitalized = day.charAt(0).toUpperCase() + day.slice(1)
-    console.log('Day capitalized', dayCapitalized)
     const dayKey = dayCapitalized as keyof HeatmapDataStructure
     let startHour = startDate.getHours()
     const endHour = startHour + 4
     const velocity = submission.totalQuantity / 4
     do {
       if (heatmapData[dayKey]) {
-        console.log(`Day: ${dayKey}, hour: ${startHour}, velocity: ${velocity}`)
         heatmapData[dayKey][startHour].push(velocity)
       }
       startHour++
     } while (startHour < endHour && startHour < 24)
   })
-
-  console.log('heatmapData', heatmapData)
 
   // Calcular el promedio de velocities por hora
   const averageHeatmapData: HeatmapDataStructure = {

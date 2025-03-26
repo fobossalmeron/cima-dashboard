@@ -9,7 +9,7 @@ export const getChartData = (
     ? Object.entries(
         // Agrupar submissions por mes
         dashboardData.submissions.reduce((acc, submission) => {
-          const date = new Date(submission.submittedAt)
+          const date = new Date(submission.startDate)
           const monthKey = `${date.getFullYear()}-${date.getMonth()}`
 
           if (!acc[monthKey]) {

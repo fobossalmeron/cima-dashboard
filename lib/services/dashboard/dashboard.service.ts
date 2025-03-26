@@ -50,7 +50,7 @@ export class DashboardService {
     const submissionsWhere: Prisma.FormSubmissionWhereInput = {}
 
     if (dateRange) {
-      submissionsWhere.submittedAt = {
+      submissionsWhere.startDate = {
         gte: dateRange.startDate,
         lte: dateRange.endDate,
       }

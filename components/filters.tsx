@@ -155,7 +155,7 @@ export function Filters({
     if (dashboardData !== null && !firstNonNullDashboardDataLoading) {
       setFirstNonNullDashboardDataLoading(true)
       const minDate = dashboardData.submissions.reduce((min, submission) => {
-        return Math.min(min, new Date(submission.submittedAt).getTime())
+        return Math.min(min, new Date(submission.startDate).getTime())
       }, Infinity)
       if (minDate !== Infinity) {
         setDateRange({
