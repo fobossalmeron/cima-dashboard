@@ -39,15 +39,15 @@ export class DashboardSyncService {
     const updatedSubmissions: RowTransactionUpdatedResult[] = []
 
     // Procesar cada fila del CSV
-    const rowsPromises = formData.map((row, rowIndex) =>
-      SubmissionSyncService.processRow(
+    const rowsPromises = formData.map((row, rowIndex) => {
+      return SubmissionSyncService.processRow(
         id,
         row,
         rowIndex,
         questions,
         questionMap,
-      ),
-    )
+      )
+    })
 
     await Promise.all(rowsPromises)
       .then((results) => {

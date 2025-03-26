@@ -8,10 +8,14 @@ import { RepslyApiService } from '@/lib/services/api'
 import { NextRequest, NextResponse } from 'next/server'
 import { SyncDashboardSuccessResponse } from '@/types/api'
 import { ApiStatus } from '@/enums/api-status'
-import { DashboardFilters } from '@/types/services/dashboard.types'
+import { DashboardFilters, DateRange } from '@/types/services/dashboard.types'
 
 export class DashboardController {
-  static async syncDashboard(request: NextRequest, params: { id: string }) {
+  static async syncDashboard(
+    request: NextRequest,
+    params: { id: string },
+    force?: boolean,
+  ) {
     try {
       const { id: dashboardId } = params
       const dashboard = await DashboardService.getById(dashboardId)
@@ -23,14 +27,18 @@ export class DashboardController {
         )
       }
 
-      const lastSyncLog =
-        dashboard.syncLogs.length > 0 ? dashboard.syncLogs[0] : null
-      const dateRange = lastSyncLog
-        ? {
-            startDate: new Date(lastSyncLog.createdAt),
-            endDate: new Date(),
-          }
-        : null
+      let dateRange: DateRange | null = null
+
+      if (!force) {
+        const lastSyncLog =
+          dashboard.syncLogs.length > 0 ? dashboard.syncLogs[0] : null
+        dateRange = lastSyncLog
+          ? {
+              startDate: new Date(lastSyncLog.createdAt),
+              endDate: new Date(),
+            }
+          : null
+      }
 
       // Obtener datos de Repsly
       const repslyResponse = await RepslyApiService.syncDashboard(

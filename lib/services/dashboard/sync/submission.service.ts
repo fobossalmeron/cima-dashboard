@@ -123,6 +123,7 @@ export class SubmissionSyncService {
     questionMap: Map<string, QuestionWithRelations>,
   ): Promise<RowTransactionResult> {
     try {
+      console.log('Processing row', rowIndex)
       const result = await withTransaction(
         async (tx: Prisma.TransactionClient) => {
           // Extract general fields from row

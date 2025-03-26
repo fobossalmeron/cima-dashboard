@@ -89,7 +89,9 @@ export default function AdminPageContent() {
       setIsSyncing(true)
       setSyncResults(null)
 
-      const response = await fetch(`/api/dashboard/${dashboardId}/sync`)
+      const response = await fetch(
+        `/api/dashboard/${dashboardId}/sync?force=true`,
+      )
 
       if (!response.ok) {
         const error = await response.json()
