@@ -1,5 +1,4 @@
 import {
-  BrandWithSubBrands,
   FormSubmissionEntryData,
   QuestionWithRelations,
   RowTransactionResult,
@@ -8,21 +7,114 @@ import {
 import { Prisma } from '@prisma/client'
 import { SyncStatus as SyncStatusEnum } from '@/enums/dashboard-sync'
 import { withTransaction } from '@/prisma/prisma'
-import { QuestionSyncService } from './question.service'
 import { AnswerSyncService } from './answer.service'
 import { GeneralFieldsService } from './general-fields.service'
 import { BrandSyncService } from './brand.service'
 import { ProductSyncService } from './product.service'
-import { DealerService } from './dealer.service'
-import { PointOfSaleService } from '../point-of-sale.service'
-import { ProductLocationService } from '../product-location.service'
-import { slugify } from '@/lib/utils'
 import { SamplingService } from './sampling.service'
 import { PhotosService } from './photos.service'
-import { RepresentativeService } from './representative.service'
-import { LocationService } from './location.service'
+import { DatesFieldsEnum, GeneralFieldsEnum } from '@/enums/general-fields'
+import { parseDate } from '@/lib/utils/date'
+import { SubmissionRepository } from '@/lib/repositories'
+import {
+  DataFieldsTagsValues,
+  ProcessSubmissionParams,
+  ProcessSubmissionResult,
+} from '@/types/services'
+import { DataFieldSearchType, DataFieldsEnum } from '@/enums/data-fields'
 
 export class SubmissionSyncService {
+  private static async processSubmission(
+    params: ProcessSubmissionParams,
+  ): Promise<ProcessSubmissionResult> {
+    const { row, data, tx } = params
+
+    const submittedAt = row[DatesFieldsEnum.ACTIVATION_DATE]
+      ? parseDate(row[DatesFieldsEnum.ACTIVATION_DATE].toString())
+      : new Date()
+
+    const startDate = row[GeneralFieldsEnum.START_DATE]
+      ? parseDate(row[GeneralFieldsEnum.START_DATE].toString())
+      : new Date()
+
+    const endDate = row[GeneralFieldsEnum.END_DATE]
+      ? parseDate(row[GeneralFieldsEnum.END_DATE].toString())
+      : new Date()
+
+    const samplesDelivered = row[DataFieldsEnum.SAMPLES_DELIVERED]?.toString()
+      ? Number(row[DataFieldsEnum.SAMPLES_DELIVERED]?.toString())
+      : 0
+
+    const productInPromotion =
+      row[DataFieldsEnum.PRODUCT_IN_PROMOTION]?.toString()?.toLowerCase() ===
+      'Yes'
+
+    const riskZone =
+      row[DataFieldsEnum.RISK_ZONE]?.toString()?.toLowerCase() === 'Yes'
+
+    const firstActivation =
+      Object.entries(row).find(([key]) => {
+        const { tags, searchType } =
+          DataFieldsTagsValues[DataFieldsEnum.FIRST_ACTIVATION]
+        switch (searchType) {
+          case DataFieldSearchType.OR:
+            return tags.some((tag) => key.includes(tag))
+          case DataFieldSearchType.AND:
+            return tags.every((tag) => key.includes(tag))
+        }
+      })?.[1] === 'Yes'
+
+    const submissionData = {
+      ...data,
+      submittedAt,
+      notes: row[GeneralFieldsEnum.NOTE]?.toString() ?? null,
+      tags:
+        row[GeneralFieldsEnum.TAGS]?.toString()?.split(',').filter(Boolean) ||
+        [],
+      email: row[GeneralFieldsEnum.EMAIL]?.toString() ?? null,
+      phone: row[GeneralFieldsEnum.PHONE]?.toString() ?? null,
+      mobilePhone: row[GeneralFieldsEnum.MOBILE]?.toString() ?? null,
+      status: row[GeneralFieldsEnum.STATUS]?.toString() ?? null,
+      registered:
+        row[GeneralFieldsEnum.REGISTERED]?.toString()?.toLowerCase() === 'true',
+      startDate,
+      endDate,
+      formLink: row[GeneralFieldsEnum.FORM_LINK]?.toString() ?? '',
+      legalName: row[GeneralFieldsEnum.LEGAL_NAME]?.toString() ?? null,
+      productInPromotion,
+      samplesDelivered,
+      riskZone,
+      firstActivation,
+    }
+
+    const { dashboardId, locationId, representativeId } = data
+
+    const submissionExists = await SubmissionRepository.findUnique(
+      {
+        dashboardId,
+        locationId,
+        representativeId,
+        startDate,
+        endDate,
+      },
+      tx,
+    )
+
+    if (submissionExists) {
+      return {
+        submission: submissionExists,
+        submissionStatus: SyncStatusEnum.UPDATED,
+      }
+    }
+
+    const submission = await SubmissionRepository.create(submissionData, tx)
+
+    return {
+      submission,
+      submissionStatus: SyncStatusEnum.SUCCESS,
+    }
+  }
+
   static async processRow(
     dashboardId: string,
     row: FormSubmissionEntryData,
@@ -33,101 +125,51 @@ export class SubmissionSyncService {
     try {
       const result = await withTransaction(
         async (tx: Prisma.TransactionClient) => {
+          // Extract general fields from row
           const {
-            dealerData,
-            representativeData,
-            locationData,
-            submissionData,
-            questionAnswers,
-            pointOfSale: pointOfSaleOption,
-            productInPromotion,
-            riskZone,
-            samplesDelivered,
-            firstActivation,
-          } = await GeneralFieldsService.processGeneralFields(row, dashboardId)
-
-          const pointOfSale = await this.processPointOfSale(
-            pointOfSaleOption,
-            tx,
-          )
-
-          const productLocation = await this.processProductLocation(
+            dealer,
+            representative,
+            location,
+            pointOfSale,
+            productLocation,
+          } = await GeneralFieldsService.processGeneralFields(
             row,
             questions,
             tx,
           )
 
-          const dealer = await DealerService.create(dealerData, tx)
-
-          const representative = await RepresentativeService.createOrUpdate(
-            representativeData,
-            tx,
-          )
-
-          const location = await LocationService.createOrUpdate(
-            locationData,
-            tx,
-          )
-
-          const submissionExists = await tx.formSubmission.findUnique({
-            where: {
-              dashboardId_locationId_representativeId_submittedAt: {
-                dashboardId: dashboardId,
+          const { submission, submissionStatus } = await this.processSubmission(
+            {
+              row,
+              data: {
+                dashboardId,
                 locationId: location.id,
                 representativeId: representative.id,
-                submittedAt: submissionData.submittedAt,
+                pointOfSaleId: pointOfSale?.id ?? null,
+                productLocationId: productLocation?.id ?? null,
               },
+              tx,
             },
-          })
+          )
+          // Create or update sampling
+          await SamplingService.createOrUpdate(row, submission.id, tx)
+          // Create or update photos
+          await PhotosService.createOrUpdate(row, submission.id, tx)
 
-          if (submissionExists) {
-            console.log('Updating submission', submissionExists.id)
-            return {
-              status: SyncStatusEnum.SKIPPED,
-              dashboardId,
-              dealer,
-              representative,
-              location,
-              submission: submissionExists,
-              answers: [],
-              productSales: [],
-            }
-          }
-
-          const submission = await tx.formSubmission.create({
-            data: {
-              ...submissionData,
-              locationId: location.id,
-              representativeId: representative.id,
-              pointOfSaleId: pointOfSale?.id,
-              productLocationId: productLocation?.id,
-              productInPromotion,
-              samplesDelivered,
-              riskZone,
-              firstActivation,
-            },
-          })
-
-          await SamplingService.create(row, submission.id, tx)
-
-          await PhotosService.processPhotos(row, submission.id, tx)
-
-          // Obtener las preguntas activas basadas en las respuestas
-          const activeQuestions = QuestionSyncService.getActiveQuestions(
+          // Process answers and validate
+          const {
+            answers: validAnswers,
+            errors,
             questionAnswers,
+            activeQuestions,
+          } = AnswerSyncService.processAnswers(
+            row,
             questions,
+            questionMap,
+            rowIndex,
           )
 
-          // Procesar las respuestas y validar
-          const { answers: validAnswers, errors } =
-            AnswerSyncService.processAnswers(
-              questionAnswers,
-              questionMap,
-              activeQuestions,
-              rowIndex,
-            )
-
-          // Si hay errores, lanzar excepción para hacer rollback
+          // If there are errors, throw an exception to make a rollback
           if (errors.length > 0) {
             throw new Error(
               JSON.stringify({
@@ -137,30 +179,22 @@ export class SubmissionSyncService {
             )
           }
 
-          // Crear las respuestas
+          // Create answers
           const answers = await AnswerSyncService.createAnswers(
-            tx,
             submission.id,
             validAnswers,
+            tx,
           )
 
-          // Procesar marcas activadas
-          const brandQuestion = questions.find((q) =>
-            q.name.toUpperCase().includes('MARCA ACTIVADA'),
+          // Process activated brands
+          const brands = await BrandSyncService.processActivatedBrands(
+            tx,
+            submission.id,
+            questions,
+            questionAnswers,
           )
 
-          let brands: BrandWithSubBrands[] = []
-
-          if (brandQuestion) {
-            brands = await BrandSyncService.processActivatedBrands(
-              tx,
-              submission.id,
-              questionAnswers[brandQuestion.name],
-              brandQuestion,
-            )
-          }
-
-          // Procesar ventas de productos
+          // Process product sales
           const { productSales, totalQuantity, totalAmount } =
             await ProductSyncService.processProductSales(
               tx,
@@ -171,7 +205,7 @@ export class SubmissionSyncService {
               brands,
             )
 
-          // Actualizar totales en el submission
+          // Update totals in the submission
           await tx.formSubmission.update({
             where: { id: submission.id },
             data: {
@@ -181,7 +215,8 @@ export class SubmissionSyncService {
           })
 
           return {
-            status: SyncStatusEnum.SUCCESS,
+            status: submissionStatus,
+            rowIndex: rowIndex + 1,
             dashboardId,
             dealer,
             representative,
@@ -246,37 +281,5 @@ export class SubmissionSyncService {
         }
       }
     }
-  }
-
-  private static async processPointOfSale(
-    pointOfSale?: string,
-    tx?: Prisma.TransactionClient,
-  ) {
-    if (!pointOfSale) return null
-    return await PointOfSaleService.createOrUpdate(
-      { name: pointOfSale, slug: pointOfSale.toLowerCase() },
-      tx,
-    )
-  }
-
-  private static async processProductLocation(
-    row: FormSubmissionEntryData,
-    questions: QuestionWithRelations[],
-    tx?: Prisma.TransactionClient,
-  ) {
-    const productLocationQuestion = questions.find((q) =>
-      q.name.toUpperCase().includes('UBICACIÓN DEL PRODUCTO'),
-    )
-    if (!productLocationQuestion) return null
-
-    const productLocation = row[productLocationQuestion.name]
-    if (!productLocation) return null
-
-    const productLocationName = productLocation.toString()
-
-    return await ProductLocationService.createOrUpdate(
-      { name: productLocationName, slug: slugify(productLocationName) },
-      tx,
-    )
   }
 }

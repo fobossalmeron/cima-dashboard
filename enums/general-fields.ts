@@ -29,3 +29,9 @@ export enum GeneralFieldsEnum {
   LEGAL_NAME = 'Nombre Legal.Nombre Legal de la Empresa',
   FORM_LINK = 'Enlace al formulario',
 }
+
+export enum DatesFieldsEnum {
+  ACTIVATION_DATE = 'Fecha de la Activación',
+  START_DATE = 'Inicio de la visita',
+  END_DATE = 'Final de la visita',
+}

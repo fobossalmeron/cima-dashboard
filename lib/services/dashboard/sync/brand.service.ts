@@ -1,7 +1,15 @@
 import { Prisma, QuestionType } from '@prisma/client'
-import { BrandWithSubBrands, QuestionWithRelations } from '@/types/api'
-import { BrandsService, SubBrandsService } from '@/lib/services'
+import {
+  BrandWithSubBrands,
+  FormSubmissionEntryData,
+  QuestionWithRelations,
+} from '@/types/api'
 import { slugify } from '@/lib/utils'
+import {
+  ActiveBrandRepository,
+  BrandRepository,
+  SubBrandRepository,
+} from '@/lib/repositories'
 
 export class BrandSyncService {
   static getSelectedBrands(
@@ -18,22 +26,29 @@ export class BrandSyncService {
   static async processActivatedBrands(
     tx: Prisma.TransactionClient,
     submissionId: string,
-    brandValue: string | number | null,
-    brandQuestion: QuestionWithRelations,
+    questions: QuestionWithRelations[],
+    questionAnswers: FormSubmissionEntryData,
   ): Promise<BrandWithSubBrands[]> {
+    const brandQuestion = questions.find((q) =>
+      q.name.toUpperCase().includes('MARCA ACTIVADA'),
+    )
+    if (!brandQuestion) return []
+
+    const brandValue = questionAnswers[brandQuestion.name]
     const selectedBrands = this.getSelectedBrands(brandValue, brandQuestion)
     const brands: BrandWithSubBrands[] = []
 
     for (const brandName of selectedBrands) {
-      let subBrand = await SubBrandsService.getBySlug(slugify(brandName))
+      let subBrand = await SubBrandRepository.getBySlug(slugify(brandName))
 
       if (!subBrand) {
-        const brandCreated = await BrandsService.createOrUpdate({
-          name: brandName,
-          slug: slugify(brandName),
-        })
+        const brandCreated = await BrandRepository.createOrUpdate(
+          brandName,
+          slugify(brandName),
+          tx,
+        )
 
-        subBrand = await SubBrandsService.createOrUpdate({
+        subBrand = await SubBrandRepository.createOrUpdate({
           name: brandName,
           slug: slugify(brandName),
           brandId: brandCreated.id,
@@ -55,19 +70,11 @@ export class BrandSyncService {
         })
       }
 
-      await tx.activatedBrand.upsert({
-        where: {
-          submissionId_brandId: {
-            submissionId,
-            brandId: subBrand.brandId,
-          },
-        },
-        update: {},
-        create: {
-          submissionId,
-          brandId: subBrand.brandId,
-        },
-      })
+      await ActiveBrandRepository.createOrUpdate(
+        submissionId,
+        subBrand.brandId,
+        tx,
+      )
     }
 
     return brands

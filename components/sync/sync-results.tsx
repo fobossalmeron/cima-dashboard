@@ -18,7 +18,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { ErrorItem } from './error-item'
-import { SkippedItem } from './skipped-item'
+import { UpdatedItem } from './updated-item'
 
 interface SyncResultsProps {
   results: ValidationResult
@@ -29,7 +29,8 @@ export function SyncResults({ results, onClose }: SyncResultsProps) {
   const totalValid = results.validSubmissions.length
   const totalInvalid = results.invalidSubmissions.length
   const totalSkipped = results.skippedSubmissions.length
-  const total = totalValid + totalInvalid + totalSkipped
+  const totalUpdated = results.updatedSubmissions.length
+  const total = totalValid + totalInvalid + totalSkipped + totalUpdated
 
   return (
     <div className="mt-8 space-y-6">
@@ -55,7 +56,7 @@ export function SyncResults({ results, onClose }: SyncResultsProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     <AlertCircle className="h-5 w-5 text-yellow-500" />
-                    <span className="text-sm font-medium">{totalSkipped}</span>
+                    <span className="text-sm font-medium">{totalUpdated}</span>
                   </div>
                 </div>
                 <div
@@ -106,9 +107,9 @@ export function SyncResults({ results, onClose }: SyncResultsProps) {
                     </AccordionTrigger>
                     <AccordionContent className="px-4 pb-4">
                       <ScrollArea className="h-[300px]">
-                        {results.invalidSubmissions.map((submission) => (
+                        {results.invalidSubmissions.map((submission, index) => (
                           <ErrorItem
-                            key={submission.rowIndex}
+                            key={`${submission.rowIndex}-${index}`}
                             error={submission}
                           />
                         ))}
@@ -116,16 +117,16 @@ export function SyncResults({ results, onClose }: SyncResultsProps) {
                     </AccordionContent>
                   </AccordionItem>
 
-                  {/* Registros Saltados */}
+                  {/* Registros Actualizados */}
                   <AccordionItem
-                    value="skipped"
+                    value="updated"
                     className="border rounded-lg !border-b-1"
                   >
                     <AccordionTrigger className="px-4 hover:no-underline">
                       <div className="flex items-center gap-2">
                         <AlertCircle className="h-5 w-5 text-yellow-500" />
                         <span className="text-lg font-medium">
-                          Registros Saltados ({totalSkipped})
+                          Registros Actualizados ({totalUpdated})
                         </span>
                       </div>
                     </AccordionTrigger>
@@ -133,8 +134,8 @@ export function SyncResults({ results, onClose }: SyncResultsProps) {
                       <div className="w-full">
                         <ScrollArea className="h-[300px] w-full">
                           <div className="grid grid-cols-2 gap-4 pr-4">
-                            {results.skippedSubmissions.map((submission) => (
-                              <SkippedItem
+                            {results.updatedSubmissions.map((submission) => (
+                              <UpdatedItem
                                 key={submission.rowIndex}
                                 submission={submission}
                               />

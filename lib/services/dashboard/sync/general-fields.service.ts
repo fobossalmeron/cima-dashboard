@@ -1,125 +1,68 @@
-import { FormSubmissionEntryData } from '@/types/api'
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { FormSubmissionEntryData, QuestionWithRelations } from '@/types/api'
 import { GeneralFieldsEnum } from '@/enums/general-fields'
 import { DataFieldSearchType, DataFieldsEnum } from '@/enums/data-fields'
 import { parseDate } from '@/lib/utils/date'
-import { DataFieldsTagsValues } from '@/types/services'
+import {
+  DataFieldsTagsValues,
+  ProcessGeneralFieldsResult,
+} from '@/types/services'
+import {
+  DealerRepository,
+  LocationRepository,
+  RepresentativeRepository,
+  SubmissionRepository,
+} from '@/lib/repositories'
+import {
+  Location,
+  PointOfSale,
+  Prisma,
+  ProductLocation,
+  Representative,
+} from '@prisma/client'
+import { PointOfSaleService } from '../point-of-sale.service'
+import { ProductLocationService } from './product-location.service'
+import { LocationService } from './location.service'
+import { RepresentativeService } from './representative.service'
+import { DealerService } from './dealer.service'
 
 export class GeneralFieldsService {
+  /**
+   * Process General Fields from row submission
+   * @param {FormSubmissionEntryData} row - Row submission
+   * @param {string} dashboardId - Dashboard ID
+   * @param {Prisma.TransactionClient} tx - Transaction client
+   * @returns {Promise<ProcessGeneralFieldsResult>} General Fields saved in database and info for submission
+   */
   static async processGeneralFields(
     row: FormSubmissionEntryData,
-    dashboardId: string,
-  ) {
+    questions: QuestionWithRelations[],
+    tx?: Prisma.TransactionClient,
+  ): Promise<ProcessGeneralFieldsResult> {
     // Process Dealer
-    const dealerData = {
-      name: row[GeneralFieldsEnum.DEALER_NAME]?.toString() || '',
-      nameOther: row[GeneralFieldsEnum.OTHER_DEALER_NAME]?.toString() || '',
-      sellerName: row[GeneralFieldsEnum.SELLER_NAME]?.toString() || '',
-      sellerMobile: row[GeneralFieldsEnum.MOBILE_SELLER]?.toString() || '',
-      sellerEmail: row[GeneralFieldsEnum.EMAIL_SELLER]?.toString() || '',
-      notes: row[GeneralFieldsEnum.NOTES_SELLER]?.toString() || '',
-    }
-
-    const representativeData = {
-      id: row[GeneralFieldsEnum.REPRESENTATIVE]?.toString() || '',
-      name: row[GeneralFieldsEnum.REPRESENTATIVE_NAME]?.toString() || '',
-    }
-
-    const locationData = {
-      id: row[GeneralFieldsEnum.LOCATION]?.toString() || '',
-      code: row[GeneralFieldsEnum.LOCATION]?.toString() || '',
-      name: row[GeneralFieldsEnum.LOCATION_NAME]?.toString() || '',
-      address: row[GeneralFieldsEnum.LOCATION_ADDRESS]?.toString() || '',
-      postalCode: row[GeneralFieldsEnum.LOCATION_POSTAL_CODE]?.toString() || '',
-      city: row[GeneralFieldsEnum.LOCATION_CITY]?.toString() || '',
-      state: row[GeneralFieldsEnum.LOCATION_STATE]?.toString() || '',
-      country: row[GeneralFieldsEnum.LOCATION_COUNTRY]?.toString() || '',
-      latitude: parseFloat(
-        row[GeneralFieldsEnum.LOCATION_LATITUDE]
-          ?.toString()
-          .replace(',', '.') || '0',
-      ),
-      longitude: parseFloat(
-        row[GeneralFieldsEnum.LOCATION_LONGITUDE]
-          ?.toString()
-          .replace(',', '.') || '0',
-      ),
-    }
-
-    const submittedAt = row[GeneralFieldsEnum.DATE]
-      ? parseDate(row[GeneralFieldsEnum.DATE].toString())
-      : new Date()
-
-    const startDate = row[GeneralFieldsEnum.START_DATE]
-      ? parseDate(row[GeneralFieldsEnum.START_DATE].toString())
-      : new Date()
-    const endDate = row[GeneralFieldsEnum.END_DATE]
-      ? parseDate(row[GeneralFieldsEnum.END_DATE].toString())
-      : new Date()
-
-    // Procesar datos del FormSubmission
-    const submissionData = {
-      submittedAt,
-      notes: row[GeneralFieldsEnum.NOTE]?.toString() ?? null,
-      tags:
-        row[GeneralFieldsEnum.TAGS]?.toString()?.split(',').filter(Boolean) ||
-        [],
-      email: row[GeneralFieldsEnum.EMAIL]?.toString() ?? null,
-      phone: row[GeneralFieldsEnum.PHONE]?.toString() ?? null,
-      mobilePhone: row[GeneralFieldsEnum.MOBILE]?.toString() ?? null,
-      status: row[GeneralFieldsEnum.STATUS]?.toString() ?? null,
-      registered:
-        row[GeneralFieldsEnum.REGISTERED]?.toString()?.toLowerCase() === 'true',
-      startDate,
-      endDate,
-      formLink: row[GeneralFieldsEnum.FORM_LINK]?.toString() ?? '',
-      legalName: row[GeneralFieldsEnum.LEGAL_NAME]?.toString() ?? null,
-      dashboardId,
-    }
-
-    const samplesDelivered = row[DataFieldsEnum.SAMPLES_DELIVERED]?.toString()
-      ? Number(row[DataFieldsEnum.SAMPLES_DELIVERED]?.toString())
-      : 0
-
-    const pointOfSale = row[DataFieldsEnum.POINT_OF_SALE]?.toString()
-
-    const productInPromotion =
-      row[DataFieldsEnum.PRODUCT_IN_PROMOTION]?.toString()?.toLowerCase() ===
-      'Yes'
-
-    const riskZone =
-      row[DataFieldsEnum.RISK_ZONE]?.toString()?.toLowerCase() === 'Yes'
-
-    const firstActivation =
-      Object.entries(row).find(([key]) => {
-        const { tags, searchType } =
-          DataFieldsTagsValues[DataFieldsEnum.FIRST_ACTIVATION]
-        switch (searchType) {
-          case DataFieldSearchType.OR:
-            return tags.some((tag) => key.includes(tag))
-          case DataFieldSearchType.AND:
-            return tags.every((tag) => key.includes(tag))
-        }
-      })?.[1] === 'Yes'
-
-    // Filtrar los campos que son preguntas
-    const questionAnswers = Object.fromEntries(
-      Object.entries(row).filter(
-        ([key]) =>
-          !Object.values(GeneralFieldsEnum).includes(key as GeneralFieldsEnum),
-      ),
+    const dealer = await DealerService.processDealer(row, tx)
+    // Process Representative
+    const representative = await RepresentativeService.processRepresentative(
+      row,
+      tx,
+    )
+    // Process Location
+    const location = await LocationService.processLocation(row, tx)
+    // Process Point of Sale
+    const pointOfSale = await PointOfSaleService.processRow(row, tx)
+    // Process product location
+    const productLocation = await ProductLocationService.processRow(
+      row,
+      questions,
+      tx,
     )
 
     return {
-      dealerData,
-      representativeData,
-      locationData,
-      submissionData,
-      questionAnswers,
-      samplesDelivered,
+      dealer,
+      representative,
+      location,
       pointOfSale,
-      productInPromotion,
-      riskZone,
-      firstActivation,
+      productLocation,
     }
   }
 }

@@ -14,7 +14,7 @@ export function ErrorItem({ error }: { error: RowTransactionErrorResult }) {
           </Badge>
         </div>
         <ul className="list-disc list-inside space-y-1 text-sm">
-          {error.errors.map((error, errorIndex) => (
+          {error.errors?.map((error, errorIndex) => (
             <li key={errorIndex}>
               <span className="font-medium">{error.column}:</span> {error.error}
             </li>

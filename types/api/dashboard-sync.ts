@@ -42,6 +42,8 @@ export interface AnswerValue {
 export interface ProcessAnswersResponse {
   answers: AnswerValue[]
   errors: ValidationError[]
+  questionAnswers: FormSubmissionEntryData
+  activeQuestions: Set<string>
 }
 
 export interface ValidationError {
@@ -76,15 +78,23 @@ export interface RowTransactionSkippedResult {
   submission: FormSubmission
 }
 
+export interface RowTransactionUpdatedResult {
+  status: SyncStatusEnum.UPDATED
+  rowIndex: number
+  submission: FormSubmission
+}
+
 export type RowTransactionResult =
   | RowTransactionSuccessResult
   | RowTransactionErrorResult
   | RowTransactionSkippedResult
+  | RowTransactionUpdatedResult
 
 export interface ValidationResult {
   validSubmissions: RowTransactionSuccessResult[]
   invalidSubmissions: RowTransactionErrorResult[]
   skippedSubmissions: RowTransactionSkippedResult[]
+  updatedSubmissions: RowTransactionUpdatedResult[]
 }
 
 export interface SyncResponseBodySuccess {

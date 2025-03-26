@@ -10,7 +10,7 @@ const prismaConfig = {
 
 // Configuración de transacciones
 const transactionConfig = {
-  timeout: 30_000, // 30 segundos
+  timeout: 40_000, // 40 segundos
   maxWait: 10_000, // 10 segundos
 }
 

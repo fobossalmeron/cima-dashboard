@@ -1,0 +1,5 @@
+export * from './brand.repository'
+export * from './consumption-moment.repository'
+export * from './photo-type.repository'
+export * from './purchase-intention.repository'
+export * from './sub-brand.repository'

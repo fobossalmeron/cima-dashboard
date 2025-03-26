@@ -1,12 +1,28 @@
-import { prisma } from '@/lib/prisma'
-import { CreateDealerParams } from '@/types/services/dealer.types'
-import { Prisma } from '@prisma/client'
+import { GeneralFieldsEnum } from '@/enums/general-fields'
+import { DealerRepository } from '@/lib/repositories'
+import { FormSubmissionEntryData } from '@/types/api'
+import { Dealer, Prisma } from '@prisma/client'
 
 export class DealerService {
-  static async create(data: CreateDealerParams, tx?: Prisma.TransactionClient) {
-    const client = tx ?? prisma
-    return client.dealer.create({
-      data,
-    })
+  /**
+   * Process Dealer from row submission
+   * @param {FormSubmissionEntryData} row - Row submission
+   * @param {Prisma.TransactionClient} tx - Transaction client
+   * @returns {Promise<Dealer>} Dealer
+   */
+  static async processDealer(
+    row: FormSubmissionEntryData,
+    tx?: Prisma.TransactionClient,
+  ): Promise<Dealer> {
+    const dealerData = {
+      name: row[GeneralFieldsEnum.DEALER_NAME]?.toString() || '',
+      nameOther: row[GeneralFieldsEnum.OTHER_DEALER_NAME]?.toString() || '',
+      sellerName: row[GeneralFieldsEnum.SELLER_NAME]?.toString() || '',
+      sellerMobile: row[GeneralFieldsEnum.MOBILE_SELLER]?.toString() || '',
+      sellerEmail: row[GeneralFieldsEnum.EMAIL_SELLER]?.toString() || '',
+      notes: row[GeneralFieldsEnum.NOTES_SELLER]?.toString() || '',
+    }
+
+    return await DealerRepository.create(dealerData, tx)
   }
 }

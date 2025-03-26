@@ -1,7 +1,6 @@
 export * from './activated-brand.service'
 export * from './answer.service'
 export * from './dashboard.service'
-export * from './location.service'
 export * from './product-sale.service'
 export * from './submission.service'
 export * from './sync'

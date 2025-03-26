@@ -14,6 +14,14 @@ export interface SamplingProcessingResult {
   promotorComments?: string
 }
 
+export interface SamplingData
+  extends Omit<
+    SamplingProcessingResult,
+    'purchaseIntentions' | 'consumptionMoments'
+  > {
+  submissionId: string
+}
+
 export type DataFieldTags = {
   [DataFieldsEnum.FIRST_ACTIVATION]: {
     tags: string[]

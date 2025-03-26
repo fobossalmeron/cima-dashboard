@@ -1,21 +1,56 @@
-import { Prisma } from '@prisma/client'
 import {
   AnswerValue,
+  FormSubmissionEntryData,
   ProcessAnswersResponse,
   QuestionWithRelations,
   ValidationError,
 } from '@/types/api'
 import { QuestionSyncService } from './question.service'
+import { GeneralFieldsEnum } from '@/enums/general-fields'
+import { Prisma } from '@prisma/client'
+import { AnswerRepository } from '@/lib/repositories'
+import { AnswerWithOptions } from '@/types/services'
 
 export class AnswerSyncService {
+  /**
+   * Filter question answers from current row
+   * @param {FormSubmissionEntryData} row - Current row
+   * @returns {FormSubmissionEntryData} Question answers
+   */
+  static filterQuestionAnswers(
+    row: FormSubmissionEntryData,
+  ): FormSubmissionEntryData {
+    return Object.fromEntries(
+      Object.entries(row).filter(
+        ([key]) =>
+          !Object.values(GeneralFieldsEnum).includes(key as GeneralFieldsEnum),
+      ),
+    )
+  }
+
+  /**
+   * Process answers
+   * @param {FormSubmissionEntryData} row - Current row
+   * @param {Record<string, string | number | null>} questionAnswers - Question answers
+   * @param {Map<string, QuestionWithRelations>} questionMap - Question map
+   * @param {Set<string>} activeQuestions - Active questions
+   * @param {number} rowIndex - Row index
+   * @returns {ProcessAnswersResponse} Process answers response
+   */
   static processAnswers(
-    questionAnswers: Record<string, string | number | null>,
+    row: FormSubmissionEntryData,
+    questions: QuestionWithRelations[],
     questionMap: Map<string, QuestionWithRelations>,
-    activeQuestions: Set<string>,
     rowIndex: number,
   ): ProcessAnswersResponse {
     const errors: ValidationError[] = []
     const answers: AnswerValue[] = []
+
+    const questionAnswers = this.filterQuestionAnswers(row)
+    const activeQuestions = QuestionSyncService.getActiveQuestions(
+      row,
+      questions,
+    )
 
     Object.entries(questionAnswers).forEach(([key, value]) => {
       try {
@@ -45,45 +80,25 @@ export class AnswerSyncService {
       }
     })
 
-    return { answers, errors }
+    return { answers, errors, questionAnswers, activeQuestions }
   }
 
+  /**
+   * Create or update answers
+   * @param {string} submissionId - Submission ID
+   * @param {AnswerValue[]} answers - Answers
+   * @param {Prisma.TransactionClient} tx - Transaction client
+   * @returns {Promise<AnswerWithOptions[]>} Answers with options
+   */
   static async createAnswers(
-    tx: Prisma.TransactionClient,
     submissionId: string,
-    validAnswers: AnswerValue[],
-  ) {
-    try {
-      // Crear las respuestas en la base de datos
-      const answers = await tx.answer.createManyAndReturn({
-        data: validAnswers.map((answer) => ({
-          value: answer.value?.toString() ?? '',
-          questionId: answer.questionId,
-          optionId: answer.optionId,
-          submissionId,
-          questionKey: answer.questionKey,
-        })),
-      })
-
-      // Crear las relaciones de opciones múltiples
-      for (const answer of answers) {
-        const answerValue = validAnswers.find(
-          (va) => va.questionId === answer.questionId,
-        )
-        if (answerValue?.selectedOptionIds?.length) {
-          await tx.answerOption.createMany({
-            data: answerValue.selectedOptionIds.map((optionId) => ({
-              answerId: answer.id,
-              optionId,
-            })),
-          })
-        }
-      }
-
-      return answers
-    } catch (error) {
-      console.error('Answers creation failed:', error)
-      throw error
-    }
+    answers: AnswerValue[],
+    tx?: Prisma.TransactionClient,
+  ): Promise<AnswerWithOptions[]> {
+    return Promise.all(
+      answers.map((answer) =>
+        AnswerRepository.createOrUpdate(answer, submissionId, tx),
+      ),
+    )
   }
 }

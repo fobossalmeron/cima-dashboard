@@ -10,45 +10,50 @@ import {
   PurchaseIntention,
   SamplingTraffic,
 } from '@prisma/client'
-import {
-  SamplingAgeRangeService,
-  SamplingConsumptionMomentService,
-  SamplingEthnicityService,
-  SamplingGenderService,
-  SamplingPurchaseIntentionService,
-  SamplingTrafficService,
-} from '@/lib/services/form-templates/sampling'
 import { SamplingProcessingResult } from '@/types/services'
 import { prisma } from '@/lib/prisma'
 import { SamplingWithRelations } from '@/types/services/sampling.types'
+import {
+  SamplingTrafficRepository,
+  SamplingEthnicityRepository,
+  SamplingAgeRangeRepository,
+  SamplingGenderRepository,
+  SamplingPurchaseIntentionRepository,
+  SamplingConsumptionMomentRepository,
+  SamplingRepository,
+  PurchaseIntentionRepository,
+  ConsumptionMomentRepository,
+} from '@/lib/repositories'
 
 export class SamplingService {
   private static async processTraffic(
     value?: string,
   ): Promise<SamplingTraffic> {
     if (!value) throw new Error('Traffic value is required')
-    const traffic = await SamplingTrafficService.getBySlug(slugify(value))
+    const traffic = await SamplingTrafficRepository.getBySlug(slugify(value))
     if (!traffic) throw new Error(`Traffic not found for value: ${value}`)
     return traffic
   }
 
   private static async processEthnicity(value?: string): Promise<Ethnicity> {
     if (!value) throw new Error('Ethnicity value is required')
-    const ethnicity = await SamplingEthnicityService.getBySlug(slugify(value))
+    const ethnicity = await SamplingEthnicityRepository.getBySlug(
+      slugify(value),
+    )
     if (!ethnicity) throw new Error(`Ethnicity not found for value: ${value}`)
     return ethnicity
   }
 
   private static async processAgeRange(value?: string): Promise<AgeRange> {
     if (!value) throw new Error('Age range value is required')
-    const ageRange = await SamplingAgeRangeService.getBySlug(slugify(value))
+    const ageRange = await SamplingAgeRangeRepository.getBySlug(slugify(value))
     if (!ageRange) throw new Error(`Age range not found for value: ${value}`)
     return ageRange
   }
 
   private static async processGender(value?: string): Promise<Gender> {
     if (!value) throw new Error('Gender value is required')
-    const gender = await SamplingGenderService.getBySlug(slugify(value))
+    const gender = await SamplingGenderRepository.getBySlug(slugify(value))
     if (!gender) throw new Error(`Gender not found for value: ${value}`)
     return gender
   }
@@ -60,8 +65,9 @@ export class SamplingService {
     const values = value.split(' | ')
     const purchaseIntentions = await Promise.all(
       values.map(async (value) => {
-        const purchaseIntention =
-          await SamplingPurchaseIntentionService.getBySlug(slugify(value))
+        const purchaseIntention = await PurchaseIntentionRepository.getBySlug(
+          slugify(value),
+        )
         if (!purchaseIntention)
           throw new Error(`Purchase intention not found for value: ${value}`)
         return purchaseIntention
@@ -77,8 +83,9 @@ export class SamplingService {
     const values = value.split(' | ')
     const consumptionMoments = await Promise.all(
       values.map(async (value) => {
-        const consumptionMoment =
-          await SamplingConsumptionMomentService.getBySlug(slugify(value))
+        const consumptionMoment = await ConsumptionMomentRepository.getBySlug(
+          slugify(value),
+        )
         if (!consumptionMoment)
           throw new Error(`Consumption moment not found for value: ${value}`)
         return consumptionMoment
@@ -139,7 +146,7 @@ export class SamplingService {
     }
   }
 
-  static async create(
+  static async createOrUpdate(
     row: FormSubmissionEntryData,
     submissionId: string,
     tx?: Prisma.TransactionClient,
@@ -151,23 +158,33 @@ export class SamplingService {
       ...rest,
       submissionId,
     }
-    const sampling = await client.sampling.create({ data })
-    await client.purchaseIntentionSampling.createMany({
-      data: purchaseIntentions.map((purchaseIntention) => ({
-        purchaseIntentionId: purchaseIntention.id,
-        samplingId: sampling.id,
-      })),
-    })
-    await client.consumptionMomentSampling.createMany({
-      data: consumptionMoments.map((consumptionMoment) => ({
-        consumptionMomentId: consumptionMoment.id,
-        samplingId: sampling.id,
-      })),
-    })
+    const sampling = await SamplingRepository.createOrUpdate(data, client)
+    const purchaseIntentionsWithRelations = await Promise.all(
+      purchaseIntentions.map((purchaseIntention) =>
+        SamplingPurchaseIntentionRepository.createOrUpdate(
+          {
+            purchaseIntentionId: purchaseIntention.id,
+            samplingId: sampling.id,
+          },
+          client,
+        ),
+      ),
+    )
+    const consumptionMomentsWithRelations = await Promise.all(
+      consumptionMoments.map((consumptionMoment) =>
+        SamplingConsumptionMomentRepository.createOrUpdate(
+          {
+            consumptionMomentId: consumptionMoment.id,
+            samplingId: sampling.id,
+          },
+          client,
+        ),
+      ),
+    )
     return {
       ...sampling,
-      purchaseIntentions,
-      consumptionMoments,
+      purchaseIntentions: purchaseIntentionsWithRelations,
+      consumptionMoments: consumptionMomentsWithRelations,
     }
   }
 }

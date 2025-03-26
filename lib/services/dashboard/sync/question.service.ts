@@ -1,44 +1,31 @@
-import { prisma } from '@/lib/prisma'
-import { QuestionWithRelations } from '@/types/api'
+import { FormSubmissionEntryData, QuestionWithRelations } from '@/types/api'
 import { QuestionType } from '@prisma/client'
 import { AnswerValue } from '@/types/api'
-
+import { AnswerSyncService } from './answer.service'
 export class QuestionSyncService {
-  static async getTemplateQuestions(
-    templateId: string,
-  ): Promise<QuestionWithRelations[]> {
-    return await prisma.question.findMany({
-      where: {
-        formTemplateId: templateId,
-      },
-      include: {
-        options: true,
-        questionGroup: true,
-        triggers: {
-          include: {
-            option: true,
-            group: true,
-          },
-        },
-      },
-    })
-  }
-
+  /**
+   * Get the active questions from the current row
+   * @param {FormSubmissionEntryData} row - The current row of the form submission
+   * @param {QuestionWithRelations[]} questions - The questions to process
+   * @returns {Set<string>} A set of active question IDs
+   */
   static getActiveQuestions(
-    answers: Record<string, string | number | null>,
+    row: FormSubmissionEntryData,
     questions: QuestionWithRelations[],
   ): Set<string> {
     const activeQuestions = new Set<string>()
     const activeGroups = new Set<string>()
     const processedQuestions = new Set<string>()
+    // Filter question answers from current row
+    const questionAnswers = AnswerSyncService.filterQuestionAnswers(row)
 
-    // Procesar todas las respuestas iniciales
-    Object.entries(answers).forEach(([questionName, answer]) => {
+    // Process all initial answers
+    Object.entries(questionAnswers).forEach(([questionName, answer]) => {
       this.activateQuestionsRecursively({
         questionName,
         answer,
         questions,
-        answers,
+        answers: questionAnswers,
         activeQuestions,
         activeGroups,
         processedQuestions,
@@ -48,6 +35,17 @@ export class QuestionSyncService {
     return activeQuestions
   }
 
+  /**
+   * Activate questions recursively based on the answer
+   * @param {Object} params - The parameters for the recursive activation
+   * @param {string} params.questionName - The name of the question
+   * @param {string | number | null} params.answer - The answer to the question
+   * @param {QuestionWithRelations[]} params.questions - The questions to process
+   * @param {Record<string, string | number | null>} params.answers - The answers to the questions
+   * @param {Set<string>} params.activeQuestions - The active questions
+   * @param {Set<string>} params.activeGroups - The active groups
+   * @param {Set<string>} params.processedQuestions - The processed questions
+   */
   private static activateQuestionsRecursively({
     questionName,
     answer,
@@ -69,8 +67,12 @@ export class QuestionSyncService {
     if (processedQuestions.has(questionName)) return
     processedQuestions.add(questionName)
 
-    const question = questions.find((q) => q.name === questionName)
-    if (!question) return
+    const question = questions.find(
+      (q) => q.name.trim() === questionName.trim(),
+    )
+    if (!question) {
+      return
+    }
 
     // Activar la pregunta actual solo si tiene una respuesta válida
     if (answer !== null && answer !== undefined) {
@@ -84,8 +86,13 @@ export class QuestionSyncService {
     question.triggers.forEach((trigger) => {
       if (!trigger.group || !trigger.option) return
 
-      const isTriggered =
-        answer.toString().toLowerCase() === trigger.option.value.toLowerCase()
+      const answerValues = answer.toString().split(' | ')
+
+      const isTriggered = answerValues.some(
+        (value) =>
+          value.toString().toLowerCase() ===
+          trigger.option?.value.toLowerCase(),
+      )
 
       if (!isTriggered) return
 
@@ -119,6 +126,12 @@ export class QuestionSyncService {
     })
   }
 
+  /**
+   * Process the value of a question
+   * @param {QuestionWithRelations} question - The question to process
+   * @param {string | number | null} value - The value to process
+   * @returns {AnswerValue} The processed value
+   */
   static processQuestionValue(
     question: QuestionWithRelations,
     value: string | number | null,
@@ -222,6 +235,11 @@ export class QuestionSyncService {
     }
   }
 
+  /**
+   * Parse the value of a checkbox question
+   * @param {string | number | null} value - The value to parse
+   * @returns {boolean} The parsed value
+   */
   private static parseCheckboxValue(value: string | number | null): boolean {
     return value === 'Yes'
   }

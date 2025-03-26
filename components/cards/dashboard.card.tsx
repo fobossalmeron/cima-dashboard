@@ -32,7 +32,7 @@ export function DashboardCard({
 }: DashboardCardProps) {
   const syncButtonText = () => {
     if (isSyncing) {
-      return 'Sincronizando...'
+      return 'Re-sincronizando...'
     }
     if (isCleaning) {
       return 'Limpiando...'
@@ -40,7 +40,7 @@ export function DashboardCard({
     if (isDeleting) {
       return 'Eliminando...'
     }
-    return 'Sincronizar'
+    return 'Resync'
   }
 
   const syncButtonVariant = () => {

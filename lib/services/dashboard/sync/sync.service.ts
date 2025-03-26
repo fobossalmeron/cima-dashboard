@@ -5,12 +5,13 @@ import {
   RowTransactionResult,
   RowTransactionSkippedResult,
   RowTransactionSuccessResult,
+  RowTransactionUpdatedResult,
   ValidationResult,
 } from '@/types/api'
 import { SyncStatus as SyncStatusEnum } from '@/enums/dashboard-sync'
 import { DashboardService } from '@/lib/services'
 import { SubmissionSyncService } from './submission.service'
-import { QuestionSyncService } from './question.service'
+import { QuestionRepository } from '@/lib/repositories'
 
 export class DashboardSyncService {
   static async sync(
@@ -23,7 +24,7 @@ export class DashboardSyncService {
     }
 
     // Obtener todas las preguntas del template con sus relaciones
-    const questions = await QuestionSyncService.getTemplateQuestions(
+    const questions = await QuestionRepository.getTemplateQuestions(
       dashboard.templateId,
     )
 
@@ -35,6 +36,7 @@ export class DashboardSyncService {
     const validSubmissions: RowTransactionSuccessResult[] = []
     const invalidSubmissions: RowTransactionErrorResult[] = []
     const skippedSubmissions: RowTransactionSkippedResult[] = []
+    const updatedSubmissions: RowTransactionUpdatedResult[] = []
 
     // Procesar cada fila del CSV
     const rowsPromises = formData.map((row, rowIndex) =>
@@ -54,6 +56,8 @@ export class DashboardSyncService {
             validSubmissions.push(result)
           } else if (result.status === SyncStatusEnum.SKIPPED) {
             skippedSubmissions.push(result)
+          } else if (result.status === SyncStatusEnum.UPDATED) {
+            updatedSubmissions.push(result)
           } else {
             invalidSubmissions.push(result)
           }
@@ -67,6 +71,7 @@ export class DashboardSyncService {
       validSubmissions,
       invalidSubmissions,
       skippedSubmissions,
+      updatedSubmissions,
     }
   }
 }

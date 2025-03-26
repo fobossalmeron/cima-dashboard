@@ -1,29 +1,10 @@
-import { prisma } from '@/lib/prisma'
-import { CreateOrUpdateSamplingData } from '@/types/services/sampling.types'
 import { Prisma } from '@prisma/client'
 import { FormTemplateWithQuestionsAndOptions } from '../form-template.service'
 import { SamplingFieldsEnum } from '@/enums/sampling-fields'
 import { QuestionWithOptions } from '@/types/api'
 import { slugify } from '@/lib/utils'
-
+import { SamplingAgeRangeRepository } from '@/lib/repositories'
 export class SamplingAgeRangeService {
-  static async getBySlug(slug: string) {
-    return await prisma.ageRange.findUnique({ where: { slug } })
-  }
-
-  static async createOrUpdate(
-    data: CreateOrUpdateSamplingData,
-    tx?: Prisma.TransactionClient,
-  ) {
-    const client = tx ?? prisma
-
-    return await client.ageRange.upsert({
-      where: { slug: data.slug },
-      update: { description: data.description },
-      create: { slug: data.slug, description: data.description },
-    })
-  }
-
   static async processOptions(
     template: FormTemplateWithQuestionsAndOptions,
     tx: Prisma.TransactionClient,
@@ -39,7 +20,7 @@ export class SamplingAgeRangeService {
     const options = ageRangeQuestion.options
 
     for (const option of options) {
-      await SamplingAgeRangeService.createOrUpdate(
+      await SamplingAgeRangeRepository.createOrUpdate(
         {
           slug: slugify(option.value.toLowerCase()),
           description: option.value,

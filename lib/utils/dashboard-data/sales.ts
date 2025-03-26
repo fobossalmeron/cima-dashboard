@@ -12,7 +12,11 @@ export function salesBySubBrand(
   const subBrands = dashboard.submissions.reduce(
     (acc: { [key: string]: { quantity: number } }, submission) => {
       submission.productSales.forEach((sale) => {
-        const subBrandName = `${sale.product.brand.name} ${sale.product.subBrand?.name}`
+        const subBrandFiltered = sale.product.subBrand?.name.replace(
+          'Not specified',
+          '',
+        )
+        const subBrandName = `${sale.product.brand.name} ${subBrandFiltered}`
         if (!acc[subBrandName]) {
           acc[subBrandName] = { quantity: 0 }
         }

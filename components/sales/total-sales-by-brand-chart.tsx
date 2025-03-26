@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   BarChart,
   Bar,
@@ -10,8 +10,8 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-} from "recharts";
-import { TotalSalesByBrandData } from "@/components/sales/sales.types";
+} from 'recharts'
+import { TotalSalesByBrandData } from '@/components/sales/sales.types'
 
 /**
  * Componente que muestra un gráfico de barras con el total de ventas por marca.
@@ -22,20 +22,20 @@ import { TotalSalesByBrandData } from "@/components/sales/sales.types";
  */
 
 const chartColors = [
-  "#FF6B6B",
-  "#4ECDC4",
-  "#45B7D1",
-  "#96CEB4",
-  "#FFEEAD",
-  "#D4A5A5",
-  "#9B786F",
-  "#6C88C4",
-  "#FFB6B9",
-  "#8785A2",
-];
+  '#FF6B6B',
+  '#4ECDC4',
+  '#45B7D1',
+  '#96CEB4',
+  '#FFEEAD',
+  '#D4A5A5',
+  '#9B786F',
+  '#6C88C4',
+  '#FFB6B9',
+  '#8785A2',
+]
 
 export function TotalSalesByBrand({ data }: { data: TotalSalesByBrandData[] }) {
-  const sortedData = [...data].sort((a, b) => b.quantity - a.quantity);
+  const sortedData = [...data].sort((a, b) => b.quantity - a.quantity)
 
   return (
     <Card>
@@ -66,5 +66,5 @@ export function TotalSalesByBrand({ data }: { data: TotalSalesByBrandData[] }) {
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  );
+  )
 }

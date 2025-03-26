@@ -1,0 +1,7 @@
+export * from './age-range.repository'
+export * from './consumption-moment.repository'
+export * from './ethnicity.repository'
+export * from './gender.repository'
+export * from './purchase-intention.repository'
+export * from './traffic.repository'
+export * from './sampling.repository'

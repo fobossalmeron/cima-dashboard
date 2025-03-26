@@ -207,6 +207,7 @@ export class RepslyAuthService {
     const tokenData = await RepslyAuthService.getToken()
 
     if (RepslyAuthService.isTokenExpiringSoon(tokenData)) {
+      console.log('Token expirando pronto, actualizando...')
       await RepslyAuthService.refreshToken()
     }
 

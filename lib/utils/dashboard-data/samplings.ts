@@ -114,23 +114,28 @@ export function getHeatmapData(
       .map(() => []),
   }
   dashboard.submissions.forEach((submission) => {
+    console.log('--------------------------------')
+    console.log('Submission', submission.id)
     const startDate = new Date(submission.startDate)
     const day = startDate.toLocaleString('es-MX', {
       weekday: 'long',
     })
     const dayCapitalized = day.charAt(0).toUpperCase() + day.slice(1)
+    console.log('Day capitalized', dayCapitalized)
     const dayKey = dayCapitalized as keyof HeatmapDataStructure
     let startHour = startDate.getHours()
     const endHour = startHour + 4
     const velocity = submission.totalQuantity / 4
-
     do {
       if (heatmapData[dayKey]) {
+        console.log(`Day: ${dayKey}, hour: ${startHour}, velocity: ${velocity}`)
         heatmapData[dayKey][startHour].push(velocity)
       }
       startHour++
     } while (startHour < endHour && startHour < 24)
   })
+
+  console.log('heatmapData', heatmapData)
 
   // Calcular el promedio de velocities por hora
   const averageHeatmapData: HeatmapDataStructure = {

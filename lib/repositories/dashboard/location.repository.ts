@@ -1,7 +1,8 @@
+import { Location } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 
-export class LocationService {
+export class LocationRepository {
   static async getAll(tx?: Prisma.TransactionClient) {
     const client = tx ?? prisma
     return await client.location.findMany()
@@ -30,6 +31,19 @@ export class LocationService {
       distinct: ['city'],
     })
     return locations.map((location) => location.city)
+  }
+
+  static async createOrUpdate(
+    location: Omit<Location, 'createdAt' | 'updatedAt'>,
+    tx?: Prisma.TransactionClient,
+  ): Promise<Location> {
+    const client = tx ?? prisma
+    const { id, ...locationDataWithoutId } = location
+    return client.location.upsert({
+      where: { id },
+      update: locationDataWithoutId,
+      create: location,
+    })
   }
 
   static async create(

@@ -29,13 +29,18 @@ export default function Sales() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-6">
           {Object.entries(groupedProducts).flatMap(([brand, subBrands]) =>
-            Object.entries(subBrands).map(([subBrand, products]) => (
-              <ProductSalesTable
-                key={`${brand}-${subBrand}`}
-                title={`${brand} ${subBrand}`}
-                data={products}
-              />
-            )),
+            Object.entries(subBrands).map(([subBrand, products]) => {
+              const subBrandName = subBrand.includes('Not specified')
+                ? subBrand.replace('Not specified', '').trim()
+                : ` ${subBrand}`
+              return (
+                <ProductSalesTable
+                  key={`${brand}-${subBrand}`}
+                  title={`${brand}${subBrandName}`}
+                  data={products}
+                />
+              )
+            }),
           )}
         </div>
       </Content>

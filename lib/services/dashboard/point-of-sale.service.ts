@@ -1,47 +1,20 @@
-import { prisma } from '@/lib/prisma'
-import { CreatePointOfSaleParams } from '@/types/services'
-import { Prisma } from '@prisma/client'
+import { PointOfSale, Prisma } from '@prisma/client'
+import { PointOfSaleRepository } from '@/lib/repositories'
+import { FormSubmissionEntryData } from '@/types/api'
+import { DataFieldsEnum } from '@/enums/data-fields'
 
 export class PointOfSaleService {
-  static async getAll(tx?: Prisma.TransactionClient) {
-    const client = tx ?? prisma
-    return await client.pointOfSale.findMany()
-  }
-
-  static async getById(id: string, tx?: Prisma.TransactionClient) {
-    const client = tx ?? prisma
-    return await client.pointOfSale.findUnique({
-      where: { id },
-    })
-  }
-
-  static async getBySlug(slug: string, tx?: Prisma.TransactionClient) {
-    const client = tx ?? prisma
-    return await client.pointOfSale.findUnique({
-      where: { slug },
-    })
-  }
-
-  static async create(
-    data: CreatePointOfSaleParams,
+  static async processRow(
+    row: FormSubmissionEntryData,
     tx?: Prisma.TransactionClient,
-  ) {
-    const client = tx ?? prisma
-    return await client.pointOfSale.create({
-      data,
-    })
-  }
+  ): Promise<PointOfSale | null> {
+    const pointOfSale = row[DataFieldsEnum.POINT_OF_SALE]?.toString()
 
-  static async createOrUpdate(
-    data: CreatePointOfSaleParams,
-    tx?: Prisma.TransactionClient,
-  ) {
-    const { name, slug } = data
-    const client = tx ?? prisma
-    return client.pointOfSale.upsert({
-      where: { slug },
-      update: { name },
-      create: data,
-    })
+    if (!pointOfSale) return null
+
+    return await PointOfSaleRepository.createOrUpdate(
+      { name: pointOfSale, slug: pointOfSale.toLowerCase() },
+      tx,
+    )
   }
 }
