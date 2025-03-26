@@ -48,7 +48,9 @@ export function ProductSalesTable({
                       height={22}
                       className="object-cover"
                     />
-                    {`${item.product.flavor?.name} ${item.product.presentation?.name}`}
+                    {`${item.product.flavor?.name
+                      .replace('Not specified', '')
+                      .trim()} ${item.product.presentation?.name}`}
                   </TableCell>
                   <TableCell className="text-end">
                     {numberFormatter.format(item.quantity)}
