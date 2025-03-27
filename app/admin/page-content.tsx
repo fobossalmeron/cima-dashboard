@@ -69,7 +69,10 @@ export default function AdminPageContent() {
 
       const result = (await response.json()) as FormTemplateResponse
       if (result.status === ApiStatus.SUCCESS) {
-        toast.success('Dashboard creado exitosamente')
+        toast.success('Dashboard creado exitosamente', {
+          description: 'Sincronizando dashboard...',
+          duration: 5000,
+        })
         loadDashboards()
         await handleSyncDashboard(result.data.dashboard.id)
         setIsDialogOpen(false)

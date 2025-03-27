@@ -26,7 +26,7 @@ export class RepslyAuthService {
     return tokenData
   }
 
-  private static isTokenExpiringSoon(tokenData: { expiresAt: Date | null }) {
+  static isTokenExpiringSoon(tokenData: { expiresAt: Date | null }) {
     if (tokenData.expiresAt === null) {
       throw new Error('No se encontró el tiempo de expiración del token')
     }
@@ -205,11 +205,6 @@ export class RepslyAuthService {
     options: RequestInit = {},
   ): Promise<T> {
     const tokenData = await RepslyAuthService.getToken()
-
-    if (RepslyAuthService.isTokenExpiringSoon(tokenData)) {
-      console.log('Token expirando pronto, actualizando...')
-      await RepslyAuthService.refreshToken()
-    }
 
     try {
       const response = await this.makeRequest(url, options, tokenData)
