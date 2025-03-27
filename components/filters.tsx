@@ -19,7 +19,12 @@ export function Filters({
   className?: string
   mobile?: boolean
 }) {
-  const { dashboardData, setDashboardData } = useClientContext()
+  const {
+    dashboardData,
+    setDashboardData,
+    filters: contextFilters,
+    setFilters: setContextFilters,
+  } = useClientContext()
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
   const [selectedCity, setSelectedCity] = useState<string | undefined>(
@@ -171,6 +176,27 @@ export function Filters({
     // Cuando cambien los filtros, activamos la carga del dashboard
     fetchDashboard()
   }, [fetchDashboard, filters])
+
+  useEffect(() => {
+    if (filters && setContextFilters) {
+      setContextFilters(filters)
+    }
+  }, [filters, setContextFilters])
+
+  useEffect(() => {
+    if (contextFilters) {
+      setSelectedBrands(contextFilters.brandIds)
+      setSelectedCity(contextFilters.city)
+      setSelectedLocation(contextFilters.locationId)
+      if (contextFilters.dateRange) {
+        setDateRange({
+          from: new Date(contextFilters.dateRange.startDate),
+          to: new Date(contextFilters.dateRange.endDate),
+        })
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>

@@ -39,51 +39,59 @@ function DatePicker({
   value?: DateRange
   onChange?: (range: DateRange) => void
 }) {
-  const today = new Date()
+  const today = React.useMemo(() => new Date(), [])
+  const [isOpen, setIsOpen] = React.useState(false)
+  const [isDebouncing, setIsDebouncing] = React.useState(false)
 
-  const presets: PresetRange[] = [
-    {
-      label: 'Últimos 7 días',
-      value: {
-        from: subDays(today, 7),
-        to: today,
+  const presets: PresetRange[] = React.useMemo(
+    () => [
+      {
+        label: 'Últimos 7 días',
+        value: {
+          from: subDays(today, 7),
+          to: today,
+        },
       },
-    },
-    {
-      label: 'Último mes',
-      value: {
-        from: subMonths(today, 1),
-        to: today,
+      {
+        label: 'Último mes',
+        value: {
+          from: subMonths(today, 1),
+          to: today,
+        },
       },
-    },
-    {
-      label: 'Últimos 3 meses',
-      value: {
-        from: subMonths(today, 3),
-        to: today,
+      {
+        label: 'Últimos 3 meses',
+        value: {
+          from: subMonths(today, 3),
+          to: today,
+        },
       },
-    },
-    {
-      label: 'Lo que va del año',
-      value: {
-        from: startOfYear(today),
-        to: today,
+      {
+        label: 'Lo que va del año',
+        value: {
+          from: startOfYear(today),
+          to: today,
+        },
       },
-    },
-  ]
+    ],
+    [today],
+  )
 
   const [selectedRange, setSelectedRange] = React.useState<DateRange>(
     value || presets[0].value,
   )
   const [month, setMonth] = React.useState<Date>(selectedRange.from)
 
-  const handleSelectPreset = (presetLabel: string) => {
-    const preset = presets.find((p) => p.label === presetLabel)
-    if (preset) {
-      setSelectedRange(preset.value)
-      onChange?.(preset.value)
-    }
-  }
+  const handleSelectPreset = React.useCallback(
+    (presetLabel: string) => {
+      const preset = presets.find((p) => p.label === presetLabel)
+      if (preset) {
+        setSelectedRange(preset.value)
+        onChange?.(preset.value)
+      }
+    },
+    [presets, onChange],
+  )
 
   React.useEffect(() => {
     if (value && value !== selectedRange) {
@@ -92,8 +100,48 @@ function DatePicker({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
 
+  const handleSelect = React.useCallback(
+    (range: import('react-day-picker').DateRange | undefined) => {
+      if (range?.from && range?.to) {
+        const currentFrom = new Date(selectedRange.from).setHours(0, 0, 0, 0)
+        const currentTo = new Date(selectedRange.to).setHours(0, 0, 0, 0)
+        const newFrom = new Date(range.from).setHours(0, 0, 0, 0)
+
+        if (currentFrom !== currentTo) {
+          // Si el rango actual tiene fechas diferentes, usar la fecha que seleccionó el usuario
+          // Si la fecha seleccionada es menor que el rango actual, usar range.from
+          // Si la fecha seleccionada es mayor que el rango actual, usar range.to
+          const selectedDate = newFrom < currentFrom ? range.from : range.to
+          const newRange = { from: selectedDate, to: selectedDate }
+          setSelectedRange(newRange)
+          onChange?.(newRange)
+        } else {
+          // Si el nuevo rango es del mismo día, permitir seleccionar un nuevo rango
+          const newRange = { from: range.from, to: range.to }
+          setSelectedRange(newRange)
+          onChange?.(newRange)
+        }
+      }
+    },
+    [selectedRange, onChange],
+  )
+
+  const handleOpenChange = React.useCallback(
+    (open: boolean) => {
+      if (isDebouncing) return
+
+      setIsDebouncing(true)
+      setIsOpen(open)
+
+      setTimeout(() => {
+        setIsDebouncing(false)
+      }, 300)
+    },
+    [isDebouncing],
+  )
+
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -114,7 +162,15 @@ function DatePicker({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-3" align="start">
+      <PopoverContent
+        className="w-auto p-3"
+        align="start"
+        sideOffset={5}
+        side="bottom"
+        style={{
+          position: 'absolute',
+        }}
+      >
         <div className="space-y-3">
           <Select onValueChange={handleSelectPreset}>
             <SelectTrigger>
@@ -133,41 +189,11 @@ function DatePicker({
             selected={selectedRange}
             month={month}
             onMonthChange={setMonth}
-            onSelect={(range) => {
-              if (range?.from && range?.to) {
-                const currentFrom = new Date(selectedRange.from).setHours(
-                  0,
-                  0,
-                  0,
-                  0,
-                )
-                const currentTo = new Date(selectedRange.to).setHours(
-                  0,
-                  0,
-                  0,
-                  0,
-                )
-                const newFrom = new Date(range.from).setHours(0, 0, 0, 0)
-
-                if (currentFrom !== currentTo) {
-                  // Si el rango actual tiene fechas diferentes, usar la fecha que seleccionó el usuario
-                  // Si la fecha seleccionada es menor que el rango actual, usar range.from
-                  // Si la fecha seleccionada es mayor que el rango actual, usar range.to
-                  const selectedDate =
-                    newFrom < currentFrom ? range.from : range.to
-                  const newRange = { from: selectedDate, to: selectedDate }
-                  setSelectedRange(newRange)
-                  onChange?.(newRange)
-                } else {
-                  // Si el nuevo rango es del mismo día, permitir seleccionar un nuevo rango
-                  const newRange = { from: range.from, to: range.to }
-                  setSelectedRange(newRange)
-                  onChange?.(newRange)
-                }
-              }
-            }}
+            onSelect={handleSelect}
             initialFocus
             locale={es}
+            numberOfMonths={1}
+            disabled={(date) => date > new Date()}
           />
         </div>
       </PopoverContent>

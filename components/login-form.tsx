@@ -2,7 +2,7 @@
 //#region React and external libraries
 // React and external libraries
 import type React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -31,6 +31,11 @@ export function LoginForm({
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -63,10 +68,19 @@ export function LoginForm({
         },
         onError: (ctx) => {
           setIsLoading(false)
-          setErrorMessage(ctx.error.error.message)
+          const errorMsg =
+            ctx.error?.error?.message ||
+            ctx.error?.message ||
+            'Error al iniciar sesión'
+
+          setErrorMessage(errorMsg)
         },
       },
     )
+  }
+
+  if (!mounted) {
+    return null
   }
 
   return (

@@ -3,11 +3,14 @@
 import { createContext, useContext, ReactNode, useState } from 'react'
 import { Client } from '@prisma/client'
 import { DashboardWithRelations } from '@/types/api/clients'
+import { DashboardFilters } from '@/types/services'
 
 interface ClientContextType {
   clientData: Client
   dashboardData: DashboardWithRelations | null
   setDashboardData: (data: DashboardWithRelations | null) => void
+  filters: DashboardFilters | undefined
+  setFilters: (filters: DashboardFilters | undefined) => void
 }
 
 const ClientContext = createContext<ClientContextType | undefined>(undefined)
@@ -23,6 +26,9 @@ export function ClientProvider({
 }) {
   const [dashboardData, setDashboardData] =
     useState<DashboardWithRelations | null>(initialDashboardData)
+  const [filters, setFilters] = useState<DashboardFilters | undefined>(
+    undefined,
+  )
 
   return (
     <ClientContext.Provider
@@ -30,6 +36,8 @@ export function ClientProvider({
         clientData,
         dashboardData,
         setDashboardData,
+        filters,
+        setFilters,
       }}
     >
       {children}
