@@ -8,6 +8,11 @@ export const PRESENTATION_PATTERNS = {
   TETRATOP: /TETRATOP\s+(\d+(?:\.\d+)?)\s*(ml|fl\s+oz)/i,
   ULTRAEDGE: /ULTRAEDGE\s+(\d+(?:\.\d+)?)\s*(ml|fl\s+oz)/i,
   HALF_GALLON: /HALF\s+GALLON/i,
+  GRAMS: /(\d+(?:\.\d+)?)\s*gr/i,
+  KILOGRAMS: /(\d+(?:\.\d+)?)\s*kg/i,
+  OUNCES: /(\d+(?:\.\d+)?)\s*oz/i,
+  PIECES: /(\d+(?:\.\d+)?)\s*pcs/i,
+  POUNDS: /(\d+(?:\.\d+)?)\s*lb/i,
 } as const
 
 // Función para formatear la presentación
@@ -32,6 +37,11 @@ export function formatPresentation(
     TETRATOP: (amount, unit) => `Tetratop ${amount} ${unit || 'ml'}`,
     ULTRAEDGE: (amount) => `Ultraedge ${amount}L`,
     HALF_GALLON: () => `Half gallon`,
+    GRAMS: (amount) => `${amount} gr`,
+    KILOGRAMS: (amount) => `${amount} kg`,
+    OUNCES: (amount) => `${amount} oz`,
+    PIECES: (amount) => `${amount} pcs`,
+    POUNDS: (amount) => `${amount} lb`,
   }
 
   return formats[container](amount, unit)
