@@ -2,17 +2,21 @@ import { NextResponse } from 'next/server'
 import { DashboardSyncService } from '@/lib/services/dashboard/sync/sync.service'
 import { Log } from '@/lib/utils/log'
 import { verifySignatureAppRouter } from '@upstash/qstash/nextjs'
+import { LocalQueueService } from '@/lib/services'
 
-async function handler(request: Request) {
+async function handler() {
   try {
-    const { jobId } = await request.json()
-    if (!jobId) {
-      return NextResponse.json({ error: 'Missing jobId' }, { status: 400 })
+    // Obtener el siguiente job pendiente
+    const job = await LocalQueueService.getNextJob()
+
+    if (!job) {
+      return NextResponse.json({ message: 'No pending jobs' })
     }
 
-    await DashboardSyncService.processJob(jobId)
+    // Procesar el job
+    await DashboardSyncService.processJob(job.id)
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, jobId: job.id })
   } catch (error) {
     Log.error('Error processing sync job', { error })
     return NextResponse.json(
