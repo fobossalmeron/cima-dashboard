@@ -325,7 +325,7 @@ model Representative {
 
 model Location {
   id              String           @id @default(cuid())
-  code            String           @unique
+  code            String
   name            String
   address         String
   postalCode      String           @map("postal_code")

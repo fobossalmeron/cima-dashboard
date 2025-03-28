@@ -14,9 +14,13 @@ export class LocationService {
     row: FormSubmissionEntryData,
     tx?: Prisma.TransactionClient,
   ) {
+    const latitude = row[GeneralFieldsEnum.LOCATION_LATITUDE]?.toString() || ''
+    const longitude =
+      row[GeneralFieldsEnum.LOCATION_LONGITUDE]?.toString() || ''
+    const code = latitude.replace(/,|-/g, '') + longitude.replace(/,|-/g, '')
     const locationData = {
-      id: row[GeneralFieldsEnum.LOCATION]?.toString() || '',
-      code: row[GeneralFieldsEnum.LOCATION]?.toString() || '',
+      id: code,
+      code,
       name: row[GeneralFieldsEnum.LOCATION_NAME]?.toString() || '',
       address: row[GeneralFieldsEnum.LOCATION_ADDRESS]?.toString() || '',
       postalCode: row[GeneralFieldsEnum.LOCATION_POSTAL_CODE]?.toString() || '',

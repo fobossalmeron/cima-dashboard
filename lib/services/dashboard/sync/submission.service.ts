@@ -102,7 +102,6 @@ export class SubmissionSyncService {
     )
 
     if (submissionExists) {
-      Log.info('Submission exists')
       return {
         submission: submissionExists,
         submissionStatus: SyncStatusEnum.UPDATED,
@@ -110,7 +109,6 @@ export class SubmissionSyncService {
     }
 
     const submission = await SubmissionRepository.create(submissionData, tx)
-    Log.info('Submission created')
 
     return {
       submission,
@@ -128,8 +126,6 @@ export class SubmissionSyncService {
     try {
       const result = await withTransaction(
         async (tx: Prisma.TransactionClient) => {
-          Log.info('--------------------------------')
-          Log.info('Processing row', { rowIndex })
           // Extract general fields from row
           const {
             dealer,
@@ -190,7 +186,6 @@ export class SubmissionSyncService {
             validAnswers,
             tx,
           )
-          Log.info('Answers created')
 
           // Process activated brands
           const brands = await BrandSyncService.processActivatedBrands(
@@ -199,7 +194,6 @@ export class SubmissionSyncService {
             questions,
             questionAnswers,
           )
-          Log.info('Brands created')
 
           // Process product sales
           const { productSales, totalQuantity, totalAmount } =
@@ -211,7 +205,6 @@ export class SubmissionSyncService {
               activeQuestions,
               brands,
             )
-          Log.info('Product sales created')
 
           // Update totals in the submission
           await tx.formSubmission.update({
@@ -221,7 +214,6 @@ export class SubmissionSyncService {
               totalAmount,
             },
           })
-          Log.info('Submission updated')
 
           return {
             status: submissionStatus,

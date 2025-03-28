@@ -9,14 +9,19 @@ import {
 import { Progress } from '@/components/ui/progress'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { AlertCircle, CheckCircle2, XCircle } from 'lucide-react'
+import { AlertCircle, CheckCircle2, XCircle, XCircleIcon } from 'lucide-react'
 
 interface SyncProgressProps {
   dashboardId: string
   onComplete?: () => void
+  onClose?: () => void
 }
 
-export function SyncProgress({ dashboardId, onComplete }: SyncProgressProps) {
+export function SyncProgress({
+  dashboardId,
+  onComplete,
+  onClose,
+}: SyncProgressProps) {
   const [batchProgress, setBatchProgress] =
     useState<PusherBatchProgress | null>(null)
   const [jobProgress, setJobProgress] = useState<SyncJobProgress | null>(null)
@@ -40,8 +45,14 @@ export function SyncProgress({ dashboardId, onComplete }: SyncProgressProps) {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="relative">
         <CardTitle>Progreso de Sincronización</CardTitle>
+        <div
+          className="absolute right-4 top-4 hover:cursor-pointer"
+          onClick={onClose}
+        >
+          <XCircleIcon className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200" />
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

@@ -8,13 +8,14 @@ import { SyncResults } from '../sync/sync-results'
 import { ValidationResult } from '@/types/api'
 import { toast } from 'sonner'
 import { StartSyncSuccessResponse } from '@/types/services'
+import { SyncStatus } from '@prisma/client'
 
 interface DashboardCardWrapperProps {
   dashboard: DashboardWithClientAndTemplate
   onClearDashboard: (dashboardId: string) => void
   onDeleteDashboard: (dashboardId: string) => void
-  isCleaning: boolean
-  isDeleting: boolean
+  cleaningDashboard: string | null
+  deletingDashboard: string | null
   debugMode: boolean
 }
 
@@ -22,13 +23,14 @@ export function DashboardCardWrapper({
   dashboard,
   onClearDashboard,
   onDeleteDashboard,
-  isCleaning,
-  isDeleting,
+  cleaningDashboard,
+  deletingDashboard,
   debugMode,
 }: DashboardCardWrapperProps) {
   const [isSyncing, setIsSyncing] = useState<boolean>(
     dashboard.SyncJob.length > 0,
   )
+  const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null)
   const [syncResults, setSyncResults] = useState<ValidationResult | null>(null)
 
   const handleSyncDashboard = async () => {
@@ -61,6 +63,16 @@ export function DashboardCardWrapper({
     }
   }
 
+  const handleSyncComplete = () => {
+    setIsSyncing(false)
+    setSyncStatus(SyncStatus.SUCCESS)
+  }
+
+  const handleSyncClose = () => {
+    setSyncStatus(null)
+    setIsSyncing(false)
+  }
+
   return (
     <div className="space-y-4">
       <DashboardCard
@@ -69,14 +81,15 @@ export function DashboardCardWrapper({
         onClearDashboard={onClearDashboard}
         onDeleteDashboard={onDeleteDashboard}
         isSyncing={isSyncing}
-        isCleaning={isCleaning}
-        isDeleting={isDeleting}
+        isCleaning={cleaningDashboard === dashboard.id}
+        isDeleting={deletingDashboard === dashboard.id}
         debugMode={debugMode}
       />
-      {isSyncing && (
+      {(isSyncing || syncStatus === SyncStatus.SUCCESS) && (
         <SyncProgress
           dashboardId={dashboard.id}
-          onComplete={() => setIsSyncing(false)}
+          onComplete={handleSyncComplete}
+          onClose={handleSyncClose}
         />
       )}
       {syncResults && (

@@ -24,8 +24,12 @@ export default function AdminPageContent() {
     useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
-  const [isCleaning, setIsCleaning] = useState<boolean>(false)
-  const [isDeleting, setIsDeleting] = useState<boolean>(false)
+  const [cleaningDashboard, setCleaningDashboard] = useState<string | null>(
+    null,
+  )
+  const [deletingDashboard, setDeletingDashboard] = useState<string | null>(
+    null,
+  )
 
   const loadDashboards = async () => {
     try {
@@ -83,7 +87,7 @@ export default function AdminPageContent() {
 
   const handleClearDashboard = async (dashboardId: string) => {
     try {
-      setIsCleaning(true)
+      setCleaningDashboard(dashboardId)
       const response = await fetch(`/api/dashboard/${dashboardId}/clear`, {
         method: 'POST',
       })
@@ -99,13 +103,13 @@ export default function AdminPageContent() {
       console.error('Error al limpiar el dashboard:', error)
       toast.error('Error al limpiar el dashboard')
     } finally {
-      setIsCleaning(false)
+      setCleaningDashboard(null)
     }
   }
 
   const handleDeleteDashboard = async (dashboardId: string) => {
     try {
-      setIsDeleting(true)
+      setDeletingDashboard(dashboardId)
       const response = await fetch(`/api/dashboard/${dashboardId}`, {
         method: 'DELETE',
       })
@@ -121,7 +125,7 @@ export default function AdminPageContent() {
       console.error('Error al eliminar el dashboard:', error)
       toast.error('Error al eliminar el dashboard')
     } finally {
-      setIsDeleting(false)
+      setDeletingDashboard(null)
     }
   }
 
@@ -156,8 +160,8 @@ export default function AdminPageContent() {
           dashboards={dashboards}
           onClearDashboard={handleClearDashboard}
           onDeleteDashboard={handleDeleteDashboard}
-          isCleaning={isCleaning}
-          isDeleting={isDeleting}
+          cleaningDashboard={cleaningDashboard}
+          deletingDashboard={deletingDashboard}
           debugMode={debugMode}
         />
       )}

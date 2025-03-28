@@ -15,13 +15,6 @@ export class LocationRepository {
     })
   }
 
-  static async getByCode(code: string, tx?: Prisma.TransactionClient) {
-    const client = tx ?? prisma
-    return await client.location.findUnique({
-      where: { code },
-    })
-  }
-
   static async getUniqueCities(tx?: Prisma.TransactionClient) {
     const client = tx ?? prisma
     const locations = await client.location.findMany({
@@ -38,10 +31,30 @@ export class LocationRepository {
     tx?: Prisma.TransactionClient,
   ): Promise<Location> {
     const client = tx ?? prisma
-    const { id, ...locationDataWithoutId } = location
+    const { id, latitude, longitude, ...locationDataWithoutId } = location
+    // Check if location exists by latitude and longitude
+    const locationExists = await client.location.findFirst({
+      where: { latitude, longitude },
+    })
+    if (locationExists && locationExists.id !== id) {
+      // Update location
+      return await client.location.update({
+        where: { id: locationExists.id },
+        data: {
+          ...locationDataWithoutId,
+          latitude: latitude,
+          longitude: longitude,
+        },
+      })
+    }
+    // Create or update location by ID
     return client.location.upsert({
       where: { id },
-      update: locationDataWithoutId,
+      update: {
+        ...locationDataWithoutId,
+        latitude: latitude || undefined,
+        longitude: longitude || undefined,
+      },
       create: location,
     })
   }
