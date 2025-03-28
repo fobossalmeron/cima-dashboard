@@ -1,8 +1,15 @@
-import { Client, Dashboard, FormTemplate, SyncLog } from '@prisma/client'
+import {
+  Client,
+  Dashboard,
+  FormTemplate,
+  SyncJob,
+  SyncLog,
+} from '@prisma/client'
 
 export type DashboardWithClientAndTemplate = Dashboard & {
   client: Client
   template: FormTemplate
+  SyncJob: SyncJob[]
 }
 
 export interface DashboardWithLogs extends Dashboard {

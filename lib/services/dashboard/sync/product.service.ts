@@ -2,6 +2,7 @@ import { Prisma, QuestionType } from '@prisma/client'
 import { BrandWithSubBrands, QuestionWithRelations } from '@/types/api'
 import { ProductTemplateProcessorService } from '@/lib/services'
 import { slugify } from '@/lib/utils'
+import { PresentationsEnum } from '@/enums/presentations'
 
 export class ProductSyncService {
   static async processProductSales(
@@ -38,8 +39,6 @@ export class ProductSyncService {
               brand.name,
             )
 
-          if (!presentationName) continue
-
           // Find the MULTISELECT question for units sold for this presentation
           const salesMultiselectQuestion = questions.find((q) => {
             const isActive = activeQuestions.has(q.id)
@@ -49,9 +48,9 @@ export class ProductSyncService {
             const includesUnitsSold = q.name
               .toUpperCase()
               .includes('UNIDADES VENDIDAS')
-            const includesPresentation = q.name
-              .toUpperCase()
-              .includes(presentationName.toUpperCase())
+            const includesPresentation = presentationName
+              ? q.name.toUpperCase().includes(presentationName.toUpperCase())
+              : true
             return (
               isActive &&
               isValidType &&
@@ -92,7 +91,9 @@ export class ProductSyncService {
 
               const whereParams = {
                 presentation: {
-                  slug: slugify(presentationName.toLowerCase()),
+                  slug: presentationName
+                    ? slugify(presentationName.toLowerCase())
+                    : slugify(PresentationsEnum.NOT_SPECIFIED.toLowerCase()),
                 },
                 brand: {
                   slug: brand.slug,
@@ -150,7 +151,9 @@ export class ProductSyncService {
 
             const whereParams = {
               presentation: {
-                slug: slugify(presentationName.toLowerCase()),
+                slug: presentationName
+                  ? slugify(presentationName.toLowerCase())
+                  : slugify(PresentationsEnum.NOT_SPECIFIED.toLowerCase()),
               },
               brand: {
                 slug: brand.slug,

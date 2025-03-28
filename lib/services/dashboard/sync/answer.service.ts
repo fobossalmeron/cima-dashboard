@@ -10,6 +10,7 @@ import { GeneralFieldsEnum } from '@/enums/general-fields'
 import { Prisma } from '@prisma/client'
 import { AnswerRepository } from '@/lib/repositories'
 import { AnswerWithOptions } from '@/types/services'
+import { FormFieldsIgnoreEnum } from '@/enums/form-fields'
 
 export class AnswerSyncService {
   /**
@@ -23,7 +24,12 @@ export class AnswerSyncService {
     return Object.fromEntries(
       Object.entries(row).filter(
         ([key]) =>
-          !Object.values(GeneralFieldsEnum).includes(key as GeneralFieldsEnum),
+          !Object.values(GeneralFieldsEnum).includes(
+            key as GeneralFieldsEnum,
+          ) &&
+          !Object.values(FormFieldsIgnoreEnum).includes(
+            key as FormFieldsIgnoreEnum,
+          ),
       ),
     )
   }

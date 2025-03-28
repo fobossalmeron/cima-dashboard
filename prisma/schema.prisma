@@ -96,6 +96,7 @@ model Dashboard {
   template    FormTemplate     @relation(fields: [templateId], references: [id], onDelete: Cascade)
   submissions FormSubmission[]
   syncLogs    SyncLog[]
+  SyncJob     SyncJob[]
 
   @@index([clientId])
   @@index([templateId])
@@ -324,7 +325,7 @@ model Representative {
 
 model Location {
   id              String           @id @default(cuid())
-  code            String           @unique
+  code            String
   name            String
   address         String
   postalCode      String           @map("postal_code")
@@ -656,6 +657,25 @@ model ServiceRefreshTokenLog {
   @@map("service_refresh_token_logs")
 }
 
+model SyncJob {
+  id          String        @id @default(cuid())
+  dashboardId String        @map("dashboard_id")
+  batchId     String        @map("batch_id")
+  rowIndex    Int           @map("row_index")
+  status      SyncJobStatus @default(PENDING)
+  result      Json?
+  error       String?
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  data        Json
+  dashboard   Dashboard     @relation(fields: [dashboardId], references: [id])
+
+  @@unique([batchId, rowIndex])
+  @@index([dashboardId])
+  @@index([status])
+  @@index([batchId])
+}
+
 enum Role {
   CLIENT
   SUPER_ADMIN
@@ -679,4 +699,11 @@ enum QuestionType {
 enum SyncStatus {
   SUCCESS
   ERROR
+}
+
+enum SyncJobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
 }

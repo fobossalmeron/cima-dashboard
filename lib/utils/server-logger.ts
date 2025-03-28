@@ -2,15 +2,11 @@ import winston from 'winston'
 import path from 'path'
 import fs from 'fs/promises'
 
-// Función para generar el nombre del archivo con timestamp
+// Función para generar el nombre del archivo con la fecha del día
 function getLogFileName(baseFileName: string): string {
   const now = new Date()
-  const timestamp = now
-    .toISOString()
-    .replace(/[:.]/g, '-') // Reemplazar : y . con -
-    .replace('T', '_') // Reemplazar T con _
-    .slice(0, -1) // Remover la Z del final
-  return path.join(process.cwd(), 'logs', `${baseFileName}-${timestamp}.log`)
+  const date = now.toISOString().split('T')[0] // Formato YYYY-MM-DD
+  return path.join(process.cwd(), 'logs', `${baseFileName}-${date}.log`)
 }
 
 // Configurar el formato de los logs
@@ -33,22 +29,22 @@ export const logger = winston.createLogger({
       filename: getLogFileName('error'),
       level: 'error',
     }),
-    // Escribir logs de sincronización
+    // Escribir logs de información
     new winston.transports.File({
-      filename: getLogFileName('sync'),
+      filename: getLogFileName('info'),
       level: 'info',
     }),
     // Escribir logs combinados
-    new winston.transports.File({
-      filename: getLogFileName('combined'),
-    }),
+    // new winston.transports.File({
+    //   filename: getLogFileName('combined'),
+    // }),
     // Mostrar logs en la consola en desarrollo
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple(),
-      ),
-    }),
+    // new winston.transports.Console({
+    //   format: winston.format.combine(
+    //     winston.format.colorize(),
+    //     winston.format.simple(),
+    //   ),
+    // }),
   ],
 })
 

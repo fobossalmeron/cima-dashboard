@@ -1,18 +1,16 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { DashboardsTable } from '@/components/tables'
 import { NewDashboardForm } from '@/types/dashboard'
 import { toast } from 'sonner'
 import { NewDashboardDialog } from '@/components/dialogs/dashboard'
 import {
   DashboardWithClientAndTemplate,
   FormTemplateResponse,
-  ValidationResult,
 } from '@/types/api'
-import { SyncResults } from '@/components/sync/sync-results'
 import { ApiStatus } from '@/enums/api-status'
 import { useSearchParams } from 'next/navigation'
+import { DashboardsTable } from '@/components/tables/dashboards.table'
 
 export default function AdminPageContent() {
   const searchParams = useSearchParams()
@@ -26,10 +24,12 @@ export default function AdminPageContent() {
     useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
-  const [syncResults, setSyncResults] = useState<ValidationResult | null>(null)
-  const [isSyncing, setIsSyncing] = useState<boolean>(false)
-  const [isCleaning, setIsCleaning] = useState<boolean>(false)
-  const [isDeleting, setIsDeleting] = useState<boolean>(false)
+  const [cleaningDashboard, setCleaningDashboard] = useState<string | null>(
+    null,
+  )
+  const [deletingDashboard, setDeletingDashboard] = useState<string | null>(
+    null,
+  )
 
   const loadDashboards = async () => {
     try {
@@ -55,7 +55,6 @@ export default function AdminPageContent() {
   const handleSubmit = async (data: NewDashboardForm) => {
     try {
       setCreateDashboardLoading(true)
-      // Create the dashboard, client and form template
       const response = await fetch(`/api/form-templates`, {
         method: 'POST',
         body: JSON.stringify(data),
@@ -74,7 +73,6 @@ export default function AdminPageContent() {
           duration: 5000,
         })
         loadDashboards()
-        await handleSyncDashboard(result.data.dashboard.id)
         setIsDialogOpen(false)
         setCreateDashboardLoading(false)
       } else {
@@ -87,39 +85,9 @@ export default function AdminPageContent() {
     }
   }
 
-  const handleSyncDashboard = async (dashboardId: string) => {
-    try {
-      setIsSyncing(true)
-      setSyncResults(null)
-
-      const response = await fetch(
-        `/api/dashboard/${dashboardId}/sync?force=true`,
-      )
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Error al sincronizar el dashboard')
-      }
-
-      const result = await response.json()
-      setSyncResults(result)
-      toast.success('Dashboard sincronizado exitosamente')
-      loadDashboards()
-    } catch (error) {
-      console.error('Error al sincronizar el dashboard:', error)
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Error al sincronizar el dashboard',
-      )
-    } finally {
-      setIsSyncing(false)
-    }
-  }
-
   const handleClearDashboard = async (dashboardId: string) => {
     try {
-      setIsCleaning(true)
+      setCleaningDashboard(dashboardId)
       const response = await fetch(`/api/dashboard/${dashboardId}/clear`, {
         method: 'POST',
       })
@@ -135,13 +103,13 @@ export default function AdminPageContent() {
       console.error('Error al limpiar el dashboard:', error)
       toast.error('Error al limpiar el dashboard')
     } finally {
-      setIsCleaning(false)
+      setCleaningDashboard(null)
     }
   }
 
   const handleDeleteDashboard = async (dashboardId: string) => {
     try {
-      setIsDeleting(true)
+      setDeletingDashboard(dashboardId)
       const response = await fetch(`/api/dashboard/${dashboardId}`, {
         method: 'DELETE',
       })
@@ -157,7 +125,7 @@ export default function AdminPageContent() {
       console.error('Error al eliminar el dashboard:', error)
       toast.error('Error al eliminar el dashboard')
     } finally {
-      setIsDeleting(false)
+      setDeletingDashboard(null)
     }
   }
 
@@ -188,24 +156,14 @@ export default function AdminPageContent() {
           {error}
         </div>
       ) : (
-        <>
-          <DashboardsTable
-            dashboards={dashboards}
-            onSyncDashboard={handleSyncDashboard}
-            onClearDashboard={handleClearDashboard}
-            isSyncing={isSyncing}
-            isCleaning={isCleaning}
-            isDeleting={isDeleting}
-            debugMode={debugMode}
-            onDeleteDashboard={handleDeleteDashboard}
-          />
-          {syncResults && (
-            <SyncResults
-              results={syncResults}
-              onClose={() => setSyncResults(null)}
-            />
-          )}
-        </>
+        <DashboardsTable
+          dashboards={dashboards}
+          onClearDashboard={handleClearDashboard}
+          onDeleteDashboard={handleDeleteDashboard}
+          cleaningDashboard={cleaningDashboard}
+          deletingDashboard={deletingDashboard}
+          debugMode={debugMode}
+        />
       )}
     </div>
   )

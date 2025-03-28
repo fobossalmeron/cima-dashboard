@@ -8,15 +8,17 @@ export class ActiveBrandRepository {
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx ?? prisma
-    return await client.activatedBrand.upsert({
+    const activeBrand = await client.activatedBrand.findUnique({
       where: {
         submissionId_brandId: {
           submissionId,
           brandId,
         },
       },
-      update: {},
-      create: {
+    })
+    if (activeBrand) return activeBrand
+    return await client.activatedBrand.create({
+      data: {
         submissionId,
         brandId,
       },

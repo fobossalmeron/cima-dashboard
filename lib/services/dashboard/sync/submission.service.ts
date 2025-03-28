@@ -22,6 +22,7 @@ import {
   ProcessSubmissionResult,
 } from '@/types/services'
 import { DataFieldSearchType, DataFieldsEnum } from '@/enums/data-fields'
+import { Log } from '@/lib/utils/log'
 
 export class SubmissionSyncService {
   private static async processSubmission(
@@ -123,7 +124,6 @@ export class SubmissionSyncService {
     questionMap: Map<string, QuestionWithRelations>,
   ): Promise<RowTransactionResult> {
     try {
-      console.log('Processing row', rowIndex)
       const result = await withTransaction(
         async (tx: Prisma.TransactionClient) => {
           // Extract general fields from row
@@ -232,6 +232,7 @@ export class SubmissionSyncService {
       return result as RowTransactionSuccessResult
     } catch (error) {
       if (error instanceof Error) {
+        Log.error('Error', { error })
         try {
           // Intentar parsear errores de validación
           const parsedError = JSON.parse(error.message)

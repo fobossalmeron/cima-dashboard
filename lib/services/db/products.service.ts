@@ -132,7 +132,8 @@ export class ProductsService {
     const parts = [brand]
     if (subBrand && subBrand !== SubBrandsEnum.NOT_SPECIFIED)
       parts.push(subBrand)
-    parts.push(presentation)
+    if (presentation && presentation !== PresentationsEnum.NOT_SPECIFIED)
+      parts.push(presentation)
     if (flavor && flavor !== PresentationsEnum.NOT_SPECIFIED) parts.push(flavor)
     return parts.join(' - ')
   }

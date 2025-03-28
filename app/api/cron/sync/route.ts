@@ -47,7 +47,10 @@ export async function GET(request: NextRequest) {
       } else {
         const successResponse = repslyResponse as SyncDashboardSuccessResponse
         try {
-          await DashboardSyncService.sync(dashboard.id, successResponse.data)
+          await DashboardSyncService.startSync(
+            dashboard.id,
+            successResponse.data,
+          )
           console.log('Dashboard synced successfully:', dashboard.client.name)
           await SyncLogService.create(dashboard.id, SyncStatus.SUCCESS)
         } catch (error) {

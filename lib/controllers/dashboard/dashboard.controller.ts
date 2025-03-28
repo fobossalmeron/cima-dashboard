@@ -9,13 +9,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { SyncDashboardSuccessResponse } from '@/types/api'
 import { ApiStatus } from '@/enums/api-status'
 import { DashboardFilters, DateRange } from '@/types/services/dashboard.types'
+import { StartSyncResponse } from '@/types/services'
 
 export class DashboardController {
   static async syncDashboard(
     request: NextRequest,
     params: { id: string },
     force?: boolean,
-  ) {
+  ): Promise<NextResponse<StartSyncResponse>> {
     try {
       const { id: dashboardId } = params
       const dashboard = await DashboardService.getById(dashboardId)
@@ -56,7 +57,7 @@ export class DashboardController {
       const successResponse = repslyResponse as SyncDashboardSuccessResponse
 
       // Sincronizar con la base de datos local
-      const result = await DashboardSyncService.sync(
+      const result = await DashboardSyncService.startSync(
         dashboardId,
         successResponse.data,
       )
