@@ -166,7 +166,7 @@ export class RepslyAuthService {
       ...options.headers,
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${url}`, {
       ...options,
       headers,
     })

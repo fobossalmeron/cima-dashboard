@@ -35,7 +35,7 @@ export class QueueService {
 
       // En producción, usar QStash
       const result = await qstash.publishJSON({
-        url: `${process.env.NEXT_PUBLIC_APP_URL}/api/sync/process`,
+        url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/sync/process`,
         body: message,
       })
       Log.info('Sync job published to QStash', { jobId: message.jobId })
