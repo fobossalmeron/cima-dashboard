@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { FormSubmissionEntryData } from '@/types/api'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -44,9 +45,36 @@ export function groupBy<T, K extends { key: string; items: T[] }>(
   }, {} as Record<string, K>)
 }
 
+/**
+ * Extrae el primer número de un texto que puede contener un rango (ej: "1-5" o "1")
+ * @param text - El texto a procesar
+ * @returns El primer número encontrado o null si no hay números
+ */
 export function extractNumber(text: string | number | null): number | null {
   if (!text) return null
   const textString = text.toString()
   const match = textString.match(/^(\d+)(?:\s*-\s*)?/)
   return match ? Number(match[1]) : null
+}
+
+/**
+ * Transforma los datos de un job a FormSubmissionEntryData
+ * @param data - Los datos del job
+ * @returns Los datos transformados en formato FormSubmissionEntryData
+ */
+export function transformJobData(
+  data: Record<string, unknown>,
+): FormSubmissionEntryData {
+  return Object.entries(data).reduce((acc, [key, value]) => {
+    // Ignorar campos especiales que no son respuestas
+    if (key === 'Código de localidad' || key === 'Enlace al formulario') {
+      return acc
+    }
+    // Asegurar que el valor sea string, number o null
+    acc[key] =
+      typeof value === 'string' || typeof value === 'number' || value === null
+        ? value
+        : value?.toString() || null
+    return acc
+  }, {} as FormSubmissionEntryData)
 }

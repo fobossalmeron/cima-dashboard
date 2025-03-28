@@ -84,11 +84,17 @@ export interface RowTransactionUpdatedResult {
   submission: FormSubmission
 }
 
+export interface RowTransactionPendingResult {
+  status: SyncStatusEnum.PENDING
+  rowIndex: number
+}
+
 export type RowTransactionResult =
   | RowTransactionSuccessResult
   | RowTransactionErrorResult
   | RowTransactionSkippedResult
   | RowTransactionUpdatedResult
+  | RowTransactionPendingResult
 
 export interface ValidationResult {
   validSubmissions: RowTransactionSuccessResult[]

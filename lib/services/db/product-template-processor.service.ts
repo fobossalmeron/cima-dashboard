@@ -142,7 +142,13 @@ export class ProductTemplateProcessorService {
         tx,
       )
     }
-    throw new Error(`Presentation not found for ${questionName}`)
+    return await PresentationService.createOrUpdate(
+      {
+        name: PresentationsEnum.NOT_SPECIFIED,
+        slug: slugify(PresentationsEnum.NOT_SPECIFIED.toLowerCase()),
+      },
+      tx,
+    )
   }
 
   private static async createFlavors(

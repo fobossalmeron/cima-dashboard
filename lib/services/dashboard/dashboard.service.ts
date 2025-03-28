@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { Dashboard, Prisma, SyncStatus } from '@prisma/client'
+import { Dashboard, Prisma, SyncJobStatus, SyncStatus } from '@prisma/client'
 import { DashboardWithClientAndTemplate, DashboardWithLogs } from '@/types/api'
 import { SubmissionService } from './submission.service'
 import { DashboardFilters } from '@/types/services/dashboard.types'
@@ -20,6 +20,17 @@ export class DashboardService {
           },
         },
         template: true,
+        SyncJob: {
+          where: {
+            status: {
+              in: [
+                SyncJobStatus.PENDING,
+                SyncJobStatus.PROCESSING,
+                SyncJobStatus.FAILED,
+              ],
+            },
+          },
+        },
       },
     })
   }
@@ -226,5 +237,21 @@ export class DashboardService {
     } catch (error) {
       console.error('Error clearing dashboard:', error)
     }
+  }
+
+  static async hasPendingSync(id: string): Promise<boolean> {
+    const syncLogs = await prisma.syncJob.findMany({
+      where: {
+        dashboardId: id,
+        status: {
+          in: [
+            SyncJobStatus.PENDING,
+            SyncJobStatus.PROCESSING,
+            SyncJobStatus.FAILED,
+          ],
+        },
+      },
+    })
+    return syncLogs.length > 0
   }
 }

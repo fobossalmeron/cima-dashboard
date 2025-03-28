@@ -3,4 +3,5 @@ export enum SyncStatus {
   ERROR = 'error',
   SKIPPED = 'skipped',
   UPDATED = 'updated',
+  PENDING = 'pending',
 }

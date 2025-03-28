@@ -1,13 +1,11 @@
 'use client'
 import { DashboardWithClientAndTemplate } from '@/types/api'
-import { DashboardCard } from '../cards/dashboard.card'
+import { DashboardCardWrapper } from '@/components/cards/dashboard-card-wrapper'
 
 interface DashboardsTableProps {
   dashboards: DashboardWithClientAndTemplate[]
-  onSyncDashboard: (dashboardId: string) => void
   onClearDashboard: (dashboardId: string) => void
   onDeleteDashboard: (dashboardId: string) => void
-  isSyncing: boolean
   isCleaning: boolean
   isDeleting: boolean
   debugMode: boolean
@@ -15,10 +13,8 @@ interface DashboardsTableProps {
 
 export function DashboardsTable({
   dashboards,
-  onSyncDashboard,
   onClearDashboard,
   onDeleteDashboard,
-  isSyncing,
   isCleaning,
   isDeleting,
   debugMode,
@@ -26,13 +22,11 @@ export function DashboardsTable({
   return (
     <div className="grid gap-4">
       {dashboards.map((dashboard) => (
-        <DashboardCard
+        <DashboardCardWrapper
           key={dashboard.id}
           dashboard={dashboard}
-          onSyncDashboard={onSyncDashboard}
           onClearDashboard={onClearDashboard}
           onDeleteDashboard={onDeleteDashboard}
-          isSyncing={isSyncing}
           isCleaning={isCleaning}
           isDeleting={isDeleting}
           debugMode={debugMode}

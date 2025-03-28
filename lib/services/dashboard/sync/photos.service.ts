@@ -6,6 +6,7 @@ import { PhotoRepository } from '@/lib/repositories/dashboard/photo.repository'
 import { FormSubmissionEntryData } from '@/types/api'
 import { CreatePhotoParams } from '@/types/services/photos.types'
 import { Photo, Prisma } from '@prisma/client'
+import { Log } from '@/lib/utils/log'
 
 export class PhotosService {
   static async createOrUpdate(
@@ -76,6 +77,8 @@ export class PhotosService {
         )
       }),
     )
+
+    Log.info('Photos created')
 
     return [productPhoto, promotorPhoto, ...clientsPhotos, ...otherPhotos]
   }
