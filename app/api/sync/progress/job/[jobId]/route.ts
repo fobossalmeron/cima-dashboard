@@ -1,13 +1,13 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { DashboardSyncService } from '@/lib/services/dashboard/sync/sync.service'
 import { Log } from '@/lib/utils/log'
 
 export async function GET(
-  request: Request,
-  { params }: { params: { jobId: string } },
+  request: NextRequest,
+  { params }: { params: Promise<{ jobId: string }> },
 ) {
   try {
-    const { jobId } = params
+    const { jobId } = await params
     if (!jobId) {
       return NextResponse.json({ error: 'Missing jobId' }, { status: 400 })
     }
