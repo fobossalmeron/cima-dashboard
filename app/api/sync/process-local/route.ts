@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server'
-import { DashboardSyncService } from '@/lib/services/dashboard/sync/sync.service'
-import { LocalQueueService } from '@/lib/services/queues/local-queue.service'
+import { DashboardSyncService, DatabaseQueueService } from '@/lib/services'
 import { Log } from '@/lib/utils/log'
 
 export async function GET() {
   try {
     // Obtener el siguiente job pendiente
-    const job = await LocalQueueService.getNextJob()
+    const job = await DatabaseQueueService.getNextJob()
 
     if (!job) {
       return NextResponse.json({ message: 'No pending jobs' })

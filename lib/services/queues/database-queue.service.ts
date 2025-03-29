@@ -3,7 +3,7 @@ import { QStashMessage } from '@/types/services/sync.types'
 import { prisma } from '@/lib/prisma'
 import { SyncJobStatus } from '@prisma/client'
 
-export class LocalQueueService {
+export class DatabaseQueueService {
   static async addToQueue(message: QStashMessage) {
     // Actualizar el job a PENDING
     await prisma.syncJob.update({
