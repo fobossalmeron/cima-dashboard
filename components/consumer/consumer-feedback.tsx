@@ -1,23 +1,22 @@
-"use client";
+'use client'
 
-import { useState } from "react";
+import { useState } from 'react'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
-import { ConsumerFeedbackData } from "./consumer.types";
+} from '@/components/ui/pagination'
+import { ConsumerFeedbackData } from './consumer.types'
 
 /**
  * Componente que muestra los comentarios de los consumidores con paginación.
@@ -27,14 +26,14 @@ import { ConsumerFeedbackData } from "./consumer.types";
  */
 
 export function ConsumerFeedback({ data }: { data: ConsumerFeedbackData[] }) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 5
+  const totalPages = Math.ceil(data.length / itemsPerPage)
 
   const currentFeedback = data.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+    currentPage * itemsPerPage,
+  )
 
   return (
     <Card>
@@ -43,7 +42,7 @@ export function ConsumerFeedback({ data }: { data: ConsumerFeedbackData[] }) {
         <CardDescription>Haz scroll para ver más.</CardDescription>
       </CardHeader>
       <CardContent className="pb-0">
-        <ScrollArea className="h-[250px] pr-4">
+        <ScrollArea className="h-auto pr-4">
           <div className="space-y-3">
             {currentFeedback.map((item, index) => (
               <div key={index} className="p-3 border rounded-lg">
@@ -63,39 +62,30 @@ export function ConsumerFeedback({ data }: { data: ConsumerFeedbackData[] }) {
               <PaginationPrevious
                 href="#"
                 onClick={(e) => {
-                  e.preventDefault();
-                  if (currentPage > 1) setCurrentPage((p) => p - 1);
+                  e.preventDefault()
+                  if (currentPage > 1) setCurrentPage((p) => p - 1)
                 }}
                 className={
-                  currentPage <= 1 ? "pointer-events-none opacity-50" : ""
+                  currentPage <= 1 ? 'pointer-events-none opacity-50' : ''
                 }
               />
             </PaginationItem>
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage(i + 1);
-                  }}
-                  isActive={currentPage === i + 1}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
+            <PaginationItem>
+              <span className="px-4 text-sm">
+                Página {currentPage} de {totalPages}
+              </span>
+            </PaginationItem>
             <PaginationItem>
               <PaginationNext
                 href="#"
                 onClick={(e) => {
-                  e.preventDefault();
-                  if (currentPage < totalPages) setCurrentPage((p) => p + 1);
+                  e.preventDefault()
+                  if (currentPage < totalPages) setCurrentPage((p) => p + 1)
                 }}
                 className={
                   currentPage >= totalPages
-                    ? "pointer-events-none opacity-50"
-                    : ""
+                    ? 'pointer-events-none opacity-50'
+                    : ''
                 }
               />
             </PaginationItem>
@@ -103,5 +93,5 @@ export function ConsumerFeedback({ data }: { data: ConsumerFeedbackData[] }) {
         </Pagination>
       </CardContent>
     </Card>
-  );
+  )
 }
