@@ -42,40 +42,52 @@ export class DashboardSyncService {
 
     const batchId = uuidv4()
 
-    // Crear jobs para cada fila
-    const jobs = await Promise.all(
-      formData.map(async (row, index) => {
-        const initialResult: JobResult = {
-          retryCount: 0,
+    const jobs = []
+
+    for (const [index, row] of formData.entries()) {
+      const initialResult: JobResult = {
+        retryCount: 0,
+        status: SyncJobStatus.PENDING,
+      }
+
+      const job = await prisma.syncJob.create({
+        data: {
+          dashboardId: id,
+          batchId,
+          rowIndex: index,
           status: SyncJobStatus.PENDING,
-        }
+          data: row,
+          result: initialResult as unknown as InputJsonValue,
+        },
+      })
 
-        return prisma.syncJob.create({
-          data: {
-            dashboardId: id,
-            batchId,
-            rowIndex: index,
-            status: SyncJobStatus.PENDING,
-            data: row,
-            result: initialResult as unknown as InputJsonValue,
-          },
-        })
-      }),
-    )
+      jobs.push(job)
+    }
 
-    // Publicar cada job en la cola
-    await Promise.all(
-      jobs.map((job) =>
-        QueueService.publishSyncJob({
+    for (const job of jobs) {
+      try {
+        // Publicar cada job en la cola
+        await QueueService.publishSyncJob({
           jobId: job.id,
           dashboardId: id,
           data: job.data as FormSubmissionEntryData,
-        }),
-      ),
-    )
+        })
+      } catch (error) {
+        Log.error('Error publishing job to QStash', { error })
+        return {
+          message: `Sincronizando ${jobs.length} activaciones de manera local`,
+          batchId,
+          totalJobs: jobs.length,
+        }
+      }
+    }
 
     Log.info('Sync batch started', { batchId, totalJobs: jobs.length })
-    return { batchId, totalJobs: jobs.length }
+    return {
+      message: `Sincronizando ${jobs.length} activaciones`,
+      batchId,
+      totalJobs: jobs.length,
+    }
   }
 
   static async processJob(jobId: string): Promise<void> {

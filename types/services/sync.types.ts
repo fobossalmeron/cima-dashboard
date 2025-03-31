@@ -9,6 +9,7 @@ import {
 } from '../api'
 
 export interface StartSyncSuccessResponse {
+  message: string
   batchId: string
   totalJobs: number
 }

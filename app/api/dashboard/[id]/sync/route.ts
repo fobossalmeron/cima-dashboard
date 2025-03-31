@@ -1,10 +1,11 @@
 import { DashboardController } from '@/lib/controllers/dashboard/dashboard.controller'
-import { NextRequest } from 'next/server'
+import { StartSyncResponse } from '@/types/services'
+import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
-) {
+): Promise<NextResponse<StartSyncResponse>> {
   const paramsObject = await params
   console.log('Force', request.nextUrl.searchParams.get('force'))
   const force = request.nextUrl.searchParams.get('force') === 'true'

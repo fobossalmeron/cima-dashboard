@@ -50,7 +50,7 @@ export function DashboardCardWrapper({
       const data = (await response.json()) as StartSyncSuccessResponse
 
       toast.success('Iniciando sincronización...', {
-        description: `Sincronizando ${data.totalJobs} submissions`,
+        description: data.message,
       })
     } catch (error) {
       console.error('Error al sincronizar el dashboard:', error)
