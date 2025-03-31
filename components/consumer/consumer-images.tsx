@@ -1,19 +1,18 @@
-"use client";
+'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { Download } from "lucide-react";
-import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import Image from 'next/image'
+import { Download } from 'lucide-react'
+import { useState } from 'react'
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
-import { ConsumerImagesData } from "./consumer.types";
+} from '@/components/ui/pagination'
+import { ConsumerImagesData } from './consumer.types'
 
 /**
  * Componente que muestra una galería de imágenes de consumidores y productos.
@@ -25,14 +24,14 @@ import { ConsumerImagesData } from "./consumer.types";
  */
 
 export function ConsumerImages({ data }: { data: ConsumerImagesData[] }) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2;
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 2
+  const totalPages = Math.ceil(data.length / itemsPerPage)
 
   const currentImages = data.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+    currentPage * itemsPerPage,
+  )
 
   return (
     <Card className="col-span-full">
@@ -46,7 +45,7 @@ export function ConsumerImages({ data }: { data: ConsumerImagesData[] }) {
               <div className="relative aspect-video group">
                 <Image
                   src={image.url}
-                  alt={image.locationName + " " + image.address}
+                  alt={image.locationName + ' ' + image.address}
                   fill
                   className="object-cover rounded-lg"
                 />
@@ -54,13 +53,13 @@ export function ConsumerImages({ data }: { data: ConsumerImagesData[] }) {
                   size="icon"
                   variant="secondary"
                   className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => window.open(image.url, "_blank")}
+                  onClick={() => window.open(image.url, '_blank')}
                 >
                   <Download className="h-4 w-4" />
                 </Button>
               </div>
               <p className="text-sm text-muted-foreground">
-                {image.locationName + " - " + image.address}
+                {image.locationName + ' - ' + image.address}
               </p>
             </div>
           ))}
@@ -72,39 +71,30 @@ export function ConsumerImages({ data }: { data: ConsumerImagesData[] }) {
               <PaginationPrevious
                 href="#"
                 onClick={(e) => {
-                  e.preventDefault();
-                  if (currentPage > 1) setCurrentPage((p) => p - 1);
+                  e.preventDefault()
+                  if (currentPage > 1) setCurrentPage((p) => p - 1)
                 }}
                 className={
-                  currentPage <= 1 ? "pointer-events-none opacity-50" : ""
+                  currentPage <= 1 ? 'pointer-events-none opacity-50' : ''
                 }
               />
             </PaginationItem>
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage(i + 1);
-                  }}
-                  isActive={currentPage === i + 1}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
+            <PaginationItem>
+              <span className="px-4 text-sm">
+                Página {currentPage} de {totalPages}
+              </span>
+            </PaginationItem>
             <PaginationItem>
               <PaginationNext
                 href="#"
                 onClick={(e) => {
-                  e.preventDefault();
-                  if (currentPage < totalPages) setCurrentPage((p) => p + 1);
+                  e.preventDefault()
+                  if (currentPage < totalPages) setCurrentPage((p) => p + 1)
                 }}
                 className={
                   currentPage >= totalPages
-                    ? "pointer-events-none opacity-50"
-                    : ""
+                    ? 'pointer-events-none opacity-50'
+                    : ''
                 }
               />
             </PaginationItem>
@@ -112,5 +102,5 @@ export function ConsumerImages({ data }: { data: ConsumerImagesData[] }) {
         </Pagination>
       </CardContent>
     </Card>
-  );
+  )
 }
