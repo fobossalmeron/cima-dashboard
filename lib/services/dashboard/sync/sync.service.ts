@@ -9,7 +9,7 @@ import {
   RowTransactionUpdatedResult,
 } from '@/types/api'
 import { SyncStatus as SyncStatusEnum } from '@/enums/dashboard-sync'
-import { DashboardService } from '@/lib/services'
+import { DashboardService, SlackService } from '@/lib/services'
 import { SubmissionSyncService } from './submission.service'
 import { QuestionRepository } from '@/lib/repositories'
 import { QueueService } from '@/lib/services'
@@ -81,6 +81,12 @@ export class DashboardSyncService {
         }
       }
     }
+
+    SlackService.sendCronJobNotification(
+      'Sync Job',
+      'success',
+      `Sync batch started: ${batchId} with ${jobs.length} jobs`,
+    )
 
     Log.info('Sync batch started', { batchId, totalJobs: jobs.length })
     return {
@@ -192,6 +198,7 @@ export class DashboardSyncService {
         try {
           const pusherObject: PusherBatchProgress = {
             batchId: batchProgress.batchId,
+            jobProcessedId: job.id,
             dashboardId: batchProgress.dashboardId,
             totalJobs: batchProgress.totalJobs,
             completedJobs: batchProgress.completedJobs,
@@ -200,6 +207,11 @@ export class DashboardSyncService {
             pendingJobs: batchProgress.pendingJobs,
           }
           SocketServer.emitBatchProgress(job.batchId, pusherObject)
+          SlackService.sendCronJobNotification(
+            'Sync Job',
+            'success',
+            `Batch progress:\n ${JSON.stringify(pusherObject)}`,
+          )
         } catch (error) {
           Log.error('Error emitting batch progress to Pusher', { error })
         }
@@ -283,6 +295,7 @@ export class DashboardSyncService {
       pendingSubmissions,
       batchId,
       dashboardId: jobs[0].dashboardId,
+      jobProcessedId: null,
     }
   }
 

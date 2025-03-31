@@ -69,6 +69,7 @@ export interface SyncJobResult extends JobResult {
 
 export interface PusherBatchProgress {
   batchId: string
+  jobProcessedId: string | null
   dashboardId: string
   totalJobs: number
   completedJobs: number

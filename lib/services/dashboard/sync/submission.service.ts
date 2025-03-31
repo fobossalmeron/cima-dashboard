@@ -14,7 +14,7 @@ import { ProductSyncService } from './product.service'
 import { SamplingService } from './sampling.service'
 import { PhotosService } from './photos.service'
 import { DatesFieldsEnum, GeneralFieldsEnum } from '@/enums/general-fields'
-import { parseDate } from '@/lib/utils/date'
+import { DateFormat, parseDate } from '@/lib/utils/date'
 import { SubmissionRepository } from '@/lib/repositories'
 import {
   DataFieldsTagsValues,
@@ -30,8 +30,8 @@ export class SubmissionSyncService {
   ): Promise<ProcessSubmissionResult> {
     const { row, data, tx } = params
 
-    const submittedAt = row[DatesFieldsEnum.ACTIVATION_DATE]
-      ? parseDate(row[DatesFieldsEnum.ACTIVATION_DATE].toString())
+    const submittedAt = row[DatesFieldsEnum.SUBMISSION_DATE]
+      ? parseDate(row[DatesFieldsEnum.SUBMISSION_DATE].toString())
       : new Date()
 
     const startDate = row[GeneralFieldsEnum.START_DATE]
@@ -41,6 +41,37 @@ export class SubmissionSyncService {
     const endDate = row[GeneralFieldsEnum.END_DATE]
       ? parseDate(row[GeneralFieldsEnum.END_DATE].toString())
       : new Date()
+
+    const activationDate = row[DatesFieldsEnum.ACTIVATION_DATE]
+      ? parseDate(
+          row[DatesFieldsEnum.ACTIVATION_DATE].toString(),
+          DateFormat.YYYY_MM_DD,
+        )
+      : new Date()
+
+    const activationHours = row[DatesFieldsEnum.ACTIVATION_HOURS]?.toString()
+      ? row[DatesFieldsEnum.ACTIVATION_HOURS].toString().split(' - ')
+      : []
+
+    const realStartDate = activationHours[0]
+      ? new Date(
+          activationDate.getFullYear(),
+          activationDate.getMonth(),
+          activationDate.getDate(),
+          Number(activationHours[0]?.split(':')[0]),
+          Number(activationHours[0]?.split(':')[1]),
+        )
+      : startDate
+
+    const realEndDate = activationHours[1]
+      ? new Date(
+          activationDate.getFullYear(),
+          activationDate.getMonth(),
+          activationDate.getDate(),
+          Number(activationHours[1]?.split(':')[0]),
+          Number(activationHours[1]?.split(':')[1]),
+        )
+      : endDate
 
     const samplesDelivered = row[DataFieldsEnum.SAMPLES_DELIVERED]?.toString()
       ? Number(row[DataFieldsEnum.SAMPLES_DELIVERED]?.toString())
@@ -78,8 +109,8 @@ export class SubmissionSyncService {
       status: row[GeneralFieldsEnum.STATUS]?.toString() ?? null,
       registered:
         row[GeneralFieldsEnum.REGISTERED]?.toString()?.toLowerCase() === 'true',
-      startDate,
-      endDate,
+      startDate: realStartDate,
+      endDate: realEndDate,
       formLink: row[GeneralFieldsEnum.FORM_LINK]?.toString() ?? '',
       legalName: row[GeneralFieldsEnum.LEGAL_NAME]?.toString() ?? null,
       productInPromotion,

@@ -1,6 +1,7 @@
 import { ApiStatus } from '@/enums/api-status'
 import { prisma } from '@/lib/prisma'
 import { ServiceToken } from '@prisma/client'
+import { SlackService } from '@/lib/services'
 
 interface TokenData {
   access_token: string
@@ -103,6 +104,9 @@ export class RepslyAuthService {
     if (!response.ok) {
       const error = await response.json()
       console.error('Error refreshing token:', error)
+      SlackService.sendMessage(
+        `Error al actualizar el token: ${error.error || 'Unknown error'}`,
+      )
       throw new Error(
         `Error al actualizar el token: ${error.error || 'Unknown error'}`,
       )
@@ -121,6 +125,10 @@ export class RepslyAuthService {
       refresh_token: data.refresh_token,
       id_token: data.id_token,
     }
+
+    SlackService.sendMessage(
+      `Token actualizado:\n ${JSON.stringify(orderedData)}`,
+    )
 
     return {
       status: ApiStatus.SUCCESS,

@@ -31,7 +31,9 @@ export enum GeneralFieldsEnum {
 }
 
 export enum DatesFieldsEnum {
-  ACTIVATION_DATE = 'Fecha de la Activación',
+  SUBMISSION_DATE = 'Fecha',
+  ACTIVATION_DATE = 'FECHA de la Activación',
   START_DATE = 'Inicio de la visita',
   END_DATE = 'Final de la visita',
+  ACTIVATION_HOURS = 'Hora de INICIO y de TERMINO',
 }
