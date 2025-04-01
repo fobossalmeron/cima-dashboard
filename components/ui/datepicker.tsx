@@ -114,7 +114,7 @@ function DatePicker({
           const selectedDate = newFrom < currentFrom ? range.from : range.to
           const newRange = {
             from: selectedDate,
-            to: new Date(selectedDate.setHours(23, 59, 59, 999)),
+            to: new Date(new Date(selectedDate).setHours(23, 59, 59, 999)),
           }
           setSelectedRange(newRange)
           onChange?.(newRange)
