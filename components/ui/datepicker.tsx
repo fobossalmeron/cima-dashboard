@@ -104,7 +104,7 @@ function DatePicker({
     (range: import('react-day-picker').DateRange | undefined) => {
       if (range?.from && range?.to) {
         const currentFrom = new Date(selectedRange.from).setHours(0, 0, 0, 0)
-        const currentTo = new Date(selectedRange.to).setHours(0, 0, 0, 0)
+        const currentTo = new Date(selectedRange.to).setHours(23, 59, 59, 999)
         const newFrom = new Date(range.from).setHours(0, 0, 0, 0)
 
         if (currentFrom !== currentTo) {
