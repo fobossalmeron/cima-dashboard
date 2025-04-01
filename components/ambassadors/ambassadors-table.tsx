@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import {
   Table,
@@ -7,16 +7,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table'
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
   CardDescription,
-} from "@/components/ui/card";
-import { ChevronDown } from "lucide-react";
-import { Ambassador } from "./ambassadors.types";
+} from '@/components/ui/card'
+import { ChevronDown } from 'lucide-react'
+import { Ambassador } from './ambassadors.types'
 
 /**
  * Componente que muestra una tabla de embajadoras con sus activaciones y ventas.
@@ -27,6 +27,8 @@ import { Ambassador } from "./ambassadors.types";
  * @property {number} activations - Número de activaciones
  * @property {number} totalSales - Total de ventas
  * @property {number} averageSales - Promedio de ventas
+ * @property {number} velocity - Velocidad de ventas
+ * @property {number} conversionRate - Tasa de conversión
  */
 
 export function AmbassadorsTable({ data }: { data: Ambassador[] }) {
@@ -43,15 +45,19 @@ export function AmbassadorsTable({ data }: { data: Ambassador[] }) {
           <Table>
             <TableHeader className="sticky top-0 bg-white z-10">
               <TableRow>
-                <TableHead className="w-[35%]">Promotora</TableHead>
-                <TableHead className="w-[20%] text-center">
+                <TableHead className="w-[25%]">Promotora</TableHead>
+                <TableHead className="w-[15%] text-center">
                   Activaciones
                 </TableHead>
-                <TableHead className="w-[20%] text-center">
+                <TableHead className="w-[15%] text-center">
                   Ventas totales
                 </TableHead>
-                <TableHead className="w-[25%] text-center">
+                <TableHead className="w-[15%] text-center">
                   Promedio de ventas
+                </TableHead>
+                <TableHead className="w-[15%] text-center">Velocity</TableHead>
+                <TableHead className="w-[15%] text-center">
+                  Conversión
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -61,17 +67,23 @@ export function AmbassadorsTable({ data }: { data: Ambassador[] }) {
               <TableBody>
                 {data.map((ambassador) => (
                   <TableRow key={ambassador.name}>
-                    <TableCell className="w-[35%] font-medium">
+                    <TableCell className="w-[25%] font-medium">
                       {ambassador.name}
                     </TableCell>
-                    <TableCell className="w-[20%] text-center">
+                    <TableCell className="w-[15%] text-center">
                       {ambassador.activations}
                     </TableCell>
-                    <TableCell className="w-[20%] text-center">
+                    <TableCell className="w-[15%] text-center">
                       {ambassador.totalSales}
                     </TableCell>
-                    <TableCell className="w-[25%] text-center">
+                    <TableCell className="w-[15%] text-center">
                       {ambassador.averageSales.toFixed(2)}
+                    </TableCell>
+                    <TableCell className="w-[15%] text-center">
+                      {ambassador.velocity.toFixed(2)}
+                    </TableCell>
+                    <TableCell className="w-[15%] text-center">
+                      {ambassador.conversionRate.toFixed(2)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -84,5 +96,5 @@ export function AmbassadorsTable({ data }: { data: Ambassador[] }) {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

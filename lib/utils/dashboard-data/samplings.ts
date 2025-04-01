@@ -35,6 +35,12 @@ export function getActivationsHistory(
           0,
         ),
         velocity: Number(velocity.toFixed(2)),
+        conversionRate: Number(
+          (
+            (submission.totalQuantity / (submission.samplesDelivered || 1)) *
+            100
+          ).toFixed(2),
+        ),
         time: new Date(submission.startDate),
       }
     })

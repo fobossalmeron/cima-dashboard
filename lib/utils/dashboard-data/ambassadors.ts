@@ -17,6 +17,8 @@ export function getAmbassadorsData(
           activations: 0,
           totalSales: 0,
           averageSales: 0,
+          velocity: 0,
+          conversionRate: 0,
         }
       }
 
@@ -24,11 +26,14 @@ export function getAmbassadorsData(
       acc[ambassadorKey].activations++
 
       // Sumar ventas de esta submission
-      const submissionSales = submission.productSales.reduce(
-        (sum, sale) => sum + sale.quantity,
-        0,
-      )
-      acc[ambassadorKey].totalSales += submissionSales
+      acc[ambassadorKey].totalSales += submission.totalQuantity
+
+      // Sumar velocidad de ventas de esta submission
+      acc[ambassadorKey].velocity += submission.totalQuantity / 4
+
+      // Sumar tasa de conversión de esta submission
+      acc[ambassadorKey].conversionRate +=
+        (submission.totalQuantity / (submission.samplesDelivered || 1)) * 100
 
       return acc
     },
