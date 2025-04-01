@@ -18,6 +18,7 @@ import {
   Presentation,
   Product,
   ProductLocation,
+  ProductLocationSubmission,
   ProductSale,
   PurchaseIntention,
   Question,
@@ -79,13 +80,18 @@ export interface PhotoWithRelations extends Photo {
   type: PhotoType
 }
 
+export interface ProductLocationSubmissionWithRelations
+  extends ProductLocationSubmission {
+  productLocation: ProductLocation
+}
+
 export interface SubmissionWithRelations extends FormSubmission {
   answers: Answer[]
   location: Location | null
   representative: Representative | null
   activatedBrands: ActivatedBrandWithRelations[]
   productSales: ProductSaleWithRelations[]
-  productLocation: ProductLocation | null
+  productLocationSubmissions: ProductLocationSubmissionWithRelations[]
   pointOfSale: PointOfSale | null
   sampling: SamplingWithRelations | null
   photos: PhotoWithRelations[]

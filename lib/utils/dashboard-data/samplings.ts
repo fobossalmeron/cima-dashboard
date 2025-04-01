@@ -9,6 +9,7 @@ import {
 } from '@/components/sampling/sampling.types'
 import { PhotoTypesEnum } from '@/enums/photos-fields'
 import { DashboardWithRelations } from '@/types/api/clients'
+import { toUTC } from '../date'
 
 export function getActivationsHistory(
   dashboard: DashboardWithRelations,
@@ -114,7 +115,7 @@ export function getHeatmapData(
       .map(() => []),
   }
   dashboard.submissions.forEach((submission) => {
-    const startDate = new Date(submission.startDate)
+    const startDate = toUTC(new Date(submission.startDate))
     const day = startDate.toLocaleString('es-MX', {
       weekday: 'long',
     })

@@ -37,14 +37,7 @@ export function getKpisData(dashboard?: DashboardWithRelations): KpisData {
     0,
   )
 
-  const conversion =
-    dashboard.submissions
-      .map(
-        (submission) =>
-          (submission.totalQuantity / submission.samplesDelivered) * 100,
-      )
-      .reduce((total, current) => total + current, 0) /
-    (dashboard.submissions.length || 1)
+  const conversion = (unitsSold / (samplesDelivered || 1)) * 100
 
   const velocity =
     dashboard.submissions

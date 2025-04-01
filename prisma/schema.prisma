@@ -379,9 +379,19 @@ model ProductLocation {
   updatedAt DateTime @updatedAt
 
   // Relations
-  formSubmissions FormSubmission[]
+  productLocationSubmissions ProductLocationSubmission[]
 
   @@map("product_locations")
+}
+
+model ProductLocationSubmission {
+  productLocationId String          @map("product_location_id")
+  submissionId      String          @map("submission_id")
+  productLocation   ProductLocation @relation(fields: [productLocationId], references: [id])
+  submission        FormSubmission  @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@unique([productLocationId, submissionId])
+  @@map("product_location_submissions")
 }
 
 model FormSubmission {
@@ -407,23 +417,22 @@ model FormSubmission {
   totalAmount        Float    @default(0) @map("total_amount")
   samplesDelivered   Int      @default(0) @map("samples_delivered")
   pointOfSaleId      String?  @map("point_of_sale_id")
-  productLocationId  String?  @map("product_location_id")
   productInPromotion Boolean  @default(false) @map("product_in_promotion")
   riskZone           Boolean  @default(false) @map("risk_zone")
   firstActivation    Boolean  @default(false) @map("first_activation")
 
   // Relations
-  answers         Answer[]
-  dealer          Dealer?
-  dashboard       Dashboard        @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
-  location        Location?        @relation(fields: [locationId], references: [id])
-  representative  Representative?  @relation(fields: [representativeId], references: [id])
-  productSales    ProductSale[]
-  activatedBrands ActivatedBrand[]
-  pointOfSale     PointOfSale?     @relation(fields: [pointOfSaleId], references: [id])
-  productLocation ProductLocation? @relation(fields: [productLocationId], references: [id])
-  sampling        Sampling?
-  photos          Photo[]
+  answers                    Answer[]
+  dealer                     Dealer?
+  dashboard                  Dashboard                   @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  location                   Location?                   @relation(fields: [locationId], references: [id])
+  representative             Representative?             @relation(fields: [representativeId], references: [id])
+  productSales               ProductSale[]
+  activatedBrands            ActivatedBrand[]
+  pointOfSale                PointOfSale?                @relation(fields: [pointOfSaleId], references: [id])
+  productLocationSubmissions ProductLocationSubmission[]
+  sampling                   Sampling?
+  photos                     Photo[]
 
   @@unique([dashboardId, locationId, representativeId, submittedAt])
   @@index([locationId])

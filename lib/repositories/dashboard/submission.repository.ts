@@ -14,6 +14,7 @@ export interface FindUniqueByDatesParams {
   representativeId: string
   startDate: Date
   endDate: Date
+  submittedAt: Date
 }
 
 interface CreateSubmissionParams {
@@ -21,7 +22,6 @@ interface CreateSubmissionParams {
   locationId: string
   representativeId: string
   pointOfSaleId: string | null
-  productLocationId: string | null
   submittedAt: Date
   notes: string | null
   tags: string[]

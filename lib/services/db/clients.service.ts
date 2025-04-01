@@ -101,7 +101,11 @@ export class ClientsService {
                 },
               },
             },
-            productLocation: true,
+            productLocationSubmissions: {
+              include: {
+                productLocation: true,
+              },
+            },
             pointOfSale: true,
             sampling: {
               include: {

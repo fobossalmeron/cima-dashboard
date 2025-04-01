@@ -131,7 +131,11 @@ export class DashboardService {
                 },
               },
             },
-            productLocation: true,
+            productLocationSubmissions: {
+              include: {
+                productLocation: true,
+              },
+            },
             pointOfSale: true,
             sampling: {
               include: {

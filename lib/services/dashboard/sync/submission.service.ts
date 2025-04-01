@@ -23,6 +23,7 @@ import {
 } from '@/types/services'
 import { DataFieldSearchType, DataFieldsEnum } from '@/enums/data-fields'
 import { Log } from '@/lib/utils/log'
+import { ProductLocationService } from './product-location.service'
 
 export class SubmissionSyncService {
   private static async processSubmission(
@@ -42,36 +43,25 @@ export class SubmissionSyncService {
       ? parseDate(row[GeneralFieldsEnum.END_DATE].toString())
       : new Date()
 
-    const activationDate = row[DatesFieldsEnum.ACTIVATION_DATE]
-      ? parseDate(
-          row[DatesFieldsEnum.ACTIVATION_DATE].toString(),
-          DateFormat.YYYY_MM_DD,
-        )
-      : new Date()
+    const activationDateString =
+      row[DatesFieldsEnum.ACTIVATION_DATE]?.toString() ??
+      `${startDate.getFullYear()}-${
+        startDate.getMonth() + 1
+      }-${startDate.getDate()}`
 
     const activationHours = row[DatesFieldsEnum.ACTIVATION_HOURS]?.toString()
       ? row[DatesFieldsEnum.ACTIVATION_HOURS].toString().split(' - ')
       : []
 
-    const realStartDate = activationHours[0]
-      ? new Date(
-          activationDate.getFullYear(),
-          activationDate.getMonth(),
-          activationDate.getDate(),
-          Number(activationHours[0]?.split(':')[0]),
-          Number(activationHours[0]?.split(':')[1]),
-        )
-      : startDate
+    const realStartDate = parseDate(
+      `${activationDateString} ${activationHours[0]}`,
+      DateFormat.YYYY_MM_DD,
+    )
 
-    const realEndDate = activationHours[1]
-      ? new Date(
-          activationDate.getFullYear(),
-          activationDate.getMonth(),
-          activationDate.getDate(),
-          Number(activationHours[1]?.split(':')[0]),
-          Number(activationHours[1]?.split(':')[1]),
-        )
-      : endDate
+    const realEndDate = parseDate(
+      `${activationDateString} ${activationHours[1]}`,
+      DateFormat.YYYY_MM_DD,
+    )
 
     const samplesDelivered = row[DataFieldsEnum.SAMPLES_DELIVERED]?.toString()
       ? Number(row[DataFieldsEnum.SAMPLES_DELIVERED]?.toString())
@@ -128,6 +118,7 @@ export class SubmissionSyncService {
         representativeId,
         startDate,
         endDate,
+        submittedAt,
       },
       tx,
     )
@@ -158,17 +149,8 @@ export class SubmissionSyncService {
       const result = await withTransaction(
         async (tx: Prisma.TransactionClient) => {
           // Extract general fields from row
-          const {
-            dealer,
-            representative,
-            location,
-            pointOfSale,
-            productLocation,
-          } = await GeneralFieldsService.processGeneralFields(
-            row,
-            questions,
-            tx,
-          )
+          const { dealer, representative, location, pointOfSale } =
+            await GeneralFieldsService.processGeneralFields(row, questions, tx)
 
           const { submission, submissionStatus } = await this.processSubmission(
             {
@@ -178,10 +160,16 @@ export class SubmissionSyncService {
                 locationId: location.id,
                 representativeId: representative.id,
                 pointOfSaleId: pointOfSale?.id ?? null,
-                productLocationId: productLocation?.id ?? null,
               },
               tx,
             },
+          )
+          // Create or update product location submissions
+          await ProductLocationService.processRow(
+            submission.id,
+            row,
+            questions,
+            tx,
           )
           // Create or update sampling
           await SamplingService.createOrUpdate(row, submission.id, tx)

@@ -48,24 +48,14 @@ export class GeneralFieldsService {
     )
     // Process Location
     const location = await LocationService.processLocation(row, tx)
-    console.log('Location created')
     // Process Point of Sale
     const pointOfSale = await PointOfSaleService.processRow(row, tx)
-    console.log('Point of Sale created')
-    // Process product location
-    const productLocation = await ProductLocationService.processRow(
-      row,
-      questions,
-      tx,
-    )
-    console.log('Product Location created')
 
     return {
       dealer,
       representative,
       location,
       pointOfSale,
-      productLocation,
     }
   }
 }

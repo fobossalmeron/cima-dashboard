@@ -9,7 +9,6 @@ export interface ProcessSubmissionParams {
     locationId: string
     representativeId: string
     pointOfSaleId: string | null
-    productLocationId: string | null
   }
   tx?: Prisma.TransactionClient
 }

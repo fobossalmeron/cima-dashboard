@@ -33,8 +33,12 @@ export function getProductLocationData(
 ): ProductLocationInPDVChartData[] {
   const locationCount = dashboard.submissions.reduce(
     (acc: { [key: string]: number }, submission) => {
-      const location = submission.productLocation?.name || 'No especificado'
-      acc[location] = (acc[location] || 0) + 1
+      submission.productLocationSubmissions.forEach(
+        (productLocationSubmission) => {
+          const location = productLocationSubmission.productLocation.name
+          acc[location] = (acc[location] || 0) + 1
+        },
+      )
       return acc
     },
     {},
@@ -52,7 +56,11 @@ export function getAveragePriceData(
   const pricesBySubBrand = dashboard.submissions.reduce(
     (acc: { [key: string]: { total: number; count: number } }, submission) => {
       submission.productSales.forEach((sale) => {
-        const brandName = `${sale.product.brand.name} ${sale.product.subBrand?.name}`
+        const subBrandName =
+          sale.product.subBrand?.name === 'Not specified'
+            ? ''
+            : sale.product.subBrand?.name
+        const brandName = `${sale.product.brand.name} ${subBrandName}`.trim()
         if (!acc[brandName]) {
           acc[brandName] = { total: 0, count: 0 }
         }
