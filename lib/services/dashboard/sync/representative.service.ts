@@ -1,4 +1,4 @@
-import { GeneralFieldsEnum } from '@/enums/general-fields'
+import { RepresentativesFieldsEnum } from '@/enums/general-fields'
 import { RepresentativeRepository } from '@/lib/repositories'
 import { FormSubmissionEntryData } from '@/types/api'
 import { Prisma, Representative } from '@prisma/client'
@@ -14,9 +14,13 @@ export class RepresentativeService {
     row: FormSubmissionEntryData,
     tx?: Prisma.TransactionClient,
   ): Promise<Representative> {
+    if (!row[RepresentativesFieldsEnum.REPRESENTATIVE_OPTION]) {
+      throw new Error('Representative name is required')
+    }
     const representativeData = {
-      id: row[GeneralFieldsEnum.REPRESENTATIVE]?.toString() || '',
-      name: row[GeneralFieldsEnum.REPRESENTATIVE_NAME]?.toString() || '',
+      name: row[RepresentativesFieldsEnum.REPRESENTATIVE_OPTION]
+        .toString()
+        .trim(),
     }
 
     return await RepresentativeRepository.createOrUpdate(representativeData, tx)

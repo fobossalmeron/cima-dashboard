@@ -37,3 +37,7 @@ export enum DatesFieldsEnum {
   END_DATE = 'Final de la visita',
   ACTIVATION_HOURS = 'Hora de INICIO y de TERMINO',
 }
+
+export enum RepresentativesFieldsEnum {
+  REPRESENTATIVE_OPTION = 'Nombre de el (la) PROMOTOR (A)',
+}
