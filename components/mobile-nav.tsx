@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import {
   Sheet,
   SheetContent,
@@ -28,6 +28,19 @@ interface MobileNavProps {
 export function MobileNav({ clientId }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  // Verificar si estamos en la URL base del cliente
+  const isClientBasePath = pathname === `/${clientId}`
+
+  // Verificar si el parámetro show-ambassadors está presente
+  const showAmbassadors = searchParams.get('show-ambassadors') === 'true'
+
+  // Crear una nueva URLSearchParams con los parámetros actuales
+  const createUrlWithCurrentParams = (path: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    return `${path}${params.toString() ? `?${params.toString()}` : ''}`
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -47,25 +60,50 @@ export function MobileNav({ clientId }: MobileNavProps) {
         </SheetHeader>
         <NavigationMenu>
           <NavigationMenuList className="flex flex-col gap-4 items-start justify-center w-full">
-            {navItems.map((item) => (
-              <NavigationMenuItem key={item.path}>
+            {navItems.map((item) => {
+              // Determinar si este ítem debe estar activo
+              const isActive =
+                pathname === `/${clientId}/${item.path}` ||
+                (isClientBasePath && item.path === '/')
+
+              const href = createUrlWithCurrentParams(
+                `/${clientId}/${item.path}`,
+              )
+
+              return (
+                <NavigationMenuItem key={item.path}>
+                  <Link href={href} legacyBehavior passHref>
+                    <NavigationMenuLink
+                      className={`${navigationMenuTriggerStyle()} ${
+                        isActive ? 'bg-accent text-accent-foreground' : ''
+                      }`}
+                    >
+                      {item.title}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              )
+            })}
+
+            {showAmbassadors && (
+              <NavigationMenuItem>
                 <Link
-                  href={`/${clientId}/${item.path}`}
+                  href={createUrlWithCurrentParams(`/${clientId}/ambassadors`)}
                   legacyBehavior
                   passHref
                 >
                   <NavigationMenuLink
                     className={`${navigationMenuTriggerStyle()} ${
-                      pathname === `/${clientId}/${item.path}`
+                      pathname === `/${clientId}/ambassadors`
                         ? 'bg-accent text-accent-foreground'
                         : ''
                     }`}
                   >
-                    {item.title}
+                    Promotoras
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
-            ))}
+            )}
           </NavigationMenuList>
         </NavigationMenu>
       </SheetContent>
