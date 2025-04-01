@@ -99,7 +99,9 @@ const columns: ColumnDef<ActivationsHistoryTableData>[] = [
       )
     },
     cell: ({ row }) => {
-      return <div className="text-center">{row.getValue('conversionRate')}</div>
+      return (
+        <div className="text-center">{row.getValue('conversionRate')}%</div>
+      )
     },
   },
 ]

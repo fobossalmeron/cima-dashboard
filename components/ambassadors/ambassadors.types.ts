@@ -5,4 +5,5 @@ export interface Ambassador {
   averageSales: number
   velocity: number
   conversionRate: number
+  samplesDelivered: number
 }

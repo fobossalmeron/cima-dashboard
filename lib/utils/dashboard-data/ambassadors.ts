@@ -19,6 +19,7 @@ export function getAmbassadorsData(
           averageSales: 0,
           velocity: 0,
           conversionRate: 0,
+          samplesDelivered: 0,
         }
       }
 
@@ -28,12 +29,8 @@ export function getAmbassadorsData(
       // Sumar ventas de esta submission
       acc[ambassadorKey].totalSales += submission.totalQuantity
 
-      // Sumar velocidad de ventas de esta submission
-      acc[ambassadorKey].velocity += submission.totalQuantity / 4
-
-      // Sumar tasa de conversión de esta submission
-      acc[ambassadorKey].conversionRate +=
-        (submission.totalQuantity / (submission.samplesDelivered || 1)) * 100
+      // Sumar muestras entregadas de esta submission
+      acc[ambassadorKey].samplesDelivered += submission.samplesDelivered || 0
 
       return acc
     },
@@ -46,7 +43,16 @@ export function getAmbassadorsData(
       ...ambassador,
       // Calcular promedio de ventas por activación
       averageSales: Number(
-        (ambassador.totalSales / ambassador.activations).toFixed(2),
+        (ambassador.totalSales / ambassador.activations).toFixed(1),
+      ),
+      velocity: Number(
+        (ambassador.totalSales / (ambassador.activations * 4)).toFixed(1),
+      ),
+      conversionRate: Number(
+        (
+          (ambassador.totalSales / (ambassador.samplesDelivered || 1)) *
+          100
+        ).toFixed(1),
       ),
     }))
     .sort((a, b) => b.totalSales - a.totalSales) // Ordenar por total de ventas

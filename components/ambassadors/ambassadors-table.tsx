@@ -77,13 +77,13 @@ export function AmbassadorsTable({ data }: { data: Ambassador[] }) {
                       {ambassador.totalSales}
                     </TableCell>
                     <TableCell className="w-[15%] text-center">
-                      {ambassador.averageSales.toFixed(2)}
+                      {ambassador.averageSales.toFixed(1)}
                     </TableCell>
                     <TableCell className="w-[15%] text-center">
-                      {ambassador.velocity.toFixed(2)}
+                      {ambassador.velocity.toFixed(1)}
                     </TableCell>
                     <TableCell className="w-[15%] text-center">
-                      {ambassador.conversionRate.toFixed(2)}
+                      {ambassador.conversionRate.toFixed(1)}%
                     </TableCell>
                   </TableRow>
                 ))}

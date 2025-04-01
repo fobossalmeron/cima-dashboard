@@ -34,12 +34,12 @@ export function getActivationsHistory(
           (acc, sale) => acc + sale.quantity,
           0,
         ),
-        velocity: Number(velocity.toFixed(2)),
+        velocity: Number(velocity.toFixed(1)),
         conversionRate: Number(
           (
             (submission.totalQuantity / (submission.samplesDelivered || 1)) *
             100
-          ).toFixed(2),
+          ).toFixed(1),
         ),
         time: new Date(submission.startDate),
       }
