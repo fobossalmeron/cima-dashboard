@@ -30,7 +30,7 @@ import { PromoterImageData } from './sampling.types'
 
 export function PromoterImages({ data }: { data: PromoterImageData[] }) {
   const [currentPage, setCurrentPage] = useState(1)
-  const imagesPerPage = 2
+  const imagesPerPage = 3
   const totalPages = Math.ceil(data.length / imagesPerPage)
 
   // Calcular las imágenes a mostrar en la página actual
@@ -47,7 +47,7 @@ export function PromoterImages({ data }: { data: PromoterImageData[] }) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 print:grid-cols-3 gap-4">
             {currentImages.map((image, index) => (
               <div
                 key={startIndex + index}
