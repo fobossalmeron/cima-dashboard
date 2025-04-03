@@ -1,20 +1,20 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import * as React from 'react'
+import { Check, ChevronsUpDown } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from '@/components/ui/popover'
 
 export function MultiSelect({
   options = [],
   selected = [],
   onChange,
-  placeholder = "Selecciona...",
+  placeholder = 'Selecciona...',
   className,
 }: {
   options?: { value: string; label: string }[]
@@ -24,11 +24,11 @@ export function MultiSelect({
   className?: string
 }) {
   const [open, setOpen] = React.useState(false)
-  const [search, setSearch] = React.useState("")
+  const [search, setSearch] = React.useState('')
   const safeSelected = Array.isArray(selected) ? selected : []
 
-  const filteredOptions = options.filter(option =>
-    option.label.toLowerCase().includes(search.toLowerCase())
+  const filteredOptions = options.filter((option) =>
+    option.label.toLowerCase().includes(search.toLowerCase()),
   )
 
   return (
@@ -38,22 +38,34 @@ export function MultiSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("min-w-[100px] justify-between font-normal", {
-            "text-muted-foreground": safeSelected.length === 0
-          }, className)}
+          className={cn(
+            'min-w-[100px] justify-between font-normal',
+            {
+              'text-muted-foreground': safeSelected.length === 0,
+            },
+            className,
+          )}
         >
           <span className="truncate">
             {safeSelected.length > 0
               ? options
-                  .filter(option => safeSelected.includes(option.value))
-                  .map(option => option.label)
-                  .join(", ")
+                  .filter((option) => safeSelected.includes(option.value))
+                  .map((option) => option.label)
+                  .join(', ')
               : placeholder}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent
+        className="w-[200px] min-w-[var(--radix-popover-trigger-width)] p-0"
+        align="start"
+        sideOffset={5}
+        side="bottom"
+        style={{
+          position: 'absolute',
+        }}
+      >
         <div className="p-1">
           <input
             type="text"
@@ -70,17 +82,17 @@ export function MultiSelect({
                   className="flex items-center p-2 hover:bg-gray-100 cursor-pointer text-sm"
                   onClick={() => {
                     const newSelected = safeSelected.includes(option.value)
-                      ? safeSelected.filter(value => value !== option.value)
+                      ? safeSelected.filter((value) => value !== option.value)
                       : [...safeSelected, option.value]
                     onChange(newSelected)
                   }}
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      'mr-2 h-4 w-4',
                       safeSelected.includes(option.value)
-                        ? "opacity-100"
-                        : "opacity-0"
+                        ? 'opacity-100'
+                        : 'opacity-0',
                     )}
                   />
                   {option.label}
@@ -96,4 +108,4 @@ export function MultiSelect({
       </PopoverContent>
     </Popover>
   )
-} 
+}
