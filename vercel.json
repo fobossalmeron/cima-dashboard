@@ -10,10 +10,6 @@
     {
       "path": "/api/cron/sync",
       "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/sync/cleanup",
-      "schedule": "0 9 * * *"
     }
   ]
 }
