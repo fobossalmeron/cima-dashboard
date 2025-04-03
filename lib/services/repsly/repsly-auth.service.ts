@@ -36,6 +36,15 @@ export class RepslyAuthService {
     return expiryTime - currentTime < RepslyAuthService.TOKEN_EXPIRY_THRESHOLD
   }
 
+  static isTokenExpired(tokenData: { expiresAt: Date | null }) {
+    if (tokenData.expiresAt === null) {
+      throw new Error('No se encontró el tiempo de expiración del token')
+    }
+    const expiryTime = new Date(tokenData.expiresAt).getTime()
+    const currentTime = Date.now()
+    return expiryTime < currentTime
+  }
+
   static async refreshToken() {
     const refreshTokenUrl = process.env.REPSLY_REFRESH_TOKEN_URL
     if (!refreshTokenUrl) {

@@ -9,9 +9,14 @@ import {
   RowTransactionUpdatedResult,
 } from '@/types/api'
 import { SyncStatus as SyncStatusEnum } from '@/enums/dashboard-sync'
-import { DashboardService, SlackService } from '@/lib/services'
+import {
+  DashboardService,
+  LocationService,
+  RepresentativeService,
+  SlackService,
+} from '@/lib/services'
 import { SubmissionSyncService } from './submission.service'
-import { QuestionRepository } from '@/lib/repositories'
+import { QuestionRepository, SubmissionRepository } from '@/lib/repositories'
 import { QueueService } from '@/lib/services'
 import { Log } from '@/lib/utils/log'
 import { prisma } from '@/lib/prisma'
@@ -29,6 +34,8 @@ import { SocketServer } from '@/lib/socket/server'
 import { transformJobData } from '@/lib/utils'
 import { DashboardRepository } from '@/lib/repositories/dashboard/dashboard.repository'
 import { SyncError } from '@/errors/sync.error'
+import { DatesFieldsEnum } from '@/enums/general-fields'
+import { parseDate } from '@/lib/utils/date'
 
 export class DashboardSyncService {
   static async startSync(
@@ -48,6 +55,26 @@ export class DashboardSyncService {
       const initialResult: JobResult = {
         retryCount: 0,
         status: SyncJobStatus.PENDING,
+      }
+
+      // Validate if the row is already in the database
+      const location = await LocationService.find(row)
+      const representative = await RepresentativeService.find(row)
+      const submittedAt = row[DatesFieldsEnum.SUBMISSION_DATE]
+        ? parseDate(row[DatesFieldsEnum.SUBMISSION_DATE].toString())
+        : new Date()
+      const validRecords = location && representative && submittedAt
+      const submissionExists = validRecords
+        ? (await SubmissionRepository.findUnique({
+            dashboardId: id,
+            locationId: location.id,
+            representativeId: representative.id,
+            submittedAt,
+          })) !== null
+        : false
+      // If the submission exists, skip the job
+      if (submissionExists) {
+        continue
       }
 
       const job = await prisma.syncJob.create({
@@ -83,8 +110,8 @@ export class DashboardSyncService {
     }
 
     SlackService.sendCronJobNotification(
-      'Sync Job',
-      'success',
+      'Creación de Sync Jobs',
+      'pending',
       `Sync batch started: ${batchId} with ${jobs.length} jobs`,
     )
 
@@ -204,11 +231,6 @@ export class DashboardSyncService {
             pendingJobs: batchProgress.pendingJobs,
           }
           SocketServer.emitBatchProgress(job.batchId, pusherObject)
-          SlackService.sendCronJobNotification(
-            'Sync Job',
-            'success',
-            `Batch progress:\n ${JSON.stringify(pusherObject)}`,
-          )
         } catch (error) {
           Log.error('Error emitting batch progress to Pusher', { error })
         }

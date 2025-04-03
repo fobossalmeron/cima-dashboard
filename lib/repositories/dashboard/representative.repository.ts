@@ -18,4 +18,14 @@ export class RepresentativeRepository {
       data: representative,
     })
   }
+
+  static async findByName(
+    name: string,
+    tx?: Prisma.TransactionClient,
+  ): Promise<Representative | null> {
+    const client = tx ?? prisma
+    return await client.representative.findFirst({
+      where: { name },
+    })
+  }
 }

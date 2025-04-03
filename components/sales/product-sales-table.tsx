@@ -9,9 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import Image from 'next/image'
 import { ProductSaleWithRelations } from '@/types/api/clients'
-import { getProductImage } from '@/lib/utils/dashboard-data/sales'
+import { ProductSalesTableRow } from './product-sales-table-row'
 
 export function ProductSalesTable({
   data,
@@ -39,23 +38,7 @@ export function ProductSalesTable({
             </TableHeader>
             <TableBody>
               {data.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="flex items-center gap-4">
-                    <Image
-                      src={getProductImage(item.product)}
-                      alt={item.product.flavor?.name ?? ''}
-                      width={22}
-                      height={22}
-                      className="object-cover"
-                    />
-                    {`${item.product.flavor?.name
-                      .replace('Not specified', '')
-                      .trim()} ${item.product.presentation?.name}`}
-                  </TableCell>
-                  <TableCell className="text-end">
-                    {numberFormatter.format(item.quantity)}
-                  </TableCell>
-                </TableRow>
+                <ProductSalesTableRow key={item.id} item={item} />
               ))}
               <TableRow className="font-medium border-t">
                 <TableCell className="pt-4">Total</TableCell>

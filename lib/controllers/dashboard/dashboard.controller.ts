@@ -3,6 +3,7 @@ import {
   DashboardService,
   DashboardSyncService,
   FormTemplateService,
+  SyncLogService,
 } from '@/lib/services'
 import { RepslyApiService } from '@/lib/services/api'
 import { NextRequest, NextResponse } from 'next/server'
@@ -10,6 +11,7 @@ import { SyncDashboardSuccessResponse } from '@/types/api'
 import { ApiStatus } from '@/enums/api-status'
 import { DashboardFilters, DateRange } from '@/types/services/dashboard.types'
 import { StartSyncResponse } from '@/types/services'
+import { SyncStatus } from '@prisma/client'
 
 export class DashboardController {
   static async syncDashboard(
@@ -56,11 +58,13 @@ export class DashboardController {
 
       const successResponse = repslyResponse as SyncDashboardSuccessResponse
 
-      // Sincronizar con la base de datos local
+      // Create sync jobs for each submission
       const result = await DashboardSyncService.startSync(
         dashboardId,
         successResponse.data,
       )
+      // Create sync log for register last sync date
+      await SyncLogService.create(dashboard.id, SyncStatus.SUCCESS)
       return NextResponse.json(result)
     } catch (error) {
       console.error('Error al sincronizar dashboard:', error)

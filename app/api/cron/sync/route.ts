@@ -2,6 +2,7 @@ import { ApiStatus } from '@/enums/api-status'
 import {
   DashboardService,
   DashboardSyncService,
+  RepslyAuthService,
   SyncLogService,
 } from '@/lib/services'
 import { RepslyApiService } from '@/lib/services/api'
@@ -21,6 +22,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    // Check if token was expired
+    const tokenData = await RepslyAuthService.getToken()
+    if (RepslyAuthService.isTokenExpired(tokenData)) {
+      throw new Error('Token expirado')
+    }
     const dashboards = await DashboardService.getAllWithLogs()
     let successCount = 0
     let errorCount = 0

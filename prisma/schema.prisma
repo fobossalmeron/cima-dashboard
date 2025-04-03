@@ -140,8 +140,8 @@ model Question {
   attachments         QuestionAttachment[]
   options             QuestionOption[]
   triggers            QuestionTrigger[]
-  formTemplate        FormTemplate         @relation(fields: [formTemplateId], references: [id])
-  questionGroup       QuestionGroup?       @relation(fields: [questionGroupId], references: [id])
+  formTemplate        FormTemplate         @relation(fields: [formTemplateId], references: [id], onDelete: Cascade)
+  questionGroup       QuestionGroup?       @relation(fields: [questionGroupId], references: [id], onDelete: Cascade)
 
   @@index([formTemplateId])
   @@index([questionGroupId])
@@ -156,7 +156,7 @@ model QuestionOption {
   updatedAt     DateTime          @updatedAt
   questionId    String
   answers       Answer[]
-  question      Question          @relation(fields: [questionId], references: [id])
+  question      Question          @relation(fields: [questionId], references: [id], onDelete: Cascade)
   triggers      QuestionTrigger[]
   answerOptions AnswerOption[]
 
@@ -170,7 +170,7 @@ model QuestionAttachment {
   type       String
   name       String
   questionId String
-  question   Question @relation(fields: [questionId], references: [id])
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@index([questionId])
   @@map("question_attachments")
@@ -183,7 +183,7 @@ model QuestionGroup {
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
   formTemplateId String
-  formTemplate   FormTemplate      @relation(fields: [formTemplateId], references: [id])
+  formTemplate   FormTemplate      @relation(fields: [formTemplateId], references: [id], onDelete: Cascade)
   triggers       QuestionTrigger[]
   questions      Question[]
 
@@ -196,9 +196,9 @@ model QuestionTrigger {
   questionId String
   groupId    String?
   optionId   String?
-  group      QuestionGroup?  @relation(fields: [groupId], references: [id])
-  option     QuestionOption? @relation(fields: [optionId], references: [id])
-  question   Question        @relation(fields: [questionId], references: [id])
+  group      QuestionGroup?  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  option     QuestionOption? @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  question   Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@index([questionId])
   @@index([groupId])
@@ -258,8 +258,8 @@ model SubBrand {
 model SubBrandTemplate {
   subBrandId String
   templateId String
-  subBrand   SubBrand     @relation(fields: [subBrandId], references: [id])
-  template   FormTemplate @relation(fields: [templateId], references: [id])
+  subBrand   SubBrand     @relation(fields: [subBrandId], references: [id], onDelete: Cascade)
+  template   FormTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
 
   @@id([subBrandId, templateId])
   @@map("sub_brands_templates")
