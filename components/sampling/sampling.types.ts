@@ -42,3 +42,9 @@ export interface PromoterImageData {
   url: string
   name: string
 }
+
+export interface GiveawayData {
+  type: string
+  quantity: number
+}
+

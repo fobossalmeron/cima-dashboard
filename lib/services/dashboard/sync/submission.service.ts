@@ -24,6 +24,7 @@ import {
 import { DataFieldSearchType, DataFieldsEnum } from '@/enums/data-fields'
 import { Log } from '@/lib/utils/log'
 import { ProductLocationService } from './product-location.service'
+import { GiveawayService } from './giveaway.service'
 
 export class SubmissionSyncService {
   private static async processSubmission(
@@ -37,10 +38,6 @@ export class SubmissionSyncService {
 
     const startDate = row[GeneralFieldsEnum.START_DATE]
       ? parseDate(row[GeneralFieldsEnum.START_DATE].toString())
-      : new Date()
-
-    const endDate = row[GeneralFieldsEnum.END_DATE]
-      ? parseDate(row[GeneralFieldsEnum.END_DATE].toString())
       : new Date()
 
     const activationDateString =
@@ -116,8 +113,6 @@ export class SubmissionSyncService {
         dashboardId,
         locationId,
         representativeId,
-        startDate,
-        endDate,
         submittedAt,
       },
       tx,
@@ -224,6 +219,17 @@ export class SubmissionSyncService {
               activeQuestions,
               brands,
             )
+
+          // Process giveaways
+          await GiveawayService.processRow(
+            {
+              submissionId: submission.id,
+              row,
+              questionsMap: questionMap,
+              questions,
+            },
+            tx,
+          )
 
           // Update totals in the submission
           await tx.formSubmission.update({

@@ -97,7 +97,6 @@ export class DashboardSyncService {
   }
 
   static async processJob(jobId: string): Promise<void> {
-    Log.info('Starting Job process: ------------------------')
     const job = await prisma.syncJob.findUnique({
       where: { id: jobId },
     })
@@ -125,7 +124,6 @@ export class DashboardSyncService {
     })
 
     try {
-      Log.info('Emitting job progress to Pusher')
       // Emitir progreso inicial
       SocketServer.emitJobProgress(jobId, {
         jobId,
@@ -138,7 +136,6 @@ export class DashboardSyncService {
     }
 
     try {
-      Log.info('Starting Job saving process')
       const dashboard = await DashboardRepository.getById(job.dashboardId)
       if (!dashboard) {
         throw new Error('Dashboard not found')
@@ -216,13 +213,6 @@ export class DashboardSyncService {
           Log.error('Error emitting batch progress to Pusher', { error })
         }
       }
-
-      Log.info('Row processed', {
-        jobId,
-        batchId: job.batchId,
-        rowIndex: job.rowIndex,
-        status: result.status,
-      })
     } catch (error) {
       // Manejar el error y programar reintento
       await QueueService.handleFailedJob(jobId)

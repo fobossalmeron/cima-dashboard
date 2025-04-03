@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   ActivationsHistoryTableData,
+  GiveawayData,
   HeatmapDataActivationsStructure,
   HeatmapDataStructure,
   PromoterImageData,
@@ -10,6 +11,7 @@ import {
 import { PhotoTypesEnum } from '@/enums/photos-fields'
 import { DashboardWithRelations } from '@/types/api/clients'
 import { toUTC } from '../date'
+import { GiveawayProductData, GroupedGiveawayData } from '@/types/api'
 
 export function getActivationsHistory(
   dashboard: DashboardWithRelations,
@@ -165,4 +167,34 @@ export function getHeatmapData(
   })
 
   return averageHeatmapData
+}
+
+export function getGiveawayProductsData(
+  dashboard: DashboardWithRelations,
+): GiveawayData[] {
+  const allGiveawayProducts: GiveawayProductData[] =
+    dashboard.submissions.flatMap((submission) =>
+      submission.giveawayProducts.map((giveawayProduct) => ({
+        type: giveawayProduct.giveawayProductType.name,
+        quantity: giveawayProduct.quantity,
+        submissionId: submission.id,
+        submissionDate: submission.submittedAt,
+      })),
+    )
+
+  const groupedByType = allGiveawayProducts.reduce<Record<string, number>>(
+    (acc, product) => {
+      if (!acc[product.type]) {
+        acc[product.type] = 0
+      }
+      acc[product.type] += product.quantity
+      return acc
+    },
+    {},
+  )
+
+  return Object.entries(groupedByType).map(([type, quantity]) => ({
+    type,
+    quantity,
+  }))
 }

@@ -1,6 +1,7 @@
 export * from './active-brand.repository'
 export * from './answer.repository'
 export * from './dealer.repository'
+export * from './giveaway-product.repository'
 export * from './location.repository'
 export * from './photo.repository'
 export * from './point-of-sale.repository'

@@ -6,8 +6,10 @@ import { TrafficDuringActivationChart } from '@/components/sampling/traffic-duri
 import { ActivationHoursHeatmap } from '@/components/sampling/activation-hours-heatmap'
 import { ActivationsHistoryTable } from '@/components/sampling/activations-history-table'
 import { PromoterImages } from '@/components/sampling/promoter-images'
+import { Giveaways } from '@/components/sampling/giveaways'
 import {
   getActivationsHistory,
+  getGiveawayProductsData,
   getHeatmapData,
   getPromoterImagesData,
   getTrafficDuringActivationChartData,
@@ -37,6 +39,7 @@ export default function Sampling() {
     getTrafficDuringActivationChartData(dashboardData)
   const promoterImagesData = getPromoterImagesData(dashboardData)
   const heatmapData = getHeatmapData(dashboardData)
+  const giveawaysData = getGiveawayProductsData(dashboardData)
   return (
     <div className="space-y-6">
       <Header title="Sampling" />
@@ -48,6 +51,9 @@ export default function Sampling() {
             />
           </div>
           <div className="md:col-span-2 lg:col-span-2 print:col-span-2">
+            <Giveaways data={giveawaysData} />
+          </div>
+          <div className="md:col-span-2 lg:col-span-3 print:col-span-3">
             <PromoterImages data={promoterImagesData} />
           </div>
           <div className="md:col-span-2 lg:col-span-3 print:col-span-3">

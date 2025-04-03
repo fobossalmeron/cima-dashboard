@@ -1,12 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { PhotosFieldsEnum, PhotoTypesEnum } from '@/enums/photos-fields'
-import { prisma } from '@/lib/prisma'
 import { PhotoTypeRepository } from '@/lib/repositories'
 import { PhotoRepository } from '@/lib/repositories/dashboard/photo.repository'
 import { FormSubmissionEntryData } from '@/types/api'
-import { CreatePhotoParams } from '@/types/services/photos.types'
 import { Photo, Prisma } from '@prisma/client'
-import { Log } from '@/lib/utils/log'
 
 export class PhotosService {
   static async createOrUpdate(
@@ -53,6 +49,7 @@ export class PhotosService {
     }
 
     const clientsPhotos = await Promise.all(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       clientsPhotoValues.map(async ([_, value]) => {
         return await PhotoRepository.createOrUpdate(
           {
@@ -66,6 +63,7 @@ export class PhotosService {
     )
 
     const otherPhotos = await Promise.all(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       otherPhotoValues.map(async ([_, value]) => {
         return await PhotoRepository.createOrUpdate(
           {
@@ -77,8 +75,6 @@ export class PhotosService {
         )
       }),
     )
-
-    Log.info('Photos created')
 
     return [productPhoto, promotorPhoto, ...clientsPhotos, ...otherPhotos]
   }

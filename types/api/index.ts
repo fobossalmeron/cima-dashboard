@@ -8,6 +8,7 @@ export * from './dashboard-sync'
 export * from './form-template'
 export * from './form-template-search-response'
 export * from './products'
+export * from './giveaways'
 
 export interface ApiResponse<T = unknown> {
   status: ApiStatus

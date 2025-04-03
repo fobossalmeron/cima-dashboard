@@ -20,7 +20,11 @@ export class QuestionRepository {
         triggers: {
           include: {
             option: true,
-            group: true,
+            group: {
+              include: {
+                questions: true,
+              },
+            },
           },
         },
       },

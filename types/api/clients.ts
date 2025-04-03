@@ -11,6 +11,8 @@ import {
   FormSubmission,
   FormTemplate,
   Gender,
+  GiveawayProduct,
+  GiveawayProductType,
   Location,
   Photo,
   PhotoType,
@@ -85,6 +87,10 @@ export interface ProductLocationSubmissionWithRelations
   productLocation: ProductLocation
 }
 
+export interface GiveawayProductWithRelations extends GiveawayProduct {
+  giveawayProductType: GiveawayProductType
+}
+
 export interface SubmissionWithRelations extends FormSubmission {
   answers: Answer[]
   location: Location | null
@@ -95,6 +101,7 @@ export interface SubmissionWithRelations extends FormSubmission {
   pointOfSale: PointOfSale | null
   sampling: SamplingWithRelations | null
   photos: PhotoWithRelations[]
+  giveawayProducts: GiveawayProductWithRelations[]
 }
 
 export interface ProductWithRelations extends Product {

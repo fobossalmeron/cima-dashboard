@@ -433,6 +433,7 @@ model FormSubmission {
   productLocationSubmissions ProductLocationSubmission[]
   sampling                   Sampling?
   photos                     Photo[]
+  giveawayProducts           GiveawayProduct[]
 
   @@unique([dashboardId, locationId, representativeId, submittedAt])
   @@index([locationId])
@@ -634,6 +635,33 @@ model Photo {
   submission   FormSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@map("photos")
+}
+
+model GiveawayProductType {
+  id   String @id @default(cuid())
+  slug String @unique
+  name String
+
+  giveawayProducts GiveawayProduct[]
+
+  @@map("giveaway_product_types")
+}
+
+model GiveawayProduct {
+  id                    String   @id @default(cuid())
+  giveawayProductTypeId String   @map("giveaway_product_type_id")
+  submissionId          String   @map("submission_id")
+  quantity              Int      @map("quantity")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  giveawayProductType GiveawayProductType @relation(fields: [giveawayProductTypeId], references: [id])
+  submission          FormSubmission      @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@unique([giveawayProductTypeId, submissionId])
+  @@index([giveawayProductTypeId])
+  @@index([submissionId])
+  @@map("giveaway_products")
 }
 
 model SyncLog {

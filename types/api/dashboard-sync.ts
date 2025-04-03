@@ -14,12 +14,16 @@ import { FormSubmissionEntryData } from './products'
 import { SyncStatus as SyncStatusEnum } from '@/enums/dashboard-sync'
 import { NextResponse } from 'next/server'
 
+export interface QuestionTriggerGroup extends QuestionGroup {
+  questions: Question[]
+}
+
 export interface QuestionWithRelations extends Question {
   options: QuestionOption[]
   questionGroup: QuestionGroup | null
   triggers: Array<{
     option: QuestionOption | null
-    group: QuestionGroup | null
+    group: QuestionTriggerGroup | null
   }>
 }
 

@@ -12,8 +12,6 @@ export interface FindUniqueByDatesParams {
   dashboardId: string
   locationId: string
   representativeId: string
-  startDate: Date
-  endDate: Date
   submittedAt: Date
 }
 
@@ -46,15 +44,13 @@ export class SubmissionRepository {
     tx?: Prisma.TransactionClient,
   ) {
     const client = tx ?? prisma
-    const { dashboardId, locationId, representativeId, startDate, endDate } =
-      params
+    const { dashboardId, locationId, representativeId, submittedAt } = params
     return await client.formSubmission.findFirst({
       where: {
-        dashboardId: dashboardId,
-        locationId: locationId,
-        representativeId: representativeId,
-        startDate: startDate,
-        endDate: endDate,
+        dashboardId,
+        locationId,
+        representativeId,
+        submittedAt,
       },
     })
   }

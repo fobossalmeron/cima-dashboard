@@ -36,7 +36,6 @@ export class SocketServer {
         useTLS: true,
       })
 
-      Log.info('Pusher initialized successfully')
       return this.instance
     } catch (error) {
       Log.error('Error initializing Pusher', { error })
@@ -54,7 +53,6 @@ export class SocketServer {
   static emitBatchProgress(batchId: string, progress: PusherBatchProgress) {
     try {
       this.getInstance().trigger(this.CHANNEL, 'batch-progress', progress)
-      Log.info('Batch progress emitted', { batchId })
     } catch (error) {
       Log.error('Error emitting batch progress', { error, batchId })
       throw error
@@ -64,7 +62,6 @@ export class SocketServer {
   static emitJobProgress(jobId: string, progress: SyncJobProgress) {
     try {
       this.getInstance().trigger(this.CHANNEL, 'job-progress', progress)
-      Log.info('Job progress emitted', { jobId })
     } catch (error) {
       Log.error('Error emitting job progress', { error, jobId })
       throw error
