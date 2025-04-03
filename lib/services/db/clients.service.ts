@@ -130,6 +130,11 @@ export class ClientsService {
                 type: true,
               },
             },
+            giveawayProducts: {
+              include: {
+                giveawayProductType: true,
+              },
+            },
           },
         },
       },

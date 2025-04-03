@@ -9,6 +9,7 @@ import { PromoterImages } from '@/components/sampling/promoter-images'
 import { Giveaways } from '@/components/sampling/giveaways'
 import {
   getActivationsHistory,
+  getGiveawayProductsData,
   getHeatmapData,
   getPromoterImagesData,
   getTrafficDuringActivationChartData,
@@ -26,16 +27,6 @@ import { useClientContext } from '@/lib/context/ClientContext'
  *     a las 2pm, 3pm, 4pm) lo que hará que los datos sean más precisos
  */
 
-const giveawaysData = [
-  { type: 'Cantaritos', quantity: 244 },
-  { type: 'Botella para agua', quantity: 185 },
-  { type: 'Termos', quantity: 156 },
-  { type: 'Abanicos', quantity: 198 },
-  { type: 'Sombreros', quantity: 167 },
-  { type: 'Bolsas de Compra', quantity: 212 },
-  { type: 'Producto de la Marca (unidad completa y cerrada)', quantity: 85 },
-]
-
 export default function Sampling() {
   const { dashboardData } = useClientContext()
 
@@ -48,6 +39,7 @@ export default function Sampling() {
     getTrafficDuringActivationChartData(dashboardData)
   const promoterImagesData = getPromoterImagesData(dashboardData)
   const heatmapData = getHeatmapData(dashboardData)
+  const giveawaysData = getGiveawayProductsData(dashboardData)
   return (
     <div className="space-y-6">
       <Header title="Sampling" />

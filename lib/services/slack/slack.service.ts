@@ -34,7 +34,6 @@ export class SlackService {
           },
         ],
       })
-      Log.info('Slack message sent successfully')
     } catch (error) {
       Log.error('Error sending Slack message', { error })
       throw error

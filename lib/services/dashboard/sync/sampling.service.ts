@@ -24,7 +24,6 @@ import {
   PurchaseIntentionRepository,
   ConsumptionMomentRepository,
 } from '@/lib/repositories'
-import { Log } from '@/lib/utils/log'
 
 export class SamplingService {
   private static async processTraffic(
@@ -182,7 +181,6 @@ export class SamplingService {
         ),
       ),
     )
-    Log.info('Sampling created')
     return {
       ...sampling,
       purchaseIntentions: purchaseIntentionsWithRelations,

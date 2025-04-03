@@ -1,27 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { FormSubmissionEntryData, QuestionWithRelations } from '@/types/api'
-import { GeneralFieldsEnum } from '@/enums/general-fields'
-import { DataFieldSearchType, DataFieldsEnum } from '@/enums/data-fields'
-import { parseDate } from '@/lib/utils/date'
-import {
-  DataFieldsTagsValues,
-  ProcessGeneralFieldsResult,
-} from '@/types/services'
-import {
-  DealerRepository,
-  LocationRepository,
-  RepresentativeRepository,
-  SubmissionRepository,
-} from '@/lib/repositories'
-import {
-  Location,
-  PointOfSale,
-  Prisma,
-  ProductLocation,
-  Representative,
-} from '@prisma/client'
+import { ProcessGeneralFieldsResult } from '@/types/services'
+import { Prisma } from '@prisma/client'
 import { PointOfSaleService } from '../point-of-sale.service'
-import { ProductLocationService } from './product-location.service'
 import { LocationService } from './location.service'
 import { RepresentativeService } from './representative.service'
 import { DealerService } from './dealer.service'

@@ -160,6 +160,11 @@ export class DashboardService {
                 type: true,
               },
             },
+            giveawayProducts: {
+              include: {
+                giveawayProductType: true,
+              },
+            },
           },
         },
         syncLogs: true,
