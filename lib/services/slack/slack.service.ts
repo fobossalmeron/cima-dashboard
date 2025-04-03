@@ -42,15 +42,32 @@ export class SlackService {
 
   static async sendCronJobNotification(
     jobName: string,
-    status: 'success' | 'error',
+    status: 'success' | 'error' | 'pending',
     details?: string,
   ) {
     const environment = process.env.NODE_ENV || 'development'
-    const emoji = status === 'success' ? '✅' : '❌'
-    const message = `**${environment.toUpperCase()}**\n${emoji} *Cron Job: ${jobName}*\nStatus: ${status}\n${
-      details ? `Details: ${details}` : ''
-    }`
+    if (environment === 'production') {
+      let emoji = ''
+      switch (status) {
+        case 'success':
+          emoji = '✅'
+          break
+        case 'error':
+          emoji = '❌'
+          break
+        case 'pending':
+          emoji = '⏳'
+          break
+        default:
+          emoji = '❓'
+          break
+      }
 
-    await this.sendMessage(message)
+      const message = `${emoji} *Cron Job: ${jobName}*\nStatus: ${status}\n${
+        details ? `Details: ${details}` : ''
+      }`
+
+      await this.sendMessage(message)
+    }
   }
 }

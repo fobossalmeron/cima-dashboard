@@ -25,4 +25,23 @@ export class RepresentativeService {
 
     return await RepresentativeRepository.createOrUpdate(representativeData, tx)
   }
+
+  /**
+   * Find Representative by name
+   * @param {FormSubmissionEntryData} row - Row submission
+   * @returns {Promise<Representative | null>} Representative
+   */
+  static async find(
+    row: FormSubmissionEntryData,
+  ): Promise<Representative | null> {
+    const representativeName = row[
+      RepresentativesFieldsEnum.REPRESENTATIVE_OPTION
+    ]
+      ?.toString()
+      .trim()
+    if (!representativeName) {
+      return null
+    }
+    return await RepresentativeRepository.findByName(representativeName)
+  }
 }

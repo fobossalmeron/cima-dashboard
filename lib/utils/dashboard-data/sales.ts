@@ -122,5 +122,5 @@ export function getProductImage(product: ProductWithRelations) {
   } else if (presentationName?.includes('TETRAPACK')) {
     return `/assets/products/placeholder-tetrapack.png`
   }
-  return `/assets/products/placeholder-botella.png`
+  return null
 }

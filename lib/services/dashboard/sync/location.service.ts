@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Location, Prisma } from '@prisma/client'
 import { FormSubmissionEntryData } from '@/types/api'
 import { GeneralFieldsEnum } from '@/enums/general-fields'
 import { LocationRepository } from '@/lib/repositories'
@@ -40,5 +40,13 @@ export class LocationService {
     }
 
     return await LocationRepository.createOrUpdate(locationData, tx)
+  }
+
+  static async find(row: FormSubmissionEntryData): Promise<Location | null> {
+    const latitude = row[GeneralFieldsEnum.LOCATION_LATITUDE]?.toString() || ''
+    const longitude =
+      row[GeneralFieldsEnum.LOCATION_LONGITUDE]?.toString() || ''
+    const code = latitude.replace(/,|-/g, '') + longitude.replace(/,|-/g, '')
+    return await LocationRepository.getById(code)
   }
 }
