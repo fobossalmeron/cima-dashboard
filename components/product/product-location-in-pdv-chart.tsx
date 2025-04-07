@@ -46,13 +46,13 @@ export function ProductLocationInPDVChart({
       <CardHeader>
         <CardTitle>Ubicación del producto en punto de venta</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <ResponsiveContainer width="100%" height={300}>
           <BarChart
             data={dataWithPercentages}
             barGap={0}
             barCategoryGap={10}
-            margin={{ left: 0, right: 0, top: 20, bottom: 5 }}
+            margin={{ left: -15, right: 20, top: 20, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
