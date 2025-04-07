@@ -1,13 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Pagination,
@@ -39,7 +33,6 @@ export function ConsumerFeedback({ data }: { data: ConsumerFeedbackData[] }) {
     <Card>
       <CardHeader>
         <CardTitle>Comentarios de consumidores</CardTitle>
-        <CardDescription>Haz scroll para ver más.</CardDescription>
       </CardHeader>
       <CardContent className="pb-0">
         <ScrollArea className="h-auto pr-4">

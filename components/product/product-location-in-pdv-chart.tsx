@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   BarChart,
   Bar,
@@ -10,9 +10,9 @@ import {
   Tooltip,
   ResponsiveContainer,
   LabelList,
-} from "recharts";
-import { useMemo } from "react";
-import { ProductLocationInPDVChartData } from "./product.types";
+} from 'recharts'
+import { useMemo } from 'react'
+import { ProductLocationInPDVChartData } from './product.types'
 
 /**
  * Componente que muestra un gráfico de barras con la ubicación de productos en punto de venta.
@@ -25,21 +25,21 @@ import { ProductLocationInPDVChartData } from "./product.types";
 export function ProductLocationInPDVChart({
   data,
 }: {
-  data: ProductLocationInPDVChartData[];
+  data: ProductLocationInPDVChartData[]
 }) {
   // Calcular el total y los porcentajes para cada ubicación y ordenar de mayor a menor
   const dataWithPercentages = useMemo(() => {
-    const total = data.reduce((sum, item) => sum + item.quantity, 0);
+    const total = data.reduce((sum, item) => sum + item.quantity, 0)
 
     // Crear array con porcentajes
     const dataWithPercentagesArray = data.map((item) => ({
       ...item,
       percentage: total > 0 ? Math.round((item.quantity / total) * 100) : 0,
-    }));
+    }))
 
     // Ordenar de mayor a menor por cantidad
-    return dataWithPercentagesArray.sort((a, b) => b.quantity - a.quantity);
-  }, [data]);
+    return dataWithPercentagesArray.sort((a, b) => b.quantity - a.quantity)
+  }, [data])
 
   return (
     <Card>
@@ -59,14 +59,35 @@ export function ProductLocationInPDVChart({
               dataKey="location"
               className="text-xs"
               interval={0}
-              tickFormatter={(value) => value.slice(0, 10)}
-              textAnchor="middle"
+              height={60}
+              tick={({ x, y, payload }) => (
+                <g transform={`translate(${x},${y})`}>
+                  <foreignObject
+                    x={-50}
+                    y={0}
+                    width={100}
+                    height={60}
+                    className="overflow-visible"
+                  >
+                    <div
+                      className="text-xs text-center break-words w-full"
+                      style={{
+                        color: '#666',
+                        lineHeight: '1.2',
+                        padding: '0 2px',
+                      }}
+                    >
+                      {payload.value}
+                    </div>
+                  </foreignObject>
+                </g>
+              )}
             />
             <YAxis className="text-xs" />
             <Tooltip
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
-                  const { location, quantity } = payload[0].payload;
+                  const { location, quantity } = payload[0].payload
                   return (
                     <div className="bg-background border border-border p-3">
                       <p className="text-base">{location}</p>
@@ -77,9 +98,9 @@ export function ProductLocationInPDVChart({
                         {quantity} ocasiones
                       </p>
                     </div>
-                  );
+                  )
                 }
-                return null;
+                return null
               }}
             />
             <Bar dataKey="quantity" fill="#8884d8">
@@ -95,5 +116,5 @@ export function ProductLocationInPDVChart({
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  );
+  )
 }
