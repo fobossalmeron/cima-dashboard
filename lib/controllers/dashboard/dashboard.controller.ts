@@ -54,6 +54,7 @@ export class DashboardController {
       const result = await DashboardSyncService.startSync(
         dashboardId,
         successResponse.data,
+        force,
       )
 
       // Create sync log for register last sync date

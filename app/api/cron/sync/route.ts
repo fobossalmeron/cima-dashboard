@@ -66,6 +66,7 @@ export async function GET(request: NextRequest) {
           await DashboardSyncService.startSync(
             dashboard.id,
             successResponse.data,
+            false,
           )
           successCount++
           Log.info('Dashboard synced successfully', {

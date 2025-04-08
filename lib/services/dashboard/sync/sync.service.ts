@@ -41,6 +41,7 @@ export class DashboardSyncService {
   static async startSync(
     id: string,
     formData: FormSubmissionEntryData[],
+    force: boolean = false,
   ): Promise<StartSyncResponse> {
     const dashboard = await DashboardService.getById(id)
     if (!dashboard) {
@@ -57,24 +58,26 @@ export class DashboardSyncService {
         status: SyncJobStatus.PENDING,
       }
 
-      // Validate if the row is already in the database
-      const location = await LocationService.find(row)
-      const representative = await RepresentativeService.find(row)
-      const submittedAt = row[DatesFieldsEnum.SUBMISSION_DATE]
-        ? parseDate(row[DatesFieldsEnum.SUBMISSION_DATE].toString())
-        : new Date()
-      const validRecords = location && representative && submittedAt
-      const submissionExists = validRecords
-        ? (await SubmissionRepository.findUnique({
-            dashboardId: id,
-            locationId: location.id,
-            representativeId: representative.id,
-            submittedAt,
-          })) !== null
-        : false
-      // If the submission exists, skip the job
-      if (submissionExists) {
-        continue
+      if (!force) {
+        // Validate if the row is already in the database
+        const location = await LocationService.find(row)
+        const representative = await RepresentativeService.find(row)
+        const submittedAt = row[DatesFieldsEnum.SUBMISSION_DATE]
+          ? parseDate(row[DatesFieldsEnum.SUBMISSION_DATE].toString())
+          : new Date()
+        const validRecords = location && representative && submittedAt
+        const submissionExists = validRecords
+          ? (await SubmissionRepository.findUnique({
+              dashboardId: id,
+              locationId: location.id,
+              representativeId: representative.id,
+              submittedAt,
+            })) !== null
+          : false
+        // If the submission exists, skip the job
+        if (submissionExists) {
+          continue
+        }
       }
 
       const job = await prisma.syncJob.create({
