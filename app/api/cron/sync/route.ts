@@ -13,7 +13,7 @@ import { SlackService } from '@/lib/services/slack/slack.service'
 import { Log } from '@/lib/utils/log'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 60
+export const maxDuration = 300
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
