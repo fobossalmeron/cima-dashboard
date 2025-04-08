@@ -4,7 +4,7 @@ import { Log } from '@/lib/utils/log'
 import { ApiStatus } from '@/enums/api-status'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 300
+export const maxDuration = 60
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
