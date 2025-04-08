@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { parse } from 'csv-parse/sync'
 import {
   SyncDashboardErrorResponse,
+  SyncDashboardErrorResponseType,
   SyncDashboardResponse,
   SyncDashboardSuccessResponse,
 } from '@/types/api'
@@ -75,18 +76,17 @@ export async function GET(
       status: ApiStatus.SUCCESS,
       data: jsonData,
     })
-  } catch (error) {
-    console.error('Error al buscar formularios:', error)
-    return NextResponse.json<SyncDashboardErrorResponse>(
-      {
-        status: ApiStatus.ERROR,
-        error:
-          error instanceof Error
-            ? error.message
-            : 'Error al buscar formularios',
-        data: null,
-      },
-      { status: 500 },
-    )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    const body: SyncDashboardErrorResponse = {
+      status: ApiStatus.ERROR,
+      type: (error.name ?? error.type) as SyncDashboardErrorResponseType,
+      error: error.message,
+      data: null,
+      statusCode: error.statusCode,
+    }
+    return NextResponse.json<SyncDashboardErrorResponse>(body, {
+      status: error.statusCode,
+    })
   }
 }

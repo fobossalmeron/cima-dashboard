@@ -13,6 +13,8 @@ import {
 } from '@/types/dashboard'
 import { RepslyAuthService } from '../repsly/repsly-auth.service'
 import { DateRange } from '@/types/services'
+import { InvalidTokenException } from '@/errors/invalid-token'
+import { ApiStatusCode } from '@/enums/api-status'
 
 export class RepslyApiService {
   static async searchForms(searchTerm: string = ''): Promise<FormSearchData> {
@@ -164,6 +166,13 @@ export class RepslyApiService {
       body: JSON.stringify(body),
     })
 
+    const contentType = response.headers.get('content-type')
+    if (!contentType?.includes('text/csv')) {
+      throw new InvalidTokenException(
+        'Error al importar las respuestas del formulario',
+        ApiStatusCode.UNAUTHORIZED,
+      )
+    }
     // Obtener el buffer completo de la respuesta
     const buffer = await response.arrayBuffer()
     // Convertir el buffer a texto usando UTF-8

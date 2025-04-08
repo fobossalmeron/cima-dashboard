@@ -1,5 +1,6 @@
 import { ApiStatus } from '@/enums/api-status'
 import { SyncStatus } from '@/enums/dashboard-sync'
+import { InvalidTokenException } from '@/errors/invalid-token'
 import {
   Answer,
   Brand,
@@ -139,10 +140,16 @@ export interface SyncDashboardSuccessResponse {
   error?: null
 }
 
+export type SyncDashboardErrorResponseType =
+  | typeof InvalidTokenException
+  | typeof Error
+
 export interface SyncDashboardErrorResponse {
   status: ApiStatus.ERROR
+  type?: SyncDashboardErrorResponseType
   error: string
   data?: null
+  statusCode?: number
 }
 
 export type SyncDashboardResponse =

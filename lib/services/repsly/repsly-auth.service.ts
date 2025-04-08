@@ -2,12 +2,15 @@ import { ApiStatus } from '@/enums/api-status'
 import { prisma } from '@/lib/prisma'
 import { ServiceToken } from '@prisma/client'
 import { SlackService } from '@/lib/services'
+import { InvalidTokenException } from '@/errors/invalid-token'
 
 interface TokenData {
   access_token: string
   expires_in: number
   token_type: string
   refresh_token: string
+  id_token: string
+  scope: string
 }
 
 export class RepslyAuthService {
@@ -158,6 +161,8 @@ export class RepslyAuthService {
         refreshToken: data.refresh_token,
         expiresIn: data.expires_in,
         expiresAt,
+        fingerprint: process.env.REPSLY_FINGERPRINT || undefined,
+        serviceClientId: process.env.REPSLY_CLIENT_ID || undefined,
       },
       create: {
         service: 'repsly',
@@ -165,6 +170,8 @@ export class RepslyAuthService {
         refreshToken: data.refresh_token,
         expiresIn: data.expires_in,
         expiresAt,
+        fingerprint: process.env.REPSLY_FINGERPRINT || undefined,
+        serviceClientId: process.env.REPSLY_CLIENT_ID || undefined,
       },
     })
   }
@@ -190,7 +197,10 @@ export class RepslyAuthService {
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        throw new Error('TOKEN_INVALID')
+        throw new InvalidTokenException(
+          'Los accesos de Repsly han caducado',
+          response.status,
+        )
       }
       throw new Error(`Error en la petición: ${response.statusText}`)
     }
@@ -223,14 +233,7 @@ export class RepslyAuthService {
   ): Promise<T> {
     const tokenData = await RepslyAuthService.getToken()
 
-    try {
-      const response = await this.makeRequest(url, options, tokenData)
-      return await this.handleResponse<T>(response)
-    } catch (error) {
-      if (error instanceof Error && error.message === 'TOKEN_INVALID') {
-        console.log('Token inválido')
-      }
-      throw error
-    }
+    const response = await this.makeRequest(url, options, tokenData)
+    return await this.handleResponse<T>(response)
   }
 }

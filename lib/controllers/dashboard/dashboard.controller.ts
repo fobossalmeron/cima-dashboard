@@ -8,7 +8,6 @@ import {
 import { RepslyApiService } from '@/lib/services/api'
 import { NextRequest, NextResponse } from 'next/server'
 import { SyncDashboardSuccessResponse } from '@/types/api'
-import { ApiStatus } from '@/enums/api-status'
 import { DashboardFilters, DateRange } from '@/types/services/dashboard.types'
 import { StartSyncResponse } from '@/types/services'
 import { SyncStatus } from '@prisma/client'
@@ -49,13 +48,6 @@ export class DashboardController {
         dateRange,
       )
 
-      if (repslyResponse.status === ApiStatus.ERROR) {
-        return NextResponse.json(
-          { error: repslyResponse.error },
-          { status: 400 },
-        )
-      }
-
       const successResponse = repslyResponse as SyncDashboardSuccessResponse
 
       // Create sync jobs for each submission
@@ -63,15 +55,24 @@ export class DashboardController {
         dashboardId,
         successResponse.data,
       )
+
       // Create sync log for register last sync date
       await SyncLogService.create(dashboard.id, SyncStatus.SUCCESS)
+
       return NextResponse.json(result)
-    } catch (error) {
-      console.error('Error al sincronizar dashboard:', error)
-      return NextResponse.json(
-        { error: 'Error al sincronizar el dashboard' },
-        { status: 500 },
-      )
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      const body = {
+        message: error.message,
+        type: error.name ?? error.type,
+      }
+
+      return new NextResponse(JSON.stringify(body), {
+        status: error.statusCode,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
     }
   }
 

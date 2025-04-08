@@ -44,7 +44,9 @@ export function DashboardCardWrapper({
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.error || 'Error al sincronizar el dashboard')
+        throw new Error(
+          error.message || error.error || 'Error al sincronizar el dashboard',
+        )
       }
 
       const data = (await response.json()) as StartSyncSuccessResponse
@@ -53,12 +55,12 @@ export function DashboardCardWrapper({
         description: data.message,
       })
     } catch (error) {
-      console.error('Error al sincronizar el dashboard:', error)
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Error al sincronizar el dashboard',
-      )
+      toast.error('Error al sincronizar el dashboard', {
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Error al sincronizar el dashboard',
+      })
       setIsSyncing(false)
     }
   }
