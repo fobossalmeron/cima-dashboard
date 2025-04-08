@@ -24,52 +24,108 @@ export class PhotosService {
       return acc
     }, {} as Record<string, string>)
 
+    await PhotoRepository.deleteBySubmissionAndType(
+      submissionId,
+      types[PhotoTypesEnum.PRODUCT],
+      tx,
+    )
+
     let productPhoto: Photo | null = null
     if (productPhotoValue) {
-      productPhoto = await PhotoRepository.createOrUpdate(
+      productPhoto = await PhotoRepository.create(
         {
           url: productPhotoValue?.toString() ?? '',
-          typeId: types[PhotoTypesEnum.PRODUCT],
-          submissionId,
+          type: {
+            connect: {
+              id: types[PhotoTypesEnum.PRODUCT],
+            },
+          },
+          submission: {
+            connect: {
+              id: submissionId,
+            },
+          },
         },
         tx,
       )
     }
 
+    await PhotoRepository.deleteBySubmissionAndType(
+      submissionId,
+      types[PhotoTypesEnum.PROMOTOR],
+      tx,
+    )
+
     let promotorPhoto: Photo | null = null
     if (promotorPhotoValue) {
-      promotorPhoto = await PhotoRepository.createOrUpdate(
+      promotorPhoto = await PhotoRepository.create(
         {
           url: promotorPhotoValue?.toString() ?? '',
-          typeId: types[PhotoTypesEnum.PROMOTOR],
-          submissionId,
+          type: {
+            connect: {
+              id: types[PhotoTypesEnum.PROMOTOR],
+            },
+          },
+          submission: {
+            connect: {
+              id: submissionId,
+            },
+          },
         },
         tx,
       )
     }
+
+    await PhotoRepository.deleteBySubmissionAndType(
+      submissionId,
+      types[PhotoTypesEnum.CLIENT],
+      tx,
+    )
 
     const clientsPhotos = await Promise.all(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       clientsPhotoValues.map(async ([_, value]) => {
-        return await PhotoRepository.createOrUpdate(
+        return await PhotoRepository.create(
           {
             url: value?.toString() ?? '',
-            typeId: types[PhotoTypesEnum.CLIENT],
-            submissionId,
+            type: {
+              connect: {
+                id: types[PhotoTypesEnum.CLIENT],
+              },
+            },
+            submission: {
+              connect: {
+                id: submissionId,
+              },
+            },
           },
           tx,
         )
       }),
     )
 
+    await PhotoRepository.deleteBySubmissionAndType(
+      submissionId,
+      types[PhotoTypesEnum.OTHER],
+      tx,
+    )
+
     const otherPhotos = await Promise.all(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       otherPhotoValues.map(async ([_, value]) => {
-        return await PhotoRepository.createOrUpdate(
+        return await PhotoRepository.create(
           {
             url: value?.toString() ?? '',
-            typeId: types[PhotoTypesEnum.OTHER],
-            submissionId,
+            type: {
+              connect: {
+                id: types[PhotoTypesEnum.OTHER],
+              },
+            },
+            submission: {
+              connect: {
+                id: submissionId,
+              },
+            },
           },
           tx,
         )

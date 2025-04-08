@@ -11,6 +11,7 @@ export class PhotoRepository {
       },
     })
   }
+
   static async createOrUpdate(
     data: CreatePhotoParams,
     tx?: Prisma.TransactionClient,
@@ -27,6 +28,25 @@ export class PhotoRepository {
     }
     return await client.photo.create({
       data,
+    })
+  }
+
+  static async create(
+    data: Prisma.PhotoCreateInput,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? prisma
+    return await client.photo.create({ data })
+  }
+
+  static async deleteBySubmissionAndType(
+    submissionId: string,
+    typeId: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? prisma
+    return await client.photo.deleteMany({
+      where: { submissionId, typeId },
     })
   }
 }

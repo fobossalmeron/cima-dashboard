@@ -3,6 +3,7 @@ import { BrandWithSubBrands, QuestionWithRelations } from '@/types/api'
 import { ProductTemplateProcessorService } from '@/lib/services'
 import { slugify } from '@/lib/utils'
 import { PresentationsEnum } from '@/enums/presentations'
+import { ProductSalesRepository } from '@/lib/repositories/dashboard/product-sales.repository'
 
 export class ProductSyncService {
   static async processProductSales(
@@ -125,19 +126,34 @@ export class ProductSyncService {
 
               if (!product) continue
 
+              await ProductSalesRepository.deleteByProductAndSubmission(
+                product.id,
+                submissionId,
+                tx,
+              )
+
               const total = price * quantity
               totalQuantity += quantity
               totalAmount += total
 
-              const productSale = await tx.productSale.create({
-                data: {
-                  submissionId,
-                  productId: product.id,
+              const productSale = await ProductSalesRepository.create(
+                {
+                  submission: {
+                    connect: {
+                      id: submissionId,
+                    },
+                  },
+                  product: {
+                    connect: {
+                      id: product.id,
+                    },
+                  },
                   quantity,
                   price,
                   total,
                 },
-              })
+                tx,
+              )
 
               productSales.push(productSale)
             }
@@ -182,19 +198,34 @@ export class ProductSyncService {
 
             if (!product) continue
 
+            await ProductSalesRepository.deleteByProductAndSubmission(
+              product.id,
+              submissionId,
+              tx,
+            )
+
             const total = price * quantity
             totalQuantity += quantity
             totalAmount += total
 
-            const productSale = await tx.productSale.create({
-              data: {
-                submissionId,
-                productId: product.id,
+            const productSale = await ProductSalesRepository.create(
+              {
+                submission: {
+                  connect: {
+                    id: submissionId,
+                  },
+                },
+                product: {
+                  connect: {
+                    id: product.id,
+                  },
+                },
                 quantity,
                 price,
                 total,
               },
-            })
+              tx,
+            )
 
             productSales.push(productSale)
           }
