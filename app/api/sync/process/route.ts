@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { DashboardSyncService } from '@/lib/services/dashboard/sync/sync.service'
 import { Log } from '@/lib/utils/log'
 import { verifySignatureAppRouter } from '@upstash/qstash/nextjs'
-import { SyncJobStatus } from '@prisma/client'
 import { SyncJobRepository } from '@/lib/repositories/jobs/sync-job.repository'
 
 // Variable para controlar el procesamiento secuencial
@@ -32,14 +31,6 @@ async function handler(request: NextRequest) {
 
       if (!job) {
         return NextResponse.json({ error: 'Job not found' }, { status: 404 })
-      }
-
-      if (job.status === SyncJobStatus.PROCESSING) {
-        Log.info('Job is already being processed', { jobId })
-        return NextResponse.json(
-          { message: 'Job is already being processed' },
-          { status: 409 },
-        )
       }
 
       // Procesar el job
