@@ -161,8 +161,6 @@ export class RepslyAuthService {
         refreshToken: data.refresh_token,
         expiresIn: data.expires_in,
         expiresAt,
-        fingerprint: process.env.REPSLY_FINGERPRINT || undefined,
-        serviceClientId: process.env.REPSLY_CLIENT_ID || undefined,
       },
       create: {
         service: 'repsly',
@@ -171,7 +169,6 @@ export class RepslyAuthService {
         expiresIn: data.expires_in,
         expiresAt,
         fingerprint: process.env.REPSLY_FINGERPRINT || undefined,
-        serviceClientId: process.env.REPSLY_CLIENT_ID || undefined,
       },
     })
   }

@@ -4,19 +4,6 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  // Crear usuario administrador
-  // await authClient.signUp.email({
-  //   email: 'admin@cima.com',
-  //   password: 'superadmin123',
-  //   name: 'Administrador',
-  // })
-
-  // await prisma.user.update({
-  //   where: { email: 'admin@cima.com' },
-  //   data: {
-  //     role: Role.SUPER_ADMIN,
-  //   },
-  // })
   // Crear token de Repsly
   await prisma.serviceToken.upsert({
     where: { service: 'repsly' },
