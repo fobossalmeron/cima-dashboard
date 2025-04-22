@@ -37,7 +37,7 @@ export function AmbassadorsTable({ data }: { data: Ambassador[] }) {
       <CardHeader>
         <CardTitle>Detalle de embajadoras</CardTitle>
         <CardDescription>
-          Activaciones y ventas por embajadora, haz scroll para ver más.
+          Demos y ventas por embajadora, haz scroll para ver más.
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-8">
@@ -46,9 +46,7 @@ export function AmbassadorsTable({ data }: { data: Ambassador[] }) {
             <TableHeader className="sticky top-0 bg-white z-10">
               <TableRow>
                 <TableHead className="w-[25%]">Promotora</TableHead>
-                <TableHead className="w-[15%] text-center">
-                  Activaciones
-                </TableHead>
+                <TableHead className="w-[15%] text-center">Demos</TableHead>
                 <TableHead className="w-[15%] text-center">
                   Ventas totales
                 </TableHead>

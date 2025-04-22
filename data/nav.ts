@@ -7,6 +7,6 @@ export const navItems: NavItem[] = [
     { path: "/", title: "General" },
     { path: "product", title: "Producto" },
     { path: "consumer", title: "Consumidor" },
-    { path: "sampling", title: "Sampling" },
+    { path: "demos", title: "Demos" },
     { path: "sales", title: "Ventas" },
 ];

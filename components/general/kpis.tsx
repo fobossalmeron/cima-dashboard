@@ -1,4 +1,4 @@
-import { KPICard } from "./kpi-card";
+import { KPICard } from './kpi-card'
 import {
   Zap,
   MapPin,
@@ -8,8 +8,8 @@ import {
   Timer,
   Star,
   Users,
-} from "lucide-react";
-import { KpisData } from "./general.types";
+} from 'lucide-react'
+import { KpisData } from './general.types'
 
 /**
  * Componente que muestra un conjunto de tarjetas KPI con métricas clave.
@@ -28,11 +28,7 @@ import { KpisData } from "./general.types";
 export function Kpis({ data }: { data: KpisData }) {
   return (
     <div className="grid grid-cols-2 gap-4">
-      <KPICard
-        title="Activaciones"
-        value={data.activations.toString()}
-        icon={Zap}
-      />
+      <KPICard title="Demos" value={data.activations.toString()} icon={Zap} />
       <KPICard
         title="Locaciones visitadas"
         value={data.locationsVisited.toString()}
@@ -75,5 +71,5 @@ export function Kpis({ data }: { data: KpisData }) {
         icon={Users}
       />
     </div>
-  );
+  )
 }

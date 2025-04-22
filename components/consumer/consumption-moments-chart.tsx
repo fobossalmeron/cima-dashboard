@@ -1,12 +1,6 @@
-"use client";
+'use client'
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   BarChart,
   Bar,
@@ -15,8 +9,8 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
-} from "recharts";
-import { ConsumptionMomentsChartData } from "./consumer.types";
+} from 'recharts'
+import { ConsumptionMomentsChartData } from './consumer.types'
 
 /**
  * Componente que muestra un gráfico de barras con la distribución de momentos de consumo.
@@ -29,21 +23,18 @@ import { ConsumptionMomentsChartData } from "./consumer.types";
 export function ConsumptionMomentsChart({
   data,
 }: {
-  data: ConsumptionMomentsChartData[];
+  data: ConsumptionMomentsChartData[]
 }) {
-  const total = data.reduce((sum, item) => sum + item.quantity, 0);
+  const total = data.reduce((sum, item) => sum + item.quantity, 0)
   const dataWithPercentages = data.map((item) => ({
     ...item,
     porcentaje: ((item.quantity / total) * 100).toFixed(1),
-  }));
+  }))
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Momentos de consumo</CardTitle>
-        <CardDescription>
-          Circunstancias en las que se consume el producto
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
@@ -53,11 +44,11 @@ export function ConsumptionMomentsChart({
             margin={{ left: 10 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis type="number" style={{ fontSize: "12px" }} />
+            <XAxis type="number" style={{ fontSize: '12px' }} />
             <YAxis
               dataKey="moment"
               type="category"
-              style={{ fontSize: "12px" }}
+              style={{ fontSize: '12px' }}
             />
             <Tooltip formatter={(value: number) => [`${value} personas`]} />
             <Bar
@@ -65,8 +56,8 @@ export function ConsumptionMomentsChart({
               fill="#8884d8"
               className="font-semibold"
               label={{
-                position: "center",
-                fill: "white",
+                position: 'center',
+                fill: 'white',
                 fontSize: 12,
                 formatter: (value: number) =>
                   `${((value / total) * 100).toFixed(1)}%`,
@@ -76,5 +67,5 @@ export function ConsumptionMomentsChart({
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  );
+  )
 }

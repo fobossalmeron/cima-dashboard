@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import {
   Card,
@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card";
+} from '@/components/ui/card'
 import {
   LineChart,
   Line,
@@ -16,8 +16,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from "recharts";
-import { ActivationSalesChartData } from "./general.types";
+} from 'recharts'
+import { ActivationSalesChartData } from './general.types'
 
 /**
  * Componente que muestra un gráfico de líneas con la relación entre activaciones y ventas por mes.
@@ -31,41 +31,41 @@ import { ActivationSalesChartData } from "./general.types";
 export function ActivationSalesChart({
   data,
 }: {
-  data: ActivationSalesChartData[];
+  data: ActivationSalesChartData[]
 }) {
-  const maxValue = Math.max(...data.map((item) => item.totalSales));
-  const minValue = 40;
+  const maxValue = Math.max(...data.map((item) => item.totalSales))
+  const minValue = 40
 
   const generateLogTicks = (min: number, max: number) => {
-    const ticks: number[] = [];
-    let current = min;
+    const ticks: number[] = []
+    let current = min
 
     while (current <= max) {
       // Redondeamos al múltiplo de 25 más cercano
-      const roundedValue = Math.round(current / 25) * 25;
-      ticks.push(roundedValue);
+      const roundedValue = Math.round(current / 25) * 25
+      ticks.push(roundedValue)
 
-      if (current < 100) current *= 2.5;
-      else if (current < 1000) current *= 2.5;
-      else current *= 2.5;
+      if (current < 100) current *= 2.5
+      else if (current < 1000) current *= 2.5
+      else current *= 2.5
     }
 
     // Aseguramos que el último tick sea el valor máximo redondeado a miles
-    const roundedMax = Math.ceil(max / 1000) * 1000;
+    const roundedMax = Math.ceil(max / 1000) * 1000
     if (ticks[ticks.length - 1] !== roundedMax) {
-      ticks.push(roundedMax);
+      ticks.push(roundedMax)
     }
 
     // Eliminamos duplicados que puedan surgir del redondeo
-    return [...new Set(ticks)];
-  };
+    return [...new Set(ticks)]
+  }
 
-  const ticks = generateLogTicks(minValue, maxValue);
+  const ticks = generateLogTicks(minValue, maxValue)
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Evolución de ventas y activaciones</CardTitle>
+        <CardTitle>Evolución de ventas y demos</CardTitle>
         <CardDescription>Se muestra en escala logarítmica</CardDescription>
       </CardHeader>
       <CardContent>
@@ -85,11 +85,11 @@ export function ActivationSalesChart({
               yAxisId="left"
               type="monotone"
               dataKey="activations"
-              name="Activaciones"
+              name="Demos"
               stroke="#8884D8"
               label={{
-                position: "top",
-                fill: "#8884D8",
+                position: 'top',
+                fill: '#8884D8',
                 fontSize: 14,
                 fontWeight: 600,
               }}
@@ -101,8 +101,8 @@ export function ActivationSalesChart({
               name="Ventas totales"
               stroke="#03aa30"
               label={{
-                position: "bottom",
-                fill: "#03aa30",
+                position: 'bottom',
+                fill: '#03aa30',
                 fontSize: 14,
                 fontWeight: 600,
               }}
@@ -114,8 +114,8 @@ export function ActivationSalesChart({
               name="Promedio de ventas"
               stroke="#ffae00"
               label={{
-                position: "top",
-                fill: "#ffae00",
+                position: 'top',
+                fill: '#ffae00',
                 fontSize: 14,
                 fontWeight: 600,
               }}
@@ -124,5 +124,5 @@ export function ActivationSalesChart({
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  );
+  )
 }

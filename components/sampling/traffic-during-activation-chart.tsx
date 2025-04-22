@@ -1,12 +1,6 @@
-"use client";
+'use client'
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Cell,
   Pie,
@@ -14,16 +8,16 @@ import {
   ResponsiveContainer,
   Tooltip,
   TooltipProps,
-} from "recharts";
-import { TrafficDuringActivationChartData } from "./sampling.types";
+} from 'recharts'
+import { TrafficDuringActivationChartData } from './sampling.types'
 
 const REFERENCE = [
-  { range: "Muy Bajo", detail: "0-24 personas", fill: "#FFBB28" },
-  { range: "Bajo", detail: "25-35 personas", fill: "#00C49F" },
-  { range: "Medio", detail: "36-50 personas", fill: "#0088FE" },
-  { range: "Alto", detail: "51-60 personas", fill: "#FF8042" },
-  { range: "Muy Alto", detail: "más de 60 personas", fill: "#8884d8" },
-];
+  { range: 'Muy Bajo', detail: '0-24 personas', fill: '#FFBB28' },
+  { range: 'Bajo', detail: '25-35 personas', fill: '#00C49F' },
+  { range: 'Medio', detail: '36-50 personas', fill: '#0088FE' },
+  { range: 'Alto', detail: '51-60 personas', fill: '#FF8042' },
+  { range: 'Muy Alto', detail: 'más de 60 personas', fill: '#8884d8' },
+]
 
 /**
  * Componente que muestra un gráfico de tráfico durante las activaciones de productos.
@@ -36,33 +30,30 @@ const REFERENCE = [
 export function TrafficDuringActivationChart({
   data,
 }: {
-  data: TrafficDuringActivationChartData[];
+  data: TrafficDuringActivationChartData[]
 }) {
   // Enriquecemos los datos con la información de color desde REFERENCE
   const formattedData = data.map((item) => {
-    const referenceItem = REFERENCE.find((ref) => ref.range === item.range);
+    const referenceItem = REFERENCE.find((ref) => ref.range === item.range)
     return {
       ...item,
       fill: referenceItem?.fill,
       detail: referenceItem?.detail,
       name: item.range,
-    };
-  });
+    }
+  })
 
   // Ordenamos los datos según el orden en REFERENCE
   const orderedData = [...formattedData].sort((a, b) => {
-    const indexA = REFERENCE.findIndex((ref) => ref.range === a.range);
-    const indexB = REFERENCE.findIndex((ref) => ref.range === b.range);
-    return indexA - indexB;
-  });
+    const indexA = REFERENCE.findIndex((ref) => ref.range === a.range)
+    const indexB = REFERENCE.findIndex((ref) => ref.range === b.range)
+    return indexA - indexB
+  })
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tráfico durante samplings</CardTitle>
-        <CardDescription>
-          Cantidad de personas en punto de venta
-        </CardDescription>
+        <CardTitle>Tráfico durante demos</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center">
@@ -95,9 +86,9 @@ export function TrafficDuringActivationChart({
                   if (active && payload && payload.length) {
                     const data = payload[0]
                       .payload as TrafficDuringActivationChartData & {
-                      fill: string;
-                      detail: string;
-                    };
+                      fill: string
+                      detail: string
+                    }
 
                     return (
                       <div className="bg-white p-3 border shadow-sm">
@@ -107,9 +98,9 @@ export function TrafficDuringActivationChart({
                           {data.value} ocasiones
                         </p>
                       </div>
-                    );
+                    )
                   }
-                  return null;
+                  return null
                 }}
               />
             </PieChart>
@@ -120,7 +111,7 @@ export function TrafficDuringActivationChart({
                 key={`legend-${index}`}
                 className="flex items-center gap-2"
                 style={{
-                  breakInside: "avoid",
+                  breakInside: 'avoid',
                 }}
               >
                 <div
@@ -136,5 +127,5 @@ export function TrafficDuringActivationChart({
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

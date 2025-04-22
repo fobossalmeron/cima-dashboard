@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Image from 'next/image'
 import { Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -40,10 +34,7 @@ export function PromoterImages({ data }: { data: PromoterImageData[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Imagenes de promotoras</CardTitle>
-        <CardDescription>
-          Imagenes de las promotoras en el punto de venta
-        </CardDescription>
+        <CardTitle>Imágenes de promotoras</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { GiveawayData } from './sampling.types'
 
 /**
@@ -22,9 +16,6 @@ export function Giveaways({ data }: { data: GiveawayData[] }) {
     <Card className="w-full h-full">
       <CardHeader>
         <CardTitle>Giveaways</CardTitle>
-        <CardDescription>
-          Distribución de artículos promocionales por tipo
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

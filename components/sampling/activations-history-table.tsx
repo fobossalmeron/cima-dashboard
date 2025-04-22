@@ -149,7 +149,7 @@ export function ActivationsHistoryTable({
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Historial de activaciones</CardTitle>
+        <CardTitle>Historial de demos</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

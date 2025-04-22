@@ -1,28 +1,28 @@
-"use client";
+'use client'
 
-import { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useMemo } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select'
 import {
   GoogleMap,
   useJsApiLoader,
   Circle,
   InfoWindow,
-} from "@react-google-maps/api";
-import { mapStyles } from "./map-styles";
+} from '@react-google-maps/api'
+import { mapStyles } from './map-styles'
 import {
   BaseLocation,
   StoreLocation,
   CityLocation,
   MapsData,
-} from "@/components/general/general.types";
-import { calculateMapSettings, getCircleOptions } from "./map-utils";
+} from '@/components/general/general.types'
+import { calculateMapSettings, getCircleOptions } from './map-utils'
 
 /**
  * Componente que muestra mapas interactivos de ciudades y puntos de venta con datos de ventas y activaciones.
@@ -48,38 +48,38 @@ import { calculateMapSettings, getCircleOptions } from "./map-utils";
  */
 
 export function Maps({ data }: { data: MapsData }) {
-  const [mapType, setMapType] = useState("pointOfSale");
+  const [mapType, setMapType] = useState('pointOfSale')
   const [selectedLocation, setSelectedLocation] = useState<BaseLocation | null>(
-    null
-  );
+    null,
+  )
 
   const { isLoaded, loadError } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-  });
+    id: 'google-map-script',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+  })
 
-  const currentData = mapType === "city" ? data.citiesData : data.storesData;
+  const currentData = mapType === 'city' ? data.citiesData : data.storesData
 
   const maxSales = useMemo(() => {
-    return Math.max(...currentData.map((location) => location.averageSales));
-  }, [currentData]);
+    return Math.max(...currentData.map((location) => location.averageSales))
+  }, [currentData])
 
   const minSales = useMemo(() => {
-    return Math.min(...currentData.map((location) => location.averageSales));
-  }, [currentData]);
+    return Math.min(...currentData.map((location) => location.averageSales))
+  }, [currentData])
 
   const maxActivations = useMemo(() => {
-    return Math.max(...currentData.map((location) => location.activations));
-  }, [currentData]);
+    return Math.max(...currentData.map((location) => location.activations))
+  }, [currentData])
 
   // Calculamos el centro y zoom del mapa
   const mapSettings = useMemo(() => {
-    return calculateMapSettings(currentData);
-  }, [currentData]);
+    return calculateMapSettings(currentData)
+  }, [currentData])
 
   const renderInfoWindow = (location: BaseLocation) => {
-    if (mapType === "city") {
-      const cityLoc = location as CityLocation;
+    if (mapType === 'city') {
+      const cityLoc = location as CityLocation
       return (
         <div className="p-2">
           <h3 className="font-bold mb-2">{location.name}</h3>
@@ -87,9 +87,9 @@ export function Maps({ data }: { data: MapsData }) {
           <p>Activaciones: {location.activations}</p>
           <p>Promedio de ventas: {location.averageSales}</p>
         </div>
-      );
+      )
     } else {
-      const storeLoc = location as StoreLocation;
+      const storeLoc = location as StoreLocation
       return (
         <div className="p-2">
           <h3 className="font-bold mb-2">
@@ -98,17 +98,17 @@ export function Maps({ data }: { data: MapsData }) {
           <p>Activaciones: {location.activations}</p>
           <p>Promedio de ventas: {location.averageSales}</p>
         </div>
-      );
+      )
     }
-  };
+  }
 
   const handleMapTypeChange = (newType: string) => {
-    setMapType(newType);
-    setSelectedLocation(null);
-  };
+    setMapType(newType)
+    setSelectedLocation(null)
+  }
 
-  if (loadError) return <div>Error al cargar el mapa</div>;
-  if (!isLoaded) return <div>Cargando mapa...</div>;
+  if (loadError) return <div>Error al cargar el mapa</div>
+  if (!isLoaded) return <div>Cargando mapa...</div>
 
   return (
     <Card className="w-full">
@@ -129,7 +129,7 @@ export function Maps({ data }: { data: MapsData }) {
       <CardContent className="space-y-4">
         <GoogleMap
           key={mapType}
-          mapContainerStyle={{ width: "100%", height: "400px" }}
+          mapContainerStyle={{ width: '100%', height: '400px' }}
           center={mapSettings.center}
           zoom={mapSettings.zoom}
           options={{
@@ -163,7 +163,7 @@ export function Maps({ data }: { data: MapsData }) {
         </GoogleMap>
         <div className="flex items-center gap-6 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
-            <span>No. activaciones</span>
+            <span>No. demos</span>
             <div className="flex items-center gap-2">
               <span>1</span>
               <div className="flex items-center gap-1">
@@ -186,5 +186,5 @@ export function Maps({ data }: { data: MapsData }) {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

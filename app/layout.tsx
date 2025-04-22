@@ -8,9 +8,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Cima Sampling Dashboard',
-  description: 'Dashboard for sampling activations',
-  generator: 'v0.dev',
+  title: 'Cima Demos Dashboard',
+  description: 'Dashboard for Cima Sales Demos',
   icons: {
     icon: '/favicon.ico?v=2',
   },

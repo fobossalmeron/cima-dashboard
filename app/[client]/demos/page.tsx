@@ -20,18 +20,18 @@ import { useClientContext } from '@/lib/context/ClientContext'
  * VELOCITY POR HORA
  *
  * Información importante:
- * - Cada activación dura 4 horas (estándar de la industria)
+ * - Cada demo dura 4 horas (estándar de la industria)
  * - El cálculo de velocity por hora:
- *   - Se asigna el mismo velocity de la activación a las 4 horas que dura
- *   - Con el tiempo, las horas se irán empalmando (ej: activaciones que comienzan
+ *   - Se asigna el mismo velocity de la demo a las 4 horas que dura
+ *   - Con el tiempo, las horas se irán empalmando (ej: demos que comienzan
  *     a las 2pm, 3pm, 4pm) lo que hará que los datos sean más precisos
  */
 
-export default function Sampling() {
+export default function Demos() {
   const { dashboardData } = useClientContext()
 
   if (!dashboardData) {
-    return <div>No dashboard data found</div>
+    return <div>No se encontró información del dashboard</div>
   }
 
   const activationsHistory = getActivationsHistory(dashboardData)
@@ -42,7 +42,7 @@ export default function Sampling() {
   const giveawaysData = getGiveawayProductsData(dashboardData)
   return (
     <div className="space-y-6">
-      <Header title="Sampling" />
+      <Header title="Demos" />
       <Content>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-6">
           <div className="lg:col-span-1 md:col-span-2">

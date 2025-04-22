@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   PieChart,
   Pie,
@@ -8,10 +8,10 @@ import {
   ResponsiveContainer,
   Tooltip,
   TooltipProps,
-} from "recharts";
-import { GenderDistributionChartData } from "./consumer.types";
+} from 'recharts'
+import { GenderDistributionChartData } from './consumer.types'
 
-const COLORS = ["#FF69B4", "#4169E1", "#9370DB"];
+const COLORS = ['#FF69B4', '#4169E1', '#9370DB']
 
 const CustomLegend = ({ data }: { data: GenderDistributionChartData[] }) => {
   return (
@@ -31,8 +31,8 @@ const CustomLegend = ({ data }: { data: GenderDistributionChartData[] }) => {
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
 /**
  * Componente que muestra un gráfico circular con la distribución de consumidores por género.
@@ -45,17 +45,17 @@ const CustomLegend = ({ data }: { data: GenderDistributionChartData[] }) => {
 export function GenderDistributionChart({
   data,
 }: {
-  data: GenderDistributionChartData[];
+  data: GenderDistributionChartData[]
 }) {
   const formattedData = data.map((item) => ({
     ...item,
     name: item.gender,
-  }));
+  }))
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Distribución por género</CardTitle>
+        <CardTitle>Consumidores por género</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={280}>
@@ -71,7 +71,7 @@ export function GenderDistributionChart({
               nameKey="gender"
               className="font-semibold"
               label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-              style={{ fontSize: "15px" }}
+              style={{ fontSize: '15px' }}
             >
               {formattedData.map((entry, index) => (
                 <Cell
@@ -84,20 +84,20 @@ export function GenderDistributionChart({
               content={({ active, payload }: TooltipProps<number, string>) => {
                 if (active && payload && payload.length) {
                   const data = payload[0]
-                    .payload as GenderDistributionChartData & { name: string };
+                    .payload as GenderDistributionChartData & { name: string }
                   const index = formattedData.findIndex(
-                    (item) => item.gender === data.gender
-                  );
-                  const color = COLORS[index % COLORS.length];
+                    (item) => item.gender === data.gender,
+                  )
+                  const color = COLORS[index % COLORS.length]
 
                   return (
                     <div className="bg-white p-3 border shadow-sm">
                       <p className="font-normal">{data.gender}</p>
                       <p style={{ color: color }}>{data.quantity} personas</p>
                     </div>
-                  );
+                  )
                 }
-                return null;
+                return null
               }}
             />
           </PieChart>
@@ -105,5 +105,5 @@ export function GenderDistributionChart({
         <CustomLegend data={data} />
       </CardContent>
     </Card>
-  );
+  )
 }

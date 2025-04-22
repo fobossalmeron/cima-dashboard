@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   BarChart,
   Bar,
@@ -10,15 +10,15 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from "recharts";
-import { Ambassador } from "./ambassadors.types";
-import { formatName } from "./ambassadors-utils";
+} from 'recharts'
+import { Ambassador } from './ambassadors.types'
+import { formatName } from './ambassadors-utils'
 
 /**
- * Componente que muestra un gráfico de barras con las activaciones y el promedio de ventas por embajadora.
+ * Componente que muestra un gráfico de barras con las demos y el promedio de ventas por embajadora.
  * @param {Ambassador[]} data
  * @property {string} name - Nombre de la embajadora.
- * @property {number} activations - Número de activaciones.
+ * @property {number} activations - Número de demos.
  * @property {number} averageSales - Promedio de ventas.
  */
 
@@ -27,10 +27,10 @@ export function ActivationsVsSalesChart({ data }: { data: Ambassador[] }) {
     ...item,
     shortName: formatName(item.name),
     fullName: item.name,
-  }));
+  }))
   const sortedData = formattedData.sort(
-    (a, b) => b.averageSales - a.averageSales
-  );
+    (a, b) => b.averageSales - a.averageSales,
+  )
 
   return (
     <Card className="w-full">
@@ -68,9 +68,9 @@ export function ActivationsVsSalesChart({ data }: { data: Ambassador[] }) {
               <Tooltip
                 labelFormatter={(name, entries) => {
                   if (entries && entries.length > 0) {
-                    return entries[0].payload.fullName;
+                    return entries[0].payload.fullName
                   }
-                  return name;
+                  return name
                 }}
               />
               <Legend wrapperStyle={{ fontSize: 14, paddingTop: 25 }} />
@@ -78,7 +78,7 @@ export function ActivationsVsSalesChart({ data }: { data: Ambassador[] }) {
                 yAxisId="left"
                 dataKey="activations"
                 fill="#82ca9d"
-                name="Activaciones"
+                name="Demos"
               />
               <Bar
                 yAxisId="right"
@@ -91,5 +91,5 @@ export function ActivationsVsSalesChart({ data }: { data: Ambassador[] }) {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
