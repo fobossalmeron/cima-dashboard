@@ -182,6 +182,7 @@ export class SubmissionSyncService {
             questions,
             questionMap,
             rowIndex,
+            tx,
           )
 
           // If there are errors, throw an exception to make a rollback

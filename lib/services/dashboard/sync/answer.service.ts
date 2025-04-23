@@ -48,6 +48,7 @@ export class AnswerSyncService {
     questions: QuestionWithRelations[],
     questionMap: Map<string, QuestionWithRelations>,
     rowIndex: number,
+    tx?: Prisma.TransactionClient,
   ): ProcessAnswersResponse {
     const errors: ValidationError[] = []
     const answers: AnswerValue[] = []
@@ -58,7 +59,7 @@ export class AnswerSyncService {
       questions,
     )
 
-    Object.entries(questionAnswers).forEach(([key, value]) => {
+    Object.entries(questionAnswers).forEach(async ([key, value]) => {
       try {
         const question = questionMap.get(key)
         if (!question) {
@@ -71,9 +72,10 @@ export class AnswerSyncService {
         }
 
         // Validar y procesar el valor según el tipo de pregunta
-        const processedValue = QuestionSyncService.processQuestionValue(
+        const processedValue = await QuestionSyncService.processQuestionValue(
           question,
           value,
+          tx,
         )
         answers.push(processedValue)
       } catch (error) {
