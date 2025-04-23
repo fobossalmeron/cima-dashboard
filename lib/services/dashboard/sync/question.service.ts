@@ -1,7 +1,8 @@
 import { FormSubmissionEntryData, QuestionWithRelations } from '@/types/api'
-import { QuestionType } from '@prisma/client'
+import { Prisma, QuestionType } from '@prisma/client'
 import { AnswerValue } from '@/types/api'
 import { AnswerSyncService } from './answer.service'
+import { QuestionOptionsRepository } from '@/lib/repositories'
 export class QuestionSyncService {
   /**
    * Get the active questions from the current row
@@ -132,10 +133,11 @@ export class QuestionSyncService {
    * @param {string | number | null} value - The value to process
    * @returns {AnswerValue} The processed value
    */
-  static processQuestionValue(
+  static async processQuestionValue(
     question: QuestionWithRelations,
     value: string | number | null,
-  ): AnswerValue {
+    tx?: Prisma.TransactionClient,
+  ): Promise<AnswerValue> {
     const isCheckbox = question.type === QuestionType.CHECKBOX
     const parsedValue = isCheckbox ? this.parseCheckboxValue(value) : value
     if (parsedValue === null || parsedValue === undefined) {
@@ -153,16 +155,21 @@ export class QuestionSyncService {
     switch (question.type) {
       case QuestionType.SELECT: {
         const valueStr = parsedValue.toString()
-        const option = question.options.find(
+        let option = question.options.find(
           (opt) => opt.value.toLowerCase() === valueStr.toLowerCase(),
         )
         if (!option) {
-          throw new Error(
-            `Valor inválido "${value}" para la pregunta ${
-              question.name
-            }. Opciones válidas: ${question.options
-              .map((opt) => opt.value)
-              .join(', ')}`,
+          option = await QuestionOptionsRepository.create(
+            {
+              value: valueStr,
+              question: {
+                connect: {
+                  id: question.id,
+                },
+              },
+              sortOrder: 0,
+            },
+            tx,
           )
         }
         return {
@@ -174,22 +181,29 @@ export class QuestionSyncService {
       }
       case QuestionType.MULTISELECT: {
         const selectedValues = parsedValue.toString().split(' | ') || []
-        const validOptions = selectedValues.map((selectedValue) => {
-          const option = question.options.find(
-            (opt) =>
-              opt.value.toLowerCase() === selectedValue.trim().toLowerCase(),
-          )
-          if (!option) {
-            throw new Error(
-              `Valor inválido "${selectedValue}" para la pregunta ${
-                question.name
-              }. Opciones válidas: ${question.options
-                .map((opt) => opt.value)
-                .join(', ')}`,
+        const validOptions = await Promise.all(
+          selectedValues.map(async (selectedValue) => {
+            let option = question.options.find(
+              (opt) =>
+                opt.value.toLowerCase() === selectedValue.trim().toLowerCase(),
             )
-          }
-          return option
-        })
+            if (!option) {
+              option = await QuestionOptionsRepository.create(
+                {
+                  value: selectedValue,
+                  question: {
+                    connect: {
+                      id: question.id,
+                    },
+                  },
+                  sortOrder: 0,
+                },
+                tx,
+              )
+            }
+            return option
+          }),
+        )
 
         return {
           value: validOptions.map((opt) => opt.value).join(' | '),
