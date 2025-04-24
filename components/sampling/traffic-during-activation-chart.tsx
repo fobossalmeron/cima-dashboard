@@ -57,7 +57,7 @@ export function TrafficDuringActivationChart({
       </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center">
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={320}>
             <PieChart>
               <Pie
                 data={orderedData}

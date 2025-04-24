@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   BarChart,
   Bar,
@@ -10,37 +10,37 @@ import {
   ResponsiveContainer,
   LabelList,
   Cell,
-} from "recharts";
-import { AveragePriceInPDVChartData } from "./product.types";
+} from 'recharts'
+import { AveragePriceInPDVChartData } from './product.types'
 
 // Colores para las barras
 const COLORS = [
-  "#0088FE", // Azul principal
-  "#00C49F", // Verde turquesa
-  "#FFBB28", // Amarillo dorado
-  "#FF8042", // Naranja intenso
-  "#8884D8", // Morado suave
-  "#82ca9d", // Verde pastel
-  "#ffc658", // Amarillo claro
-  "#8dd1e1", // Azul claro
-  "#7dce31", // Verde lima
-  "#fd7abd", // Verde oliva oscuro (mejor contraste)
-  "#ff9f7f", // Salmón
-  "#f7a35c", // Naranja pastel
-  "#7cb5ec", // Azul cielo
-  "#434348", // Gris oscuro
-  "#90ed7d", // Verde menta
-];
+  '#0088FE', // Azul principal
+  '#00C49F', // Verde turquesa
+  '#FFBB28', // Amarillo dorado
+  '#FF8042', // Naranja intenso
+  '#8884D8', // Morado suave
+  '#82ca9d', // Verde pastel
+  '#ffc658', // Amarillo claro
+  '#8dd1e1', // Azul claro
+  '#7dce31', // Verde lima
+  '#fd7abd', // Verde oliva oscuro (mejor contraste)
+  '#ff9f7f', // Salmón
+  '#f7a35c', // Naranja pastel
+  '#7cb5ec', // Azul cielo
+  '#434348', // Gris oscuro
+  '#90ed7d', // Verde menta
+]
 
 // Definir una interfaz específica para el tooltip
 interface CustomTooltipProps {
-  active?: boolean;
+  active?: boolean
   payload?: Array<{
-    payload: AveragePriceInPDVChartData;
-    dataKey: string;
-    value: number;
-    color: string;
-  }>;
+    payload: AveragePriceInPDVChartData
+    dataKey: string
+    value: number
+    color: string
+  }>
 }
 
 /**
@@ -55,21 +55,21 @@ interface CustomTooltipProps {
 export function AveragePriceInPDVChart({
   data,
 }: {
-  data: AveragePriceInPDVChartData[];
+  data: AveragePriceInPDVChartData[]
 }) {
-  const sortedData = data.sort((a, b) => b.averagePrice - a.averagePrice);
+  const sortedData = data.sort((a, b) => b.averagePrice - a.averagePrice)
 
   // Componente personalizado para el Tooltip
   const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
-      const currentData = payload[0].payload;
+      const currentData = payload[0].payload
 
       // Encontrar el índice del elemento en el array de datos
       const dataIndex = sortedData.findIndex(
-        (item: AveragePriceInPDVChartData) => item.brand === currentData.brand
-      );
-      const colorIndex = dataIndex >= 0 ? dataIndex % COLORS.length : 0;
-      const color = COLORS[colorIndex];
+        (item: AveragePriceInPDVChartData) => item.brand === currentData.brand,
+      )
+      const colorIndex = dataIndex >= 0 ? dataIndex % COLORS.length : 0
+      const color = COLORS[colorIndex]
 
       return (
         <div className="bg-white border border-gray-200 p-3">
@@ -78,25 +78,25 @@ export function AveragePriceInPDVChart({
             Precio promedio ${currentData.averagePrice.toFixed(2)}
           </p>
         </div>
-      );
+      )
     }
 
-    return null;
-  };
+    return null
+  }
 
   return (
-    <Card className="w-full">
+    <Card className="md:col-span-2 col-span-1 w-full">
       <CardHeader>
         <CardTitle>Precio promedio del producto en punto de venta</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height={300}>
           <BarChart
             data={sortedData}
             layout="vertical"
             margin={{ top: 20, right: 10, left: 10, bottom: 5 }}
           >
-            <XAxis type="number" domain={[0, "dataMax + 0.5"]} hide={true} />
+            <XAxis type="number" domain={[0, 'dataMax + 0.5']} hide={true} />
             <YAxis
               type="category"
               dataKey="brand"
@@ -109,7 +109,7 @@ export function AveragePriceInPDVChart({
                 dataKey="averagePrice"
                 position="right"
                 formatter={(value: number) => `$${value}`}
-                style={{ fontSize: "10px" }}
+                style={{ fontSize: '10px' }}
               />
               {sortedData.map((entry, index) => (
                 <Cell
@@ -122,5 +122,5 @@ export function AveragePriceInPDVChart({
         </ResponsiveContainer>
       </CardContent>
     </Card>
-  );
+  )
 }

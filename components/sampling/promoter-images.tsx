@@ -32,34 +32,42 @@ export function PromoterImages({ data }: { data: PromoterImageData[] }) {
   const currentImages = data.slice(startIndex, startIndex + imagesPerPage)
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>Imágenes de promotoras</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="space-y-4 h-full flex flex-col justify-between">
           <div className="grid grid-cols-1 md:grid-cols-3 print:grid-cols-3 gap-4">
-            {currentImages.map((image, index) => (
-              <div
-                key={startIndex + index}
-                className="relative aspect-video group"
-              >
-                <Image
-                  src={image.url}
-                  alt={image.name}
-                  fill
-                  className="object-cover rounded-lg"
-                />
-                <Button
-                  size="icon"
-                  variant="secondary"
-                  className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => window.open(image.url, '_blank')}
+            {currentImages.length > 0 ? (
+              currentImages.map((image, index) => (
+                <div
+                  key={startIndex + index}
+                  className="relative aspect-video group"
                 >
-                  <Download className="h-4 w-4" />
-                </Button>
+                  <Image
+                    src={image.url}
+                    alt={image.name}
+                    fill
+                    className="object-cover rounded-lg"
+                  />
+                  <Button
+                    size="icon"
+                    variant="secondary"
+                    className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => window.open(image.url, '_blank')}
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))
+            ) : (
+              <div className="relative aspect-video bg-muted rounded-lg flex items-center justify-center">
+                <p className="text-muted-foreground text-sm">
+                  No se encontraron imágenes
+                </p>
               </div>
-            ))}
+            )}
           </div>
 
           {totalPages > 1 && (

@@ -4,7 +4,6 @@ import { PDVTypeChart } from '@/components/product/pdv-type-chart'
 import { ProductLocationInPDVChart } from '@/components/product/product-location-in-pdv-chart'
 import { ProductStatusInPDVChart } from '@/components/product/product-status-in-pdv-chart'
 import { AveragePriceInPDVChart } from '@/components/product/average-price-in-pdv-chart'
-import { OldAndNewActivationsChart } from '@/components/product/old-and-new-activations-chart'
 import { PDVProductImages } from '@/components/product/pdv-product-images'
 import { Header } from '@/components/header'
 import { Content } from '@/components/content'
@@ -14,7 +13,6 @@ import {
   getProductLocationData,
   getAveragePriceData,
   getProductStatusInPDVChartData,
-  getOldAndNewActivationsChartData,
   getPDVProductImages,
 } from '@/lib/utils/dashboard-data/products'
 
@@ -30,8 +28,6 @@ export default function ProductInfo() {
   const averagePriceData = getAveragePriceData(dashboardData)
   const productStatusInPDVChartData =
     getProductStatusInPDVChartData(dashboardData)
-  const oldAndNewActivationsChartData =
-    getOldAndNewActivationsChartData(dashboardData)
   const pdvProductImages = getPDVProductImages(dashboardData)
 
   return (
@@ -41,9 +37,8 @@ export default function ProductInfo() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-6">
           <PDVTypeChart data={pdvTypeData} />
           <ProductLocationInPDVChart data={productLocationData} />
-          <ProductStatusInPDVChart data={productStatusInPDVChartData} />
           <AveragePriceInPDVChart data={averagePriceData} />
-          <OldAndNewActivationsChart data={oldAndNewActivationsChartData} />
+          <ProductStatusInPDVChart data={productStatusInPDVChartData} />
           <PDVProductImages data={pdvProductImages} />
         </div>
       </Content>
