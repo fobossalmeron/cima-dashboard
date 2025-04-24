@@ -12,6 +12,7 @@ import { PhotoTypesEnum } from '@/enums/photos-fields'
 import { DashboardWithRelations } from '@/types/api/clients'
 import { toUTC } from '../date'
 import { GiveawayProductData, GroupedGiveawayData } from '@/types/api'
+import { Option } from '@/types'
 
 export function getActivationsHistory(
   dashboard: DashboardWithRelations,
@@ -171,7 +172,19 @@ export function getHeatmapData(
 
 export function getGiveawayProductsData(
   dashboard: DashboardWithRelations,
+  giveawayProductTypes: Option[],
 ): GiveawayData[] {
+  // Create basic map of giveaway product types
+  const giveawayProductTypesMap = giveawayProductTypes.reduce<
+    Record<string, { label: string; quantity: number }>
+  >((acc, type) => {
+    acc[type.value] = {
+      label: type.label,
+      quantity: 0,
+    }
+    return acc
+  }, {})
+
   const allGiveawayProducts: GiveawayProductData[] =
     dashboard.submissions.flatMap((submission) =>
       submission.giveawayProducts.map((giveawayProduct) => ({
@@ -182,19 +195,17 @@ export function getGiveawayProductsData(
       })),
     )
 
-  const groupedByType = allGiveawayProducts.reduce<Record<string, number>>(
-    (acc, product) => {
-      if (!acc[product.type]) {
-        acc[product.type] = 0
-      }
-      acc[product.type] += product.quantity
-      return acc
-    },
-    {},
-  )
+  allGiveawayProducts.forEach((product) => {
+    const nameAsSlug = product.type.toLowerCase().replace(/ /g, '-')
+    if (giveawayProductTypesMap[nameAsSlug]) {
+      giveawayProductTypesMap[nameAsSlug].quantity += product.quantity
+    }
+  })
 
-  return Object.entries(groupedByType).map(([type, quantity]) => ({
-    type,
-    quantity,
-  }))
+  return Object.entries(giveawayProductTypesMap)
+    .map(([type, quantity]) => ({
+      type: quantity.label,
+      quantity: quantity.quantity,
+    }))
+    .sort((a, b) => b.quantity - a.quantity)
 }

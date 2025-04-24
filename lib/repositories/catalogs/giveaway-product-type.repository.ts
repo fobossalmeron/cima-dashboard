@@ -18,4 +18,12 @@ export class GiveawayProductTypeRepository {
       create: { name, slug },
     })
   }
+
+  static async findByQuestionOptions(options: string[]) {
+    return await prisma.giveawayProductType.findMany({
+      where: {
+        slug: { in: options },
+      },
+    })
+  }
 }
