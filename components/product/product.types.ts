@@ -29,5 +29,7 @@ export interface OldAndNewActivationsChartData {
 
 export interface AveragePriceInPDVChartData {
   brand: string
-  averagePrice: number
+  averagePriceByPdvType: {
+    [key: string]: number;  // Clave es el tipo de PDV, valor es el precio
+  }
 }
