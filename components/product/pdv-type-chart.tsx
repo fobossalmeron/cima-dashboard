@@ -1,7 +1,7 @@
-"use client";
+'use client'
 
-import * as React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import * as React from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   PieChart,
   Pie,
@@ -9,19 +9,19 @@ import {
   ResponsiveContainer,
   Tooltip,
   Label,
-} from "recharts";
-import { PDVTypeChartData } from "./product.types";
+} from 'recharts'
+import { PDVTypeChartData } from './product.types'
 
 const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#8884D8",
-  "#82ca9d",
-  "#ffc658",
-  "#8dd1e1",
-];
+  '#0088FE',
+  '#00C49F',
+  '#FFBB28',
+  '#FF8042',
+  '#8884D8',
+  '#82ca9d',
+  '#ffc658',
+  '#8dd1e1',
+]
 
 /**
  * Componente que muestra un gráfico circular con la distribución de tipos de puntos de venta.
@@ -32,29 +32,27 @@ const COLORS = [
  */
 
 export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
-  const calculatedTotalPdv = data.reduce((sum, item) => sum + item.quantity, 0);
+  const calculatedTotalPdv = data.reduce((sum, item) => sum + item.quantity, 0)
 
   // Personalización del tooltip
   interface CustomTooltipProps {
-    active?: boolean;
+    active?: boolean
     payload?: Array<{
-      payload: PDVTypeChartData;
-      dataKey: string;
-      name: string;
-      color: string;
-    }>;
+      payload: PDVTypeChartData
+      dataKey: string
+      name: string
+      color: string
+    }>
   }
 
   const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
-      const currentData = payload[0].payload;
+      const currentData = payload[0].payload
 
       // Encontrar el índice del elemento en el array de datos
-      const dataIndex = data.findIndex(
-        (item) => item.type === currentData.type
-      );
-      const colorIndex = dataIndex >= 0 ? dataIndex % COLORS.length : 0;
-      const color = COLORS[colorIndex];
+      const dataIndex = data.findIndex((item) => item.type === currentData.type)
+      const colorIndex = dataIndex >= 0 ? dataIndex % COLORS.length : 0
+      const color = COLORS[colorIndex]
 
       return (
         <div className="bg-background border border-border p-3">
@@ -63,13 +61,13 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
             {currentData.quantity} puntos de venta
           </p>
         </div>
-      );
+      )
     }
-    return null;
-  };
+    return null
+  }
 
   return (
-    <Card>
+    <Card className="lg:col-span-1 md:col-span-2 col-span-1">
       <CardHeader>
         <CardTitle>Tipo de punto de venta</CardTitle>
       </CardHeader>
@@ -96,7 +94,7 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
               ))}
               <Label
                 content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                  if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
                     return (
                       <text
                         x={viewBox.cx}
@@ -119,7 +117,7 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
                           PDV
                         </tspan>
                       </text>
-                    );
+                    )
                   }
                 }}
               />
@@ -133,7 +131,7 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
               key={`legend-${index}`}
               className="flex items-center gap-2"
               style={{
-                breakInside: "avoid",
+                breakInside: 'avoid',
               }}
             >
               <div
@@ -151,5 +149,5 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

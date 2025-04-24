@@ -37,8 +37,8 @@ export default function ProductInfo() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-6">
           <PDVTypeChart data={pdvTypeData} />
           <ProductLocationInPDVChart data={productLocationData} />
-          <ProductStatusInPDVChart data={productStatusInPDVChartData} />
           <AveragePriceInPDVChart data={averagePriceData} />
+          <ProductStatusInPDVChart data={productStatusInPDVChartData} />
           <PDVProductImages data={pdvProductImages} />
         </div>
       </Content>

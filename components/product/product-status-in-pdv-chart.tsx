@@ -1,10 +1,10 @@
-"use client";
+'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { ProductStatusInPDVChartData } from "./product.types";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
+import { ProductStatusInPDVChartData } from './product.types'
 
-const COLORS = ["#00C49F", "#FF8042"];
+const COLORS = ['#00C49F', '#FF8042']
 
 /**
  * Componente que muestra un gráfico circular sobre el estado de promoción de productos.
@@ -17,30 +17,28 @@ const COLORS = ["#00C49F", "#FF8042"];
 export function ProductStatusInPDVChart({
   data,
 }: {
-  data: ProductStatusInPDVChartData[];
+  data: ProductStatusInPDVChartData[]
 }) {
   // Interfaz para las propiedades del tooltip personalizado
   interface CustomTooltipProps {
-    active?: boolean;
+    active?: boolean
     payload?: Array<{
-      payload: ProductStatusInPDVChartData;
-      dataKey: string;
-      name: string;
-      color: string;
-    }>;
+      payload: ProductStatusInPDVChartData
+      dataKey: string
+      name: string
+      color: string
+    }>
   }
 
   // Componente de tooltip personalizado
   const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
-      const currentData = payload[0].payload;
+      const currentData = payload[0].payload
 
       // Encontrar el índice del elemento en el array de datos
-      const dataIndex = data.findIndex(
-        (item) => item.type === currentData.type
-      );
-      const colorIndex = dataIndex >= 0 ? dataIndex % COLORS.length : 0;
-      const color = COLORS[colorIndex];
+      const dataIndex = data.findIndex((item) => item.type === currentData.type)
+      const colorIndex = dataIndex >= 0 ? dataIndex % COLORS.length : 0
+      const color = COLORS[colorIndex]
 
       return (
         <div className="bg-background border border-border p-3">
@@ -49,13 +47,13 @@ export function ProductStatusInPDVChart({
             {currentData.quantity} ocasiones
           </p>
         </div>
-      );
+      )
     }
-    return null;
-  };
+    return null
+  }
 
   return (
-    <Card>
+    <Card className="lg:col-span-1 md:col-span-2 col-span-1">
       <CardHeader>
         <CardTitle>¿Producto en promoción?</CardTitle>
       </CardHeader>
@@ -91,7 +89,7 @@ export function ProductStatusInPDVChart({
               key={`legend-${index}`}
               className="flex items-center gap-2"
               style={{
-                breakInside: "avoid",
+                breakInside: 'avoid',
               }}
             >
               <div
@@ -109,5 +107,5 @@ export function ProductStatusInPDVChart({
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

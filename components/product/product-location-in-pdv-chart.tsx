@@ -42,7 +42,7 @@ export function ProductLocationInPDVChart({
   }, [data])
 
   return (
-    <Card>
+    <Card className="md:col-span-2 col-span-1">
       <CardHeader>
         <CardTitle>Ubicación del producto en punto de venta</CardTitle>
       </CardHeader>
