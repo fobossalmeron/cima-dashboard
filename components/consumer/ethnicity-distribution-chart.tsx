@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   PieChart,
   Pie,
@@ -8,10 +8,10 @@ import {
   ResponsiveContainer,
   Tooltip,
   TooltipProps,
-} from "recharts";
-import { EthnicityDistributionChartData } from "./consumer.types";
+} from 'recharts'
+import { EthnicityDistributionChartData } from './consumer.types'
 
-const COLORS = ["#FF8042", "#00C49F", "#FFBB28", "#0088FE", "#9370DB"];
+const COLORS = ['#FF8042', '#00C49F', '#FFBB28', '#0088FE', '#9370DB']
 
 /**
  * Componente que muestra un gráfico circular con la distribución de consumidores por etnia.
@@ -23,17 +23,17 @@ const COLORS = ["#FF8042", "#00C49F", "#FFBB28", "#0088FE", "#9370DB"];
 export function EthnicityDistributionChart({
   data,
 }: {
-  data: EthnicityDistributionChartData[];
+  data: EthnicityDistributionChartData[]
 }) {
   const formattedData = data.map((item) => ({
     ...item,
     name: item.ethnicity,
-  }));
+  }))
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Distribución por etnia</CardTitle>
+        <CardTitle>Consumidores por etnia</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={280}>
@@ -65,21 +65,21 @@ export function EthnicityDistributionChart({
                 if (active && payload && payload.length) {
                   const data = payload[0]
                     .payload as EthnicityDistributionChartData & {
-                    name: string;
-                  };
+                    name: string
+                  }
                   const index = formattedData.findIndex(
-                    (item) => item.ethnicity === data.ethnicity
-                  );
-                  const color = COLORS[index % COLORS.length];
+                    (item) => item.ethnicity === data.ethnicity,
+                  )
+                  const color = COLORS[index % COLORS.length]
 
                   return (
                     <div className="bg-white p-3 border shadow-sm">
                       <p className="font-normal">{data.ethnicity}</p>
                       <p style={{ color: color }}>{data.quantity} personas</p>
                     </div>
-                  );
+                  )
                 }
-                return null;
+                return null
               }}
             />
           </PieChart>
@@ -90,7 +90,7 @@ export function EthnicityDistributionChart({
               key={`legend-${index}`}
               className="flex items-center gap-2"
               style={{
-                breakInside: "avoid",
+                breakInside: 'avoid',
               }}
             >
               <div
@@ -108,5 +108,5 @@ export function EthnicityDistributionChart({
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
