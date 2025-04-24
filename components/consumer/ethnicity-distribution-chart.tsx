@@ -25,11 +25,6 @@ export function EthnicityDistributionChart({
 }: {
   data: EthnicityDistributionChartData[]
 }) {
-  const formattedData = data.map((item) => ({
-    ...item,
-    name: item.ethnicity,
-  }))
-
   return (
     <Card>
       <CardHeader>
@@ -39,7 +34,7 @@ export function EthnicityDistributionChart({
         <ResponsiveContainer width="100%" height={280}>
           <PieChart>
             <Pie
-              data={formattedData}
+              data={data}
               cx="50%"
               cy="40%"
               labelLine={false}
@@ -53,7 +48,7 @@ export function EthnicityDistributionChart({
               }}
               label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
             >
-              {formattedData.map((entry, index) => (
+              {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
@@ -63,19 +58,17 @@ export function EthnicityDistributionChart({
             <Tooltip
               content={({ active, payload }: TooltipProps<number, string>) => {
                 if (active && payload && payload.length) {
-                  const data = payload[0]
-                    .payload as EthnicityDistributionChartData & {
-                    name: string
-                  }
-                  const index = formattedData.findIndex(
-                    (item) => item.ethnicity === data.ethnicity,
+                  const item = payload[0]
+                    .payload as EthnicityDistributionChartData
+                  const index = data.findIndex(
+                    (d) => d.ethnicity === item.ethnicity,
                   )
                   const color = COLORS[index % COLORS.length]
 
                   return (
                     <div className="bg-white p-3 border shadow-sm">
-                      <p className="font-normal">{data.ethnicity}</p>
-                      <p style={{ color: color }}>{data.quantity} personas</p>
+                      <p className="font-normal">{item.ethnicity}</p>
+                      <p style={{ color: color }}>{item.quantity} personas</p>
                     </div>
                   )
                 }
@@ -85,7 +78,7 @@ export function EthnicityDistributionChart({
           </PieChart>
         </ResponsiveContainer>
         <div className="flex flex-wrap justify-center gap-3 gap-y-1">
-          {formattedData.map((entry, index) => (
+          {data.map((entry, index) => (
             <div
               key={`legend-${index}`}
               className="flex items-center gap-2"
