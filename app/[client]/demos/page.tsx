@@ -5,6 +5,7 @@ import { Content } from '@/components/content'
 import { TrafficDuringActivationChart } from '@/components/sampling/traffic-during-activation-chart'
 import { ActivationHoursHeatmap } from '@/components/sampling/activation-hours-heatmap'
 import { ActivationsHistoryTable } from '@/components/sampling/activations-history-table'
+import { OldAndNewActivationsChart } from '@/components/sampling/old-and-new-activations-chart'
 import { PromoterImages } from '@/components/sampling/promoter-images'
 import { Giveaways } from '@/components/sampling/giveaways'
 import {
@@ -14,6 +15,7 @@ import {
   getPromoterImagesData,
   getTrafficDuringActivationChartData,
 } from '@/lib/utils/dashboard-data/samplings'
+import { getOldAndNewActivationsChartData } from '@/lib/utils/dashboard-data/products'
 import { useClientContext } from '@/lib/context/ClientContext'
 
 /**
@@ -40,6 +42,9 @@ export default function Demos() {
   const promoterImagesData = getPromoterImagesData(dashboardData)
   const heatmapData = getHeatmapData(dashboardData)
   const giveawaysData = getGiveawayProductsData(dashboardData)
+  const oldAndNewActivationsChartData =
+    getOldAndNewActivationsChartData(dashboardData)
+
   return (
     <div className="space-y-6">
       <Header title="Demos" />
@@ -50,14 +55,15 @@ export default function Demos() {
               data={trafficDuringActivationChartData}
             />
           </div>
-          <div className="md:col-span-2 lg:col-span-2 print:col-span-2">
-            <Giveaways data={giveawaysData} />
-          </div>
+          <OldAndNewActivationsChart data={oldAndNewActivationsChartData} />
           <div className="md:col-span-2 lg:col-span-3 print:col-span-3">
             <PromoterImages data={promoterImagesData} />
           </div>
-          <div className="md:col-span-2 lg:col-span-3 print:col-span-3">
+          <div className="md:col-span-2 lg:col-span-2 print:col-span-2">
             <ActivationHoursHeatmap data={heatmapData} />
+          </div>
+          <div className="col-span-1 md:col-span-2 lg:col-span-1 print:col-span-1">
+            <Giveaways data={giveawaysData} />
           </div>
           <div className="md:col-span-2 lg:col-span-3 print:col-span-3">
             <ActivationsHistoryTable data={activationsHistory} />

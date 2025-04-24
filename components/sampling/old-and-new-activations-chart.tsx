@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
   LabelList,
 } from 'recharts'
-import { OldAndNewActivationsChartData } from './product.types'
+import { OldAndNewActivationsChartData } from '../product/product.types'
 
 /**
  * Componente que muestra un gráfico de barras comparando activaciones en tiendas nuevas y anteriores.
@@ -30,13 +30,26 @@ export function OldAndNewActivationsChart({
 }: {
   data: OldAndNewActivationsChartData[]
 }) {
+  const totalNewLocations = data.reduce(
+    (sum, item) => sum + item.new_locations,
+    0,
+  )
+
   return (
     <Card className="md:col-span-2 print:col-span-2">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-start justify-between">
         <CardTitle>Demos en tiendas nuevas y anteriores</CardTitle>
+        <div className="flex items-center gap-2 rounded-lg bg-[#0088FE]/10 px-4 py-2">
+          <span className="text-sm font-medium text-[#0088FE]">
+            Total tiendas nuevas:
+          </span>
+          <span className="text-lg font-bold text-[#0088FE]">
+            {totalNewLocations}
+          </span>
+        </div>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="month" style={{ fontSize: '12px' }} />
@@ -54,29 +67,7 @@ export function OldAndNewActivationsChart({
               iconType="circle"
               iconSize={12}
             />
-            <Bar
-              dataKey="new_location_activations"
-              name="Demos en Tiendas Nuevas"
-              fill="#0088FE"
-            >
-              <LabelList
-                dataKey="new_location_activations"
-                position="top"
-                style={{ fontSize: '11px' }}
-              />
-            </Bar>
-            <Bar
-              dataKey="previous_location_activations"
-              name="Demos en Tiendas Anteriores"
-              fill="#00C49F"
-            >
-              <LabelList
-                dataKey="previous_location_activations"
-                position="top"
-                style={{ fontSize: '11px' }}
-              />
-            </Bar>
-            <Bar dataKey="new_locations" name="Tiendas Nuevas" fill="#FFBB28">
+            <Bar dataKey="new_locations" name="Tiendas nuevas" fill="#0088FE">
               <LabelList
                 dataKey="new_locations"
                 position="top"
@@ -85,7 +76,7 @@ export function OldAndNewActivationsChart({
             </Bar>
             <Bar
               dataKey="previous_locations"
-              name="Tiendas Anteriores"
+              name="Tiendas anteriores"
               fill="#FF8042"
             >
               <LabelList
