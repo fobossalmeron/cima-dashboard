@@ -23,7 +23,7 @@ export function getKpisData(dashboard?: DashboardWithRelations): KpisData {
   const uniqueLocations = new Set(
     dashboard.submissions
       .filter((submission) => submission.location)
-      .map((submission) => submission.location?.code),
+      .map((submission) => submission.location?.name),
   )
 
   // Calcular unidades totales vendidas
