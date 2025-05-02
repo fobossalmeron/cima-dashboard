@@ -51,10 +51,22 @@ export class SamplingService {
     return ageRange
   }
 
-  private static async processGender(value?: string): Promise<Gender> {
+  private static async processGender(
+    value?: string,
+    tx?: Prisma.TransactionClient,
+  ): Promise<Gender> {
     if (!value) throw new Error('Gender value is required')
     const gender = await SamplingGenderRepository.getBySlug(slugify(value))
-    if (!gender) throw new Error(`Gender not found for value: ${value}`)
+    if (!gender) {
+      const genderCreated = await SamplingGenderRepository.createOrUpdate(
+        {
+          slug: slugify(value),
+          description: value,
+        },
+        tx,
+      )
+      return genderCreated
+    }
     return gender
   }
 
@@ -96,6 +108,7 @@ export class SamplingService {
 
   static async processSampling(
     row: FormSubmissionEntryData,
+    tx?: Prisma.TransactionClient,
   ): Promise<SamplingProcessingResult> {
     const trafficQuestion = row[SamplingFieldsEnum.TRAFFIC]
     const ethnicityQuestion = row[SamplingFieldsEnum.ETHNICITY]
@@ -111,7 +124,7 @@ export class SamplingService {
     const traffic = await this.processTraffic(trafficQuestion?.toString())
     const ethnicity = await this.processEthnicity(ethnicityQuestion?.toString())
     const ageRange = await this.processAgeRange(ageRangeQuestion?.toString())
-    const gender = await this.processGender(genderQuestion?.toString())
+    const gender = await this.processGender(genderQuestion?.toString(), tx)
     const purchaseIntentions = await this.processPurchaseIntentions(
       purchaseIntentionQuestion?.toString(),
     )
@@ -152,7 +165,7 @@ export class SamplingService {
     tx?: Prisma.TransactionClient,
   ): Promise<SamplingWithRelations> {
     const client = tx || prisma
-    const samplingData = await this.processSampling(row)
+    const samplingData = await this.processSampling(row, tx)
     const { purchaseIntentions, consumptionMoments, ...rest } = samplingData
     const data = {
       ...rest,

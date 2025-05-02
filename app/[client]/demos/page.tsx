@@ -17,6 +17,7 @@ import {
 } from '@/lib/utils/dashboard-data/samplings'
 import { getOldAndNewActivationsChartData } from '@/lib/utils/dashboard-data/products'
 import { useClientContext } from '@/lib/context/ClientContext'
+import { useCatalogContext } from '@/lib/context/CatalogContext'
 
 /**
  * VELOCITY POR HORA
@@ -31,6 +32,7 @@ import { useClientContext } from '@/lib/context/ClientContext'
 
 export default function Demos() {
   const { dashboardData } = useClientContext()
+  const { giveawayProductTypes } = useCatalogContext()
 
   if (!dashboardData) {
     return <div>No se encontró información del dashboard</div>
@@ -41,7 +43,10 @@ export default function Demos() {
     getTrafficDuringActivationChartData(dashboardData)
   const promoterImagesData = getPromoterImagesData(dashboardData)
   const heatmapData = getHeatmapData(dashboardData)
-  const giveawaysData = getGiveawayProductsData(dashboardData)
+  const giveawaysData = getGiveawayProductsData(
+    dashboardData,
+    giveawayProductTypes,
+  )
   const oldAndNewActivationsChartData =
     getOldAndNewActivationsChartData(dashboardData)
 

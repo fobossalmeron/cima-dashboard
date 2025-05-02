@@ -38,10 +38,10 @@ export function OldAndNewActivationsChart({
   return (
     <Card className="md:col-span-2 print:col-span-2">
       <CardHeader className="flex flex-row items-start justify-between">
-        <CardTitle>Demos en tiendas nuevas y anteriores</CardTitle>
+        <CardTitle>Tiendas nuevas y anteriores por mes</CardTitle>
         <div className="flex items-center gap-2 rounded-lg bg-[#0088FE]/10 px-4 py-2">
           <span className="text-sm font-medium text-[#0088FE]">
-            Total tiendas nuevas:
+            Acumulado tiendas nuevas:
           </span>
           <span className="text-lg font-bold text-[#0088FE]">
             {totalNewLocations}

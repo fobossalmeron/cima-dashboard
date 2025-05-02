@@ -2,6 +2,8 @@ import { ReactNode } from 'react'
 import { ClientProvider } from '@/lib/context/ClientContext'
 import { notFound } from 'next/navigation'
 import { ClientsService } from '@/lib/services'
+import { GiveawayProductsTypesService } from '@/lib/services/db/giveaway-products-types.service'
+import { CatalogProvider } from '@/lib/context/CatalogContext'
 
 export default async function ClientLayout({
   children,
@@ -13,10 +15,15 @@ export default async function ClientLayout({
   const resolvedParams = await params
   const clientData = await ClientsService.getBySlug(resolvedParams.client)
 
-  if (!clientData) {
+  if (!clientData || !clientData.dashboard) {
     notFound()
     return null
   }
+
+  const giveawayProductTypes =
+    await GiveawayProductsTypesService.getGiveawayProductTypeByDashboardId(
+      clientData.dashboard.id,
+    )
 
   const dashboardData = clientData.dashboard
 
@@ -27,7 +34,9 @@ export default async function ClientLayout({
 
   return (
     <ClientProvider clientData={clientData} dashboardData={dashboardData}>
-      {children}
+      <CatalogProvider giveawayProductTypes={giveawayProductTypes}>
+        {children}
+      </CatalogProvider>
     </ClientProvider>
   )
 }
