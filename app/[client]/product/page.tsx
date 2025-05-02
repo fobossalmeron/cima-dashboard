@@ -14,6 +14,7 @@ import {
   //getAveragePriceData,
   getProductStatusInPDVChartData,
   getPDVProductImages,
+  getAveragePriceData,
 } from '@/lib/utils/dashboard-data/products'
 
 export default function ProductInfo() {
@@ -25,42 +26,10 @@ export default function ProductInfo() {
 
   const pdvTypeData = getPDVTypeData(dashboardData)
   const productLocationData = getProductLocationData(dashboardData)
-  // const averagePriceData = getAveragePriceData(dashboardData)
+  const averagePriceData = getAveragePriceData(dashboardData)
   const productStatusInPDVChartData =
     getProductStatusInPDVChartData(dashboardData)
   const pdvProductImages = getPDVProductImages(dashboardData)
-
-  // Datos de ejemplo para la gráfica
-  const sampleData = [
-    {
-      brand: 'RAPTOR',
-      averagePriceByPdvType: {
-        Supermarket: 1.95,
-        'C-Store': 2.1,
-      },
-    },
-    {
-      brand: 'Del Frutal Orange Drink',
-      averagePriceByPdvType: {
-        Supermarket: 1.65,
-        'C-Store': 1.9,
-      },
-    },
-    {
-      brand: 'Del Frutal Nectar',
-      averagePriceByPdvType: {
-        Supermarket: 0.95,
-        'C-Store': 1.15,
-      },
-    },
-    {
-      brand: "Natura's Nectar",
-      averagePriceByPdvType: {
-        Supermarket: 0.85,
-        'C-Store': 1.05,
-      },
-    },
-  ]
 
   return (
     <div className="space-y-6">
@@ -69,7 +38,7 @@ export default function ProductInfo() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-6">
           <PDVTypeChart data={pdvTypeData} />
           <ProductLocationInPDVChart data={productLocationData} />
-          <AveragePriceInPDVChart data={sampleData} />
+          <AveragePriceInPDVChart data={averagePriceData} />
           <ProductStatusInPDVChart data={productStatusInPDVChartData} />
           <PDVProductImages data={pdvProductImages} />
         </div>

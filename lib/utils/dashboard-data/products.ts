@@ -53,31 +53,57 @@ export function getProductLocationData(
 export function getAveragePriceData(
   dashboard: DashboardWithRelations,
 ): AveragePriceInPDVChartData[] {
-  const pricesBySubBrand = dashboard.submissions.reduce(
-    (acc: { [key: string]: { total: number; count: number } }, submission) => {
+  const pricesByBrandAndPDVType = dashboard.submissions.reduce(
+    (
+      acc: {
+        [key: string]: { [key: string]: { total: number; count: number } }
+      },
+      submission,
+    ) => {
+      const pdvType = submission.pointOfSale?.name || 'Otros'
+
       submission.productSales.forEach((sale) => {
         const subBrandName =
           sale.product.subBrand?.name === 'Not specified'
             ? ''
             : sale.product.subBrand?.name
         const brandName = `${sale.product.brand.name} ${subBrandName}`.trim()
+        console.log({
+          brand: brandName,
+          subBrand: subBrandName,
+          presentation: sale.product.presentation?.name,
+          flavor: sale.product.flavor?.name,
+          pdvType,
+          price: sale.price,
+        })
+
         if (!acc[brandName]) {
-          acc[brandName] = { total: 0, count: 0 }
+          acc[brandName] = {}
         }
-        acc[brandName].total += sale.price
-        acc[brandName].count++
+
+        if (!acc[brandName][pdvType]) {
+          acc[brandName][pdvType] = { total: 0, count: 0 }
+        }
+
+        acc[brandName][pdvType].total += sale.price
+        acc[brandName][pdvType].count++
       })
+
       return acc
     },
     {},
   )
 
-  return Object.entries(pricesBySubBrand)
-    .map(([brand, data]) => ({
-      brand,
-      averagePrice: Number((data.total / data.count).toFixed(2)),
-    }))
-    .sort((a, b) => b.averagePrice - a.averagePrice)
+  return Object.entries(pricesByBrandAndPDVType).map(([brand, pdvTypes]) => ({
+    brand,
+    averagePriceByPdvType: Object.entries(pdvTypes).reduce(
+      (acc, [pdvType, data]) => {
+        acc[pdvType] = Number((data.total / data.count).toFixed(2))
+        return acc
+      },
+      {} as { [key: string]: number },
+    ),
+  }))
 }
 
 export function getProductStatusInPDVChartData(

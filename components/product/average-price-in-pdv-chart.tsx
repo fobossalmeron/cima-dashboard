@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useMemo } from 'react'
 import {
   BarChart,
   Bar,
@@ -10,8 +10,8 @@ import {
   ResponsiveContainer,
   LabelList,
 } from 'recharts'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AveragePriceInPDVChartData } from './product.types'
-import { useMemo } from 'react'
 
 // Paleta de colores base para asignar dinámicamente
 const COLOR_PALETTE = [
