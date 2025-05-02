@@ -11,9 +11,10 @@ import { useClientContext } from '@/lib/context/ClientContext'
 import {
   getPDVTypeData,
   getProductLocationData,
-  getAveragePriceData,
+  //getAveragePriceData,
   getProductStatusInPDVChartData,
   getPDVProductImages,
+  getAveragePriceData,
 } from '@/lib/utils/dashboard-data/products'
 
 export default function ProductInfo() {
