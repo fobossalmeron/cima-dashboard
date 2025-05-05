@@ -14,10 +14,14 @@ export interface CreateOrUpdateSamplingData {
 export interface CreateOrUpdatePurchaseIntentionSamplingData {
   purchaseIntentionId: string
   samplingId: string
+  slug: string
+  description: string
 }
 
 export interface CreateOrUpdateConsumptionMomentSamplingData {
   consumptionMomentId: string
+  slug: string
+  description: string
   samplingId: string
 }
 

@@ -18,12 +18,16 @@ export class SamplingConsumptionMomentRepository {
     tx?: Prisma.TransactionClient,
   ): Promise<SamplingConsumptionMomentWithRelations> {
     const client = tx ?? prisma
-    const consumptionMoment = await ConsumptionMomentRepository.getById(
+    let consumptionMoment = await ConsumptionMomentRepository.getById(
       data.consumptionMomentId,
     )
     if (!consumptionMoment) {
-      throw new Error(
-        `Consumption moment not found for value: ${data.consumptionMomentId}`,
+      consumptionMoment = await ConsumptionMomentRepository.createOrUpdate(
+        {
+          slug: data.slug,
+          description: data.description,
+        },
+        client,
       )
     }
     const consumptionMomentSamplingExists = await this.getFirst(data)

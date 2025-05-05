@@ -18,12 +18,16 @@ export class SamplingPurchaseIntentionRepository {
     tx?: Prisma.TransactionClient,
   ): Promise<SamplingPurchaseIntentionWithRelations> {
     const client = tx ?? prisma
-    const purchaseIntention = await PurchaseIntentionRepository.getById(
+    let purchaseIntention = await PurchaseIntentionRepository.getById(
       data.purchaseIntentionId,
     )
     if (!purchaseIntention) {
-      throw new Error(
-        `Purchase intention not found for value: ${data.purchaseIntentionId}`,
+      purchaseIntention = await PurchaseIntentionRepository.createOrUpdate(
+        {
+          slug: data.slug,
+          description: data.description,
+        },
+        client,
       )
     }
     const purchaseIntentionSamplingExists = await this.getFirst(data)
