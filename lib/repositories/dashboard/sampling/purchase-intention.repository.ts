@@ -9,7 +9,10 @@ import { PurchaseIntentionRepository } from '../../catalogs'
 export class SamplingPurchaseIntentionRepository {
   static async getFirst(data: CreateOrUpdatePurchaseIntentionSamplingData) {
     return await prisma.purchaseIntentionSampling.findFirst({
-      where: data,
+      where: {
+        purchaseIntentionId: data.purchaseIntentionId,
+        samplingId: data.samplingId,
+      },
     })
   }
 

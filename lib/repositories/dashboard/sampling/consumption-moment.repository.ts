@@ -9,7 +9,10 @@ import { ConsumptionMomentRepository } from '../../catalogs'
 export class SamplingConsumptionMomentRepository {
   static async getFirst(data: CreateOrUpdateConsumptionMomentSamplingData) {
     return await prisma.consumptionMomentSampling.findFirst({
-      where: data,
+      where: {
+        consumptionMomentId: data.consumptionMomentId,
+        samplingId: data.samplingId,
+      },
     })
   }
 
