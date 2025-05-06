@@ -106,6 +106,11 @@ export function AveragePriceInPDVChart({
       }))
   }, [data])
 
+  // Helper para mostrar el nombre correcto del tipo de PDV
+  function getDisplayType(type: string): string {
+    return type === 'Minimarket' || type === 'Conveniencia' ? 'C-Store' : type
+  }
+
   // Componente personalizado para el Tooltip
   const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
@@ -116,7 +121,7 @@ export function AveragePriceInPDVChart({
           <p className="font-semibold">{brand}</p>
           {payload.map((entry, entryIndex) => (
             <p key={`tooltip-${entryIndex}`} style={{ color: entry.color }}>
-              {entry.name}: ${entry.value.toFixed(2)}
+              {getDisplayType(entry.name)}: ${entry.value.toFixed(2)}
             </p>
           ))}
         </div>
@@ -172,7 +177,7 @@ export function AveragePriceInPDVChart({
               <Bar
                 key={`bar-${pdvType}`}
                 dataKey={pdvType}
-                name={pdvType}
+                name={getDisplayType(pdvType)}
                 fill={pdvTypeColors[pdvType]}
               >
                 <LabelList
@@ -198,7 +203,7 @@ export function AveragePriceInPDVChart({
                 className="text-sm"
                 style={{ color: pdvTypeColors[pdvType] }}
               >
-                {pdvType}
+                {getDisplayType(pdvType)}
               </span>
             </div>
           ))}

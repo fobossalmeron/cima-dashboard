@@ -31,6 +31,11 @@ const COLORS = [
  * @property {number} quantity - Número de puntos de venta de este tipo
  */
 
+// Helper para mostrar el nombre correcto del tipo de PDV
+function getDisplayType(type: string): string {
+  return type === 'Minimarket' || type === 'Conveniencia' ? 'C-Store' : type
+}
+
 export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
   const calculatedTotalPdv = data.reduce((sum, item) => sum + item.quantity, 0)
 
@@ -56,7 +61,7 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
 
       return (
         <div className="bg-background border border-border p-3">
-          <p className="text-base">{currentData.type}</p>
+          <p className="text-base">{getDisplayType(currentData.type)}</p>
           <p className="text-base" style={{ color: color }}>
             {currentData.quantity} puntos de venta
           </p>
@@ -142,7 +147,7 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
                 className="text-sm"
                 style={{ color: COLORS[index % COLORS.length] }}
               >
-                {entry.type}
+                {getDisplayType(entry.type)}
               </span>
             </div>
           ))}

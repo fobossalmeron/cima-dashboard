@@ -22,6 +22,30 @@ import { ProductLocationInPDVChartData } from './product.types'
  * @property {number} quantity - Cantidad de ocaciones que un producto se colocó en esta ubicación
  */
 
+function normalizeLocation(location: string): string {
+  const lower = location.toLowerCase().trim()
+  if (lower.includes('estante')) return 'Anaquel'
+  if (
+    lower.includes('display de la marca') ||
+    lower.includes('rack de la marca')
+  )
+    return 'Rack de la marca'
+  if (lower.includes('neveras') || lower.includes('nevera')) return 'Nevera'
+  return location.trim()
+}
+
+function groupAndSumByLocation(data: ProductLocationInPDVChartData[]) {
+  const grouped: Record<string, number> = {}
+  data.forEach((item) => {
+    const normalized = normalizeLocation(item.location)
+    grouped[normalized] = (grouped[normalized] || 0) + item.quantity
+  })
+  return Object.entries(grouped).map(([location, quantity]) => ({
+    location,
+    quantity,
+  }))
+}
+
 export function ProductLocationInPDVChart({
   data,
 }: {
@@ -29,10 +53,12 @@ export function ProductLocationInPDVChart({
 }) {
   // Calcular el total y los porcentajes para cada ubicación y ordenar de mayor a menor
   const dataWithPercentages = useMemo(() => {
-    const total = data.reduce((sum, item) => sum + item.quantity, 0)
+    // Agrupar y normalizar ubicaciones
+    const groupedData = groupAndSumByLocation(data)
+    const total = groupedData.reduce((sum, item) => sum + item.quantity, 0)
 
     // Crear array con porcentajes
-    const dataWithPercentagesArray = data.map((item) => ({
+    const dataWithPercentagesArray = groupedData.map((item) => ({
       ...item,
       percentage: total > 0 ? Math.round((item.quantity / total) * 100) : 0,
     }))
@@ -95,7 +121,7 @@ export function ProductLocationInPDVChart({
                         className="text-base"
                         style={{ color: payload[0].color }}
                       >
-                        {quantity} ocasiones
+                        {quantity} puntos de venta
                       </p>
                     </div>
                   )

@@ -46,7 +46,7 @@ export function AgeDistributionChart({
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="ageRange" style={{ fontSize: '12px' }} />
             <YAxis dataKey="quantity" style={{ fontSize: '12px' }} />
-            <Tooltip formatter={(value: number) => [`${value} personas`]} />
+            <Tooltip formatter={(value: number) => [`${value} demos`]} />
             <Bar
               dataKey="quantity"
               fill="#8884d8"

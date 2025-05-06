@@ -49,9 +49,13 @@ export function PurchaseFactorsChart({
             margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="factor" style={{ fontSize: '12px' }} />
-            <YAxis dataKey="quantity" style={{ fontSize: '12px' }} />
-            <Tooltip formatter={(value: number) => [`${value} personas`]} />
+            <XAxis
+              dataKey="factor"
+              style={{ fontSize: '12px' }}
+              padding={{ left: 0, right: 0 }}
+            />
+            <YAxis dataKey="quantity" style={{ fontSize: '12px' }} width={25} />
+            <Tooltip formatter={(value: number) => [`${value} demos`]} />
             <Bar
               dataKey="quantity"
               fill="hsl(217, 91%, 60%)"

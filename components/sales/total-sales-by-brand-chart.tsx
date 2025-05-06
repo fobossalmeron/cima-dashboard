@@ -12,6 +12,7 @@ import {
   Cell,
 } from 'recharts'
 import { TotalSalesByBrandData } from '@/components/sales/sales.types'
+import type { LabelProps } from 'recharts'
 
 /**
  * Componente que muestra un gráfico de barras con el total de ventas por marca.
@@ -37,6 +38,29 @@ const chartColors = [
 export function TotalSalesByBrand({ data }: { data: TotalSalesByBrandData[] }) {
   const sortedData = [...data].sort((a, b) => b.quantity - a.quantity)
 
+  // Etiqueta personalizada para mostrar el quantity arriba de cada barra
+  function renderCustomLabel(props: LabelProps) {
+    const { x, y, width, value } = props
+    if (
+      typeof x !== 'number' ||
+      typeof y !== 'number' ||
+      typeof width !== 'number'
+    )
+      return <g />
+    return (
+      <text
+        x={x + width / 2}
+        y={y - 8}
+        textAnchor="middle"
+        fontSize={12}
+        fill="#6B7280" // gris Tailwind
+        fontWeight={500}
+      >
+        {value}
+      </text>
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -54,7 +78,7 @@ export function TotalSalesByBrand({ data }: { data: TotalSalesByBrandData[] }) {
             <Tooltip
               formatter={(value: number) => [`${value} unidades vendidas`]}
             />
-            <Bar dataKey="quantity" fill="#000">
+            <Bar dataKey="quantity" fill="#000" label={renderCustomLabel}>
               {sortedData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
