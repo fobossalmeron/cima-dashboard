@@ -13,6 +13,29 @@ import { EthnicityDistributionChartData } from './consumer.types'
 
 const COLORS = ['#FF8042', '#00C49F', '#FFBB28', '#0088FE', '#9370DB']
 
+const normalizeEthnicity = (ethnicity: string) => {
+  const value = ethnicity.toLowerCase()
+  if (value.includes('hispano') || value.includes('latino'))
+    return 'Hispanos/Latinos'
+  if (value.includes('blanco') || value.includes('americano blanco'))
+    return 'Americanos Blancos'
+  if (value.includes('afro') || value.includes('negro')) return 'Afroamericanos'
+  return 'Otros'
+}
+
+function groupAndSumByEthnicity(data: EthnicityDistributionChartData[]) {
+  const grouped: Record<string, number> = {}
+  data.forEach((item) => {
+    const normalized = normalizeEthnicity(item.ethnicity)
+    grouped[normalized] = (grouped[normalized] || 0) + item.quantity
+  })
+  return Object.entries(grouped).map(([ethnicity, quantity]) => ({
+    ethnicity,
+    quantity,
+    name: ethnicity,
+  }))
+}
+
 /**
  * Componente que muestra un gráfico circular con la distribución de consumidores por etnia.
  *
@@ -25,6 +48,8 @@ export function EthnicityDistributionChart({
 }: {
   data: EthnicityDistributionChartData[]
 }) {
+  const formattedData = groupAndSumByEthnicity(data)
+
   return (
     <Card>
       <CardHeader>
@@ -34,7 +59,7 @@ export function EthnicityDistributionChart({
         <ResponsiveContainer width="100%" height={280}>
           <PieChart>
             <Pie
-              data={data}
+              data={formattedData}
               cx="50%"
               cy="40%"
               labelLine={false}
@@ -48,7 +73,7 @@ export function EthnicityDistributionChart({
               }}
               label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
             >
-              {data.map((entry, index) => (
+              {formattedData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
@@ -59,8 +84,10 @@ export function EthnicityDistributionChart({
               content={({ active, payload }: TooltipProps<number, string>) => {
                 if (active && payload && payload.length) {
                   const item = payload[0]
-                    .payload as EthnicityDistributionChartData
-                  const index = data.findIndex(
+                    .payload as EthnicityDistributionChartData & {
+                    name: string
+                  }
+                  const index = formattedData.findIndex(
                     (d) => d.ethnicity === item.ethnicity,
                   )
                   const color = COLORS[index % COLORS.length]
@@ -68,7 +95,7 @@ export function EthnicityDistributionChart({
                   return (
                     <div className="bg-white p-3 border shadow-sm">
                       <p className="font-normal">{item.ethnicity}</p>
-                      <p style={{ color: color }}>{item.quantity} personas</p>
+                      <p style={{ color: color }}>{item.quantity} demos</p>
                     </div>
                   )
                 }
@@ -78,7 +105,7 @@ export function EthnicityDistributionChart({
           </PieChart>
         </ResponsiveContainer>
         <div className="flex flex-wrap justify-center gap-3 gap-y-1">
-          {data.map((entry, index) => (
+          {formattedData.map((entry, index) => (
             <div
               key={`legend-${index}`}
               className="flex items-center gap-2"
