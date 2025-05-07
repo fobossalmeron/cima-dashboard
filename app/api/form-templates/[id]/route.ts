@@ -44,6 +44,7 @@ export async function PUT(
     return NextResponse.json({
       status: ApiStatus.SUCCESS,
       data: {
+        template,
         questions,
       },
     })
