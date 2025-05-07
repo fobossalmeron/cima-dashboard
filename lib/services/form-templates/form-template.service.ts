@@ -408,7 +408,7 @@ export class FormTemplateService {
           id: question.Id,
           sortOrder: question.SortOrder,
           type: FormTemplateService.getQuestionType(question.Type),
-          name: question.Name,
+          name: question.Name.trim(),
           isMandatory: question.IsMandatory,
           isAutoFill: question.IsAutoFill,
           questionGroupId: question.QuestionGroupId,

@@ -3,8 +3,6 @@ import { ClientsService } from '@/lib/services'
 import { ClientController } from '@/lib/controllers'
 
 export async function GET() {
-  console.log('Iniciando GET /api/clients')
-
   try {
     const clients = await ClientsService.getAll()
 

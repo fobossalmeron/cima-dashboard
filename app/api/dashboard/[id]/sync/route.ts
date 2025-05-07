@@ -7,7 +7,6 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse<StartSyncResponse>> {
   const paramsObject = await params
-  console.log('Force', request.nextUrl.searchParams.get('force'))
   const force = request.nextUrl.searchParams.get('force') === 'true'
   return DashboardController.syncDashboard(request, paramsObject, force)
 }

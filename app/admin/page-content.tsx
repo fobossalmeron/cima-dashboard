@@ -143,13 +143,6 @@ export default function AdminPageContent() {
       } else {
         const result = await response.json()
         if (result.status === ApiStatus.SUCCESS) {
-          console.log(
-            'Template:',
-            result.data.template.Questions.map(
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (question: any) => question.Name,
-            ),
-          )
           toast.success('Plantilla actualizada exitosamente')
         } else {
           throw new Error(result.error || 'Error al actualizar el template')
