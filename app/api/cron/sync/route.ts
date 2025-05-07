@@ -17,6 +17,7 @@ export const maxDuration = 60
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
+  const force = request.nextUrl.searchParams.get('force') === 'true'
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
           await DashboardSyncService.startSync(
             dashboard.id,
             successResponse.data,
-            false,
+            force,
           )
           successCount++
           Log.info('Dashboard synced successfully', {

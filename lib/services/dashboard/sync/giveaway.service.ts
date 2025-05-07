@@ -4,7 +4,7 @@ import {
   GiveawaysColumnsValues,
 } from '@/enums/giveaways-column'
 import { DataFieldSearchType } from '@/enums/data-fields'
-import { slugify } from '@/lib/utils'
+import { slugify, calculateStringSimilarity } from '@/lib/utils'
 import {
   GiveawayProductTypeRepository,
   GiveawayProductRepository,
@@ -76,9 +76,16 @@ export class GiveawayService {
     const giveawayProducts: GiveawayProduct[] = []
 
     for (const value of giveawayQuestionValues) {
-      const triggeredQuestion = triggeredQuestions.find((question) =>
-        question.name.trim().includes(value),
-      )
+      const triggeredQuestion = triggeredQuestions.find((question) => {
+        const questionValue = question.name
+          .replace(/UNIDADES de /i, '')
+          .replace(/UNIDADES DE /i, '')
+          .replace('Unidades de ', '')
+          .replace(/UNIDADES/i, '')
+          .trim()
+        const similarity = calculateStringSimilarity(value, questionValue)
+        return similarity >= 0.6 // Umbral de similitud del 60%
+      })
       if (triggeredQuestion) {
         const triggeredQuestionValue = row[triggeredQuestion.name]
         if (triggeredQuestionValue) {

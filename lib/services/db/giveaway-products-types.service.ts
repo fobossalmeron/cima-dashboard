@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { DashboardService } from '../dashboard'
-import { QuestionRepository } from '@/lib/repositories'
+import { GiveawayProductTypesRepository } from '@/lib/repositories'
 import { Option } from '@/types'
 import { slugify } from '@/lib/utils'
 
@@ -22,25 +22,12 @@ export class GiveawayProductsTypesService {
       throw new Error('Dashboard not found')
     }
 
-    // Get the template questions
-    const templateQuestions = await QuestionRepository.getTemplateQuestions(
-      dashboard.templateId,
-    )
+    const giveawayProductTypes =
+      await GiveawayProductTypesRepository.getGiveawayProductTypes()
 
-    // Get the giveaway question
-    const giveawayQuestion = templateQuestions.find((question) =>
-      question.name.includes('REGALOS PROMOCIONALES'),
-    )
-
-    if (!giveawayQuestion) {
-      throw new Error('Giveaway question not found')
-    }
-
-    return giveawayQuestion.options
-      .filter((option) => option.value !== 'Ninguno')
-      .map((option) => ({
-        value: slugify(option.value),
-        label: option.value,
-      }))
+    return giveawayProductTypes.map((option) => ({
+      value: slugify(option.slug),
+      label: option.name,
+    }))
   }
 }
