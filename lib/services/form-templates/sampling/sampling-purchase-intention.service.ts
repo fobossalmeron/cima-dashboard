@@ -1,7 +1,9 @@
 import { Prisma } from '@prisma/client'
-import { FormTemplateWithQuestionsAndOptions } from '../form-template.service'
 import { SamplingFieldsEnum } from '@/enums/sampling-fields'
-import { QuestionWithOptions } from '@/types/api'
+import {
+  FormTemplateWithQuestionsAndOptions,
+  QuestionWithOptions,
+} from '@/types/api'
 import { slugify } from '@/lib/utils'
 import { PurchaseIntentionRepository } from '@/lib/repositories'
 
