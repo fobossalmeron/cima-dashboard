@@ -50,7 +50,7 @@ export function ConsumptionMomentsChart({
               type="category"
               style={{ fontSize: '12px' }}
             />
-            <Tooltip formatter={(value: number) => [`${value} personas`]} />
+            <Tooltip formatter={(value: number) => [`${value} demos`]} />
             <Bar
               dataKey="quantity"
               fill="#8884d8"

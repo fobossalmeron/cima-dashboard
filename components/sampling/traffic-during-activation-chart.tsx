@@ -24,7 +24,7 @@ const REFERENCE = [
  *
  * @param {TrafficDuringActivationChartData[]} props.data
  * @property {Range} range - Rango de tráfico (ej. "Muy Bajo", "Bajo", etc.)
- * @property {number} value - Ocasiones que se registró este rango de tráfico
+ * @property {number} value - Demos en que se registró este rango de tráfico
  */
 
 export function TrafficDuringActivationChart({
@@ -94,9 +94,7 @@ export function TrafficDuringActivationChart({
                       <div className="bg-white p-3 border shadow-sm">
                         <p className="font-normal">{data.range}</p>
                         <p className="text-gray-600">({data.detail})</p>
-                        <p style={{ color: data.fill }}>
-                          {data.value} ocasiones
-                        </p>
+                        <p style={{ color: data.fill }}>{data.value} demos</p>
                       </div>
                     )
                   }

@@ -44,7 +44,7 @@ export function ProductStatusInPDVChart({
         <div className="bg-background border border-border p-3">
           <p className="text-base">{currentData.type}</p>
           <p className="text-base" style={{ color: color }}>
-            {currentData.quantity} ocasiones
+            {currentData.quantity} demos
           </p>
         </div>
       )

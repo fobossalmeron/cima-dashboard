@@ -35,6 +35,33 @@ export function OldAndNewActivationsChart({
     0,
   )
 
+  const MONTHS = [
+    'enero',
+    'febrero',
+    'marzo',
+    'abril',
+    'mayo',
+    'junio',
+    'julio',
+    'agosto',
+    'septiembre',
+    'octubre',
+    'noviembre',
+    'diciembre',
+  ]
+
+  // Ordena los datos según el orden de los meses
+  function sortByMonth(
+    a: OldAndNewActivationsChartData,
+    b: OldAndNewActivationsChartData,
+  ) {
+    const aIndex = MONTHS.indexOf(a.month.toLowerCase())
+    const bIndex = MONTHS.indexOf(b.month.toLowerCase())
+    return aIndex - bIndex
+  }
+
+  const sortedData = [...data].sort(sortByMonth)
+
   return (
     <Card className="md:col-span-2 print:col-span-2">
       <CardHeader className="flex flex-row items-start justify-between">
@@ -50,19 +77,21 @@ export function OldAndNewActivationsChart({
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data}>
+          <BarChart data={sortedData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="month" style={{ fontSize: '12px' }} />
             <YAxis style={{ fontSize: '12px' }} />
             <Tooltip />
             <Legend
+              layout="horizontal"
+              align="center"
+              verticalAlign="bottom"
               wrapperStyle={{
                 fontSize: '14px',
-                display: 'flex',
-                justifyContent: 'space-between',
                 width: '100%',
-                paddingLeft: '10px',
-                paddingRight: '10px',
+                paddingLeft: 0,
+                paddingRight: 0,
+                marginTop: 16,
               }}
               iconType="circle"
               iconSize={12}

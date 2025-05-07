@@ -13,6 +13,27 @@ import { GenderDistributionChartData } from './consumer.types'
 
 const COLORS = ['#FF69B4', '#4169E1', '#9370DB']
 
+const removeMayoria = (text: string) => text.replace('Mayoría', '').trim()
+
+const normalizeGender = (gender: string) => {
+  if (gender.toLowerCase().includes('femenino')) return 'Femenino'
+  if (gender.toLowerCase().includes('masculino')) return 'Masculino'
+  return 'Otro'
+}
+
+function groupAndSumByGender(data: GenderDistributionChartData[]) {
+  const grouped: Record<string, number> = {}
+  data.forEach((item) => {
+    const normalized = normalizeGender(item.gender)
+    grouped[normalized] = (grouped[normalized] || 0) + item.quantity
+  })
+  return Object.entries(grouped).map(([gender, quantity]) => ({
+    gender,
+    quantity,
+    name: gender,
+  }))
+}
+
 const CustomLegend = ({ data }: { data: GenderDistributionChartData[] }) => {
   return (
     <div className="flex justify-center gap-3 print:static">
@@ -26,7 +47,7 @@ const CustomLegend = ({ data }: { data: GenderDistributionChartData[] }) => {
             className="text-sm"
             style={{ color: COLORS[index % COLORS.length] }}
           >
-            {entry.gender}
+            {removeMayoria(entry.gender)}
           </span>
         </div>
       ))}
@@ -47,10 +68,7 @@ export function GenderDistributionChart({
 }: {
   data: GenderDistributionChartData[]
 }) {
-  const formattedData = data.map((item) => ({
-    ...item,
-    name: item.gender,
-  }))
+  const formattedData = groupAndSumByGender(data)
 
   return (
     <Card>
@@ -92,8 +110,10 @@ export function GenderDistributionChart({
 
                   return (
                     <div className="bg-white p-3 border shadow-sm">
-                      <p className="font-normal">{data.gender}</p>
-                      <p style={{ color: color }}>{data.quantity} personas</p>
+                      <p className="font-normal">
+                        {removeMayoria(data.gender)}
+                      </p>
+                      <p style={{ color: color }}>{data.quantity} demos</p>
                     </div>
                   )
                 }
@@ -102,7 +122,7 @@ export function GenderDistributionChart({
             />
           </PieChart>
         </ResponsiveContainer>
-        <CustomLegend data={data} />
+        <CustomLegend data={formattedData} />
       </CardContent>
     </Card>
   )
