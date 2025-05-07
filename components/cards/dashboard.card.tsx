@@ -14,9 +14,11 @@ interface DashboardCardProps {
   onSyncDashboard: (dashboardId: string) => void
   onClearDashboard: (dashboardId: string) => void
   onDeleteDashboard: (dashboardId: string) => void
+  onUpdateTemplate: (templateId: string) => void
   isSyncing: boolean
   isCleaning: boolean
   isDeleting: boolean
+  isUpdatingTemplate: boolean
   debugMode: boolean
 }
 
@@ -25,9 +27,11 @@ export function DashboardCard({
   onSyncDashboard,
   onClearDashboard,
   onDeleteDashboard,
+  onUpdateTemplate,
   isSyncing,
   isCleaning,
   isDeleting,
+  isUpdatingTemplate,
   debugMode,
 }: DashboardCardProps) {
   const syncButtonText = () => {
@@ -60,6 +64,19 @@ export function DashboardCard({
           </p>
         </div>
         <div className="flex gap-2">
+          {debugMode && (
+            <Button
+              onClick={() => onUpdateTemplate(dashboard.template.id)}
+              variant="outline"
+            >
+              {isUpdatingTemplate ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCcw className="mr-2 h-4 w-4" />
+              )}
+              Actualizar Plantilla
+            </Button>
+          )}
           {debugMode && (
             <Button
               onClick={() => onClearDashboard(dashboard.id)}

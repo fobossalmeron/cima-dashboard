@@ -30,6 +30,7 @@ export default function AdminPageContent() {
   const [deletingDashboard, setDeletingDashboard] = useState<string | null>(
     null,
   )
+  const [isUpdatingTemplate, setIsUpdatingTemplate] = useState<boolean>(false)
 
   const loadDashboards = async () => {
     try {
@@ -129,6 +130,27 @@ export default function AdminPageContent() {
     }
   }
 
+  const handleUpdateTemplate = async (templateId: string) => {
+    try {
+      setIsUpdatingTemplate(true)
+      const response = await fetch(`/api/form-templates/${templateId}`, {
+        method: 'PUT',
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Error al actualizar el template')
+      }
+
+      toast.success('Plantilla actualizada exitosamente')
+    } catch (error) {
+      console.error('Error al actualizar el template:', error)
+      toast.error('Error al actualizar el template')
+    } finally {
+      setIsUpdatingTemplate(false)
+    }
+  }
+
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-8">
@@ -163,6 +185,8 @@ export default function AdminPageContent() {
           cleaningDashboard={cleaningDashboard}
           deletingDashboard={deletingDashboard}
           debugMode={debugMode}
+          onUpdateTemplate={handleUpdateTemplate}
+          isUpdatingTemplate={isUpdatingTemplate}
         />
       )}
     </div>

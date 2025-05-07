@@ -18,19 +18,14 @@ import {
   FormTemplateQuestion,
   FormTemplateQuestionGroup,
   FormTemplateServiceParams,
+  FormTemplateUpdateParams,
+  FormTemplateUpdateQuestionsResponse,
+  FormTemplateWithQuestionsAndOptions,
 } from '@/types/api/form-template'
 import { QuestionWithRelations } from '@/types/api/clients'
 import { QuestionOptionWithRelations } from '@/types/api'
 import { withTransaction } from '@/prisma/prisma'
 import { FormTemplateWithDashboardsCount } from '@/types/services/form-template.types'
-
-export type FormTemplateWithQuestionsAndOptions = FormTemplate & {
-  questions: (Question & {
-    options: QuestionOptionWithRelations[]
-    triggers: QuestionTrigger[]
-  })[]
-  questionGroups: QuestionGroup[]
-}
 
 export class FormTemplateService {
   static async getAll(): Promise<FormTemplate[]> {
@@ -401,14 +396,14 @@ export class FormTemplateService {
     }
   }
 
-  private static async createQuestions(
+  private static async createOrUpdateQuestions(
     questions: FormTemplateQuestion[],
     formTemplateId: string,
     tx: Prisma.TransactionClient,
   ): Promise<QuestionWithRelations[]> {
     return await Promise.all(
       questions.map(async (question) => {
-        // Primero creamos la pregunta
+        // Primero creamos o actualizamos la pregunta
         const questionData = {
           id: question.Id,
           sortOrder: question.SortOrder,
@@ -423,7 +418,7 @@ export class FormTemplateService {
         const { id: questionId, ...rest } = questionData
 
         const createdQuestion = await tx.question.upsert({
-          where: { id: questionId },
+          where: { id: questionId, formTemplateId },
           update: rest,
           create: questionData,
         })
@@ -443,7 +438,7 @@ export class FormTemplateService {
               }
               const { id: optionId, ...rest } = optionData
               const createdOption = await tx.questionOption.upsert({
-                where: { id: optionId },
+                where: { id: optionId, questionId: createdQuestion.id },
                 update: rest,
                 create: optionData,
               })
@@ -547,7 +542,7 @@ export class FormTemplateService {
         formTemplate.id,
         tx,
       )
-      const questions = await this.createQuestions(
+      const questions = await this.createOrUpdateQuestions(
         Questions,
         formTemplate.id,
         tx,
@@ -583,7 +578,7 @@ export class FormTemplateService {
         )
 
         // Crear las preguntas y sus opciones
-        const questions = await this.createQuestions(
+        const questions = await this.createOrUpdateQuestions(
           Questions,
           formTemplate.id,
           tx,
@@ -596,6 +591,43 @@ export class FormTemplateService {
             questions,
             questionGroups,
           },
+        }
+      })
+    }
+  }
+
+  static async updateFromTemplateQuestions(
+    data: FormTemplateUpdateParams,
+    tx?: Prisma.TransactionClient,
+  ): Promise<FormTemplateUpdateQuestionsResponse> {
+    const { Questions, Id: formTemplateId } = data.template
+
+    const formTemplate = await this.getById(formTemplateId)
+
+    if (!formTemplate) {
+      throw new Error('Form template not found')
+    }
+
+    if (tx) {
+      const questions = await this.createOrUpdateQuestions(
+        Questions,
+        formTemplate.id,
+        tx,
+      )
+
+      return {
+        questions,
+      }
+    } else {
+      return await withTransaction(async (tx) => {
+        const questions = await this.createOrUpdateQuestions(
+          Questions,
+          formTemplate.id,
+          tx,
+        )
+
+        return {
+          questions,
         }
       })
     }

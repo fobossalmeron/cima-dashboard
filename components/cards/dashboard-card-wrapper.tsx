@@ -14,18 +14,22 @@ interface DashboardCardWrapperProps {
   dashboard: DashboardWithClientAndTemplate
   onClearDashboard: (dashboardId: string) => void
   onDeleteDashboard: (dashboardId: string) => void
+  onUpdateTemplate: (templateId: string) => void
   cleaningDashboard: string | null
   deletingDashboard: string | null
   debugMode: boolean
+  isUpdatingTemplate: boolean
 }
 
 export function DashboardCardWrapper({
   dashboard,
   onClearDashboard,
   onDeleteDashboard,
+  onUpdateTemplate,
   cleaningDashboard,
   deletingDashboard,
   debugMode,
+  isUpdatingTemplate,
 }: DashboardCardWrapperProps) {
   const [isSyncing, setIsSyncing] = useState<boolean>(
     dashboard.SyncJob.length > 0,
@@ -82,9 +86,11 @@ export function DashboardCardWrapper({
         onSyncDashboard={handleSyncDashboard}
         onClearDashboard={onClearDashboard}
         onDeleteDashboard={onDeleteDashboard}
+        onUpdateTemplate={onUpdateTemplate}
         isSyncing={isSyncing}
         isCleaning={cleaningDashboard === dashboard.id}
         isDeleting={deletingDashboard === dashboard.id}
+        isUpdatingTemplate={isUpdatingTemplate}
         debugMode={debugMode}
       />
       {(isSyncing || syncStatus === SyncStatus.SUCCESS) && (
