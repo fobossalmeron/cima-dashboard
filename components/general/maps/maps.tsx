@@ -58,7 +58,11 @@ export function Maps({ data }: { data: MapsData }) {
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
   })
 
-  const currentData = mapType === 'city' ? data.citiesData : data.storesData
+  const currentData = useMemo(() => {
+    const dataToUse = mapType === 'city' ? data.citiesData : data.storesData
+    // Filtra ubicaciones con lat/lng válidos
+    return dataToUse.filter((loc) => loc.lat && loc.lng)
+  }, [mapType, data])
 
   const maxSales = useMemo(() => {
     return Math.max(...currentData.map((location) => location.averageSales))
@@ -141,14 +145,21 @@ export function Maps({ data }: { data: MapsData }) {
             fullscreenControl: true,
           }}
         >
-          {currentData.map((location, index) => (
-            <Circle
-              key={`${mapType}-${index}`}
-              center={{ lat: location.lat, lng: location.lng }}
-              options={getCircleOptions(location, minSales, maxSales, mapType)}
-              onClick={() => setSelectedLocation(location)}
-            />
-          ))}
+          {currentData.map((location, index) => {
+            return (
+              <Circle
+                key={`${mapType}-${index}`}
+                center={{ lat: location.lat, lng: location.lng }}
+                options={getCircleOptions(
+                  location,
+                  minSales,
+                  maxSales,
+                  mapType,
+                )}
+                onClick={() => setSelectedLocation(location)}
+              />
+            )
+          })}
           {selectedLocation && (
             <InfoWindow
               position={{
