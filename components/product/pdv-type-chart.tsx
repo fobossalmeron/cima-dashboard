@@ -36,8 +36,25 @@ function getDisplayType(type: string): string {
   return type === 'Minimarket' || type === 'Conveniencia' ? 'C-Store' : type
 }
 
+// Agrupa los tipos de PDV por display name y suma las cantidades
+function groupPDVTypes(data: PDVTypeChartData[]): PDVTypeChartData[] {
+  const grouped: Record<string, number> = {}
+
+  data.forEach(({ type, quantity }) => {
+    const displayType = getDisplayType(type)
+    grouped[displayType] = (grouped[displayType] || 0) + quantity
+  })
+
+  return Object.entries(grouped).map(([type, quantity]) => ({ type, quantity }))
+}
+
 export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
-  const calculatedTotalPdv = data.reduce((sum, item) => sum + item.quantity, 0)
+  // Agrupar los datos antes de renderizar
+  const groupedData = groupPDVTypes(data)
+  const calculatedTotalPdv = groupedData.reduce(
+    (sum, item) => sum + item.quantity,
+    0,
+  )
 
   // Personalización del tooltip
   interface CustomTooltipProps {
@@ -55,13 +72,15 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
       const currentData = payload[0].payload
 
       // Encontrar el índice del elemento en el array de datos
-      const dataIndex = data.findIndex((item) => item.type === currentData.type)
+      const dataIndex = groupedData.findIndex(
+        (item) => item.type === currentData.type,
+      )
       const colorIndex = dataIndex >= 0 ? dataIndex % COLORS.length : 0
       const color = COLORS[colorIndex]
 
       return (
         <div className="bg-background border border-border p-3">
-          <p className="text-base">{getDisplayType(currentData.type)}</p>
+          <p className="text-base">{currentData.type}</p>
           <p className="text-base" style={{ color: color }}>
             {currentData.quantity} puntos de venta
           </p>
@@ -80,7 +99,7 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
         <ResponsiveContainer width="100%" height={260}>
           <PieChart>
             <Pie
-              data={data}
+              data={groupedData}
               cx="50%"
               cy="50%"
               innerRadius={60}
@@ -91,7 +110,7 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
               label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
               className="font-semibold"
             >
-              {data.map((entry, index) => (
+              {groupedData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
@@ -131,7 +150,7 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
           </PieChart>
         </ResponsiveContainer>
         <div className="flex flex-wrap justify-center gap-3 gap-y-1">
-          {data.map((entry, index) => (
+          {groupedData.map((entry, index) => (
             <div
               key={`legend-${index}`}
               className="flex items-center gap-2"
@@ -147,7 +166,7 @@ export function PDVTypeChart({ data }: { data: PDVTypeChartData[] }) {
                 className="text-sm"
                 style={{ color: COLORS[index % COLORS.length] }}
               >
-                {getDisplayType(entry.type)}
+                {entry.type}
               </span>
             </div>
           ))}
