@@ -3,9 +3,32 @@ import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 
 export class LocationRepository {
-  static async getAll(tx?: Prisma.TransactionClient) {
+  static async getAll({
+    tx,
+    dashboardId,
+  }: {
+    tx?: Prisma.TransactionClient
+    dashboardId?: string
+  }) {
     const client = tx ?? prisma
-    return await client.location.findMany()
+    if (!dashboardId) {
+      return await client.location.findMany()
+    }
+    const dashboard = await client.dashboard.findFirst({
+      where: { id: dashboardId },
+    })
+    if (!dashboard) {
+      return await client.location.findMany()
+    }
+    return await client.location.findMany({
+      where: {
+        formSubmissions: {
+          some: {
+            dashboardId: dashboard.id,
+          },
+        },
+      },
+    })
   }
 
   static async getById(id: string, tx?: Prisma.TransactionClient) {
@@ -15,13 +38,39 @@ export class LocationRepository {
     })
   }
 
-  static async getUniqueCities(tx?: Prisma.TransactionClient) {
+  static async getUniqueCities({
+    tx,
+    dashboardId,
+  }: {
+    tx?: Prisma.TransactionClient
+    dashboardId?: string
+  }) {
     const client = tx ?? prisma
-    const locations = await client.location.findMany({
+    const baseQuery: Prisma.LocationFindManyArgs = {
       select: {
         city: true,
       },
       distinct: ['city'],
+    }
+    if (!dashboardId) {
+      return await client.location.findMany(baseQuery)
+    }
+    const dashboard = await client.dashboard.findFirst({
+      where: { id: dashboardId },
+    })
+    if (!dashboard) {
+      return await client.location.findMany(baseQuery)
+    }
+
+    const locations = await client.location.findMany({
+      ...baseQuery,
+      where: {
+        formSubmissions: {
+          some: {
+            dashboardId: dashboard.id,
+          },
+        },
+      },
     })
     return locations.map((location) => location.city)
   }
