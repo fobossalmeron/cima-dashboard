@@ -1,0 +1,160 @@
+'use client'
+
+import * as React from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  Label,
+} from 'recharts'
+import { PDVCoolerChartData } from './sampling.types'
+
+const COLORS = [
+  '#0088FE', // Azul para "Con cooler"
+  '#FF8042', // Naranja para "Sin cooler"
+]
+
+/**
+ * Componente que muestra un gráfico circular con la distribución de puntos de venta con cooler o sin cooler.
+ *
+ * @param {PDVCoolerChartData[]} props.data
+ * @property {string} type - Tipo de punto de venta ("Con cooler" o "Sin cooler")
+ * @property {number} quantity - Número de puntos de venta de este tipo
+ */
+
+export function PDVCoolerChart({ data }: { data: PDVCoolerChartData[] }) {
+  // Filtrar datos que tengan cantidad mayor a 0
+  const filteredData = data.filter((item) => item.quantity > 0)
+
+  // Si no hay datos válidos, no renderizar el componente
+  if (filteredData.length === 0) {
+    return null
+  }
+
+  const calculatedTotalPdv = filteredData.reduce(
+    (sum, item) => sum + item.quantity,
+    0,
+  )
+
+  // Personalización del tooltip
+  interface CustomTooltipProps {
+    active?: boolean
+    payload?: Array<{
+      payload: PDVCoolerChartData
+      dataKey: string
+      name: string
+      color: string
+    }>
+  }
+
+  const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+    if (active && payload && payload.length) {
+      const currentData = payload[0].payload
+
+      // Encontrar el índice del elemento en el array de datos
+      const dataIndex = filteredData.findIndex(
+        (item) => item.type === currentData.type,
+      )
+      const colorIndex = dataIndex >= 0 ? dataIndex % COLORS.length : 0
+      const color = COLORS[colorIndex]
+
+      return (
+        <div className="bg-background border border-border p-3">
+          <p className="text-base">{currentData.type}</p>
+          <p className="text-base" style={{ color: color }}>
+            {currentData.quantity} puntos de venta
+          </p>
+        </div>
+      )
+    }
+    return null
+  }
+
+  return (
+    <Card className="lg:col-span-1 md:col-span-2 col-span-1">
+      <CardHeader>
+        <CardTitle>Coolers - Puntos de venta con cooler</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={260}>
+          <PieChart>
+            <Pie
+              data={filteredData}
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={80}
+              dataKey="quantity"
+              nameKey="type"
+              labelLine={false}
+              label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+              className="font-semibold"
+            >
+              {filteredData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+              <Label
+                content={({ viewBox }) => {
+                  if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                    return (
+                      <text
+                        x={viewBox.cx}
+                        y={viewBox.cy}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                      >
+                        <tspan
+                          x={viewBox.cx}
+                          y={viewBox.cy}
+                          className="fill-foreground text-3xl font-bold"
+                        >
+                          {calculatedTotalPdv}
+                        </tspan>
+                        <tspan
+                          x={viewBox.cx}
+                          y={(viewBox.cy || 0) + 24}
+                          className="fill-muted-foreground"
+                        >
+                          PDV
+                        </tspan>
+                      </text>
+                    )
+                  }
+                }}
+              />
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+          </PieChart>
+        </ResponsiveContainer>
+        <div className="flex flex-wrap justify-center gap-3 gap-y-1">
+          {filteredData.map((entry, index) => (
+            <div
+              key={`legend-${index}`}
+              className="flex items-center gap-2"
+              style={{
+                breakInside: 'avoid',
+              }}
+            >
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+              />
+              <span
+                className="text-sm"
+                style={{ color: COLORS[index % COLORS.length] }}
+              >
+                {entry.type}
+              </span>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}

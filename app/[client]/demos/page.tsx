@@ -8,6 +8,13 @@ import { ActivationsHistoryTable } from '@/components/sampling/activations-histo
 import { OldAndNewActivationsChart } from '@/components/sampling/old-and-new-activations-chart'
 import { PromoterImages } from '@/components/sampling/promoter-images'
 import { Giveaways } from '@/components/sampling/giveaways'
+import { PDVCoolerChart } from '@/components/sampling/pdv-cooler-chart'
+import { CoolerSalesChart } from '@/components/sampling/cooler-sales-chart'
+import { CoolerTypesChart } from '@/components/sampling/cooler-types-chart'
+import { CoolerImages } from '@/components/sampling/cooler-images'
+import { PDVPOPChart } from '@/components/sampling/pdv-pop-chart'
+import { POPTypesChart } from '@/components/sampling/pop-types-chart'
+import { POPImages } from '@/components/sampling/pop-images'
 import {
   getActivationsHistory,
   getGiveawayProductsData,
@@ -50,6 +57,79 @@ export default function Demos() {
   const oldAndNewActivationsChartData =
     getOldAndNewActivationsChartData(dashboardData)
 
+  // Datos de ejemplo para el gráfico de cooler (reemplazar con datos reales cuando estén disponibles)
+  const coolerData = [
+    { type: 'Con cooler' as const, quantity: 45 },
+    { type: 'Sin cooler' as const, quantity: 23 },
+  ]
+
+  // Datos de ejemplo para el gráfico de ventas por cooler (reemplazar con datos reales cuando estén disponibles)
+  const coolerSalesData = [
+    { type: 'Con cooler' as const, ventas: 125000 },
+    { type: 'Sin cooler' as const, ventas: 87500 },
+  ]
+
+  // Datos de ejemplo para el gráfico de tipos de cooler (reemplazar con datos reales cuando estén disponibles)
+  const coolerTypesData = [
+    { type: 'Vertical', quantity: 28 },
+    { type: 'Horizontal', quantity: 15 },
+    { type: 'Portátil', quantity: 12 },
+  ]
+
+  // Datos de ejemplo para las imágenes de coolers (reemplazar con datos reales cuando estén disponibles)
+  const coolerImagesData = [
+    {
+      url: '/assets/dummy/pdv1.jpg',
+      name: 'Cooler Vertical - Supermercado Central',
+    },
+    {
+      url: '/assets/dummy/pdv2.jpg',
+      name: 'Cooler Horizontal - Tienda Express',
+    },
+    {
+      url: '/assets/dummy/pdv3.jpg',
+      name: 'Cooler Portátil - Evento Especial',
+    },
+    {
+      url: '/assets/dummy/pdv4.jpg',
+      name: 'Cooler de Mesa - Oficina',
+    },
+  ]
+
+  // Datos de ejemplo para el gráfico de POP (reemplazar con datos reales cuando estén disponibles)
+  const popData = [
+    { type: 'Con POP' as const, quantity: 32 },
+    { type: 'Sin POP' as const, quantity: 36 },
+  ]
+
+  // Datos de ejemplo para el gráfico de tipos de POP (reemplazar con datos reales cuando estén disponibles)
+  const popTypesData = [
+    { type: 'Cintillo', quantity: 18 },
+    { type: 'Dangler', quantity: 12 },
+    { type: 'Preciador', quantity: 8 },
+    { type: 'Banner', quantity: 5 },
+  ]
+
+  // Datos de ejemplo para las imágenes de POP (reemplazar con datos reales cuando estén disponibles)
+  const popImagesData = [
+    {
+      url: '/assets/dummy/pdv1.jpg',
+      name: 'Cintillo promocional - Supermercado Central',
+    },
+    {
+      url: '/assets/dummy/pdv2.jpg',
+      name: 'Dangler de producto - Tienda Express',
+    },
+    {
+      url: '/assets/dummy/pdv3.jpg',
+      name: 'Preciador especial - Evento Promocional',
+    },
+    {
+      url: '/assets/dummy/pdv4.jpg',
+      name: 'Banner de marca - Punto de venta',
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <Header title="Demos" />
@@ -72,6 +152,17 @@ export default function Demos() {
           </div>
           <div className="md:col-span-2 lg:col-span-3 print:col-span-3">
             <ActivationsHistoryTable data={activationsHistory} />
+          </div>
+          <PDVCoolerChart data={coolerData} />
+          <CoolerTypesChart data={coolerTypesData} />
+          <div className="md:col-span-2 lg:col-span-2 print:col-span-3">
+            <CoolerImages data={coolerImagesData} />
+          </div>
+          <CoolerSalesChart data={coolerSalesData} />
+          <PDVPOPChart data={popData} />
+          <POPTypesChart data={popTypesData} />
+          <div className="md:col-span-2 lg:col-span-2 print:col-span-3">
+            <POPImages data={popImagesData} />
           </div>
         </div>
       </Content>
