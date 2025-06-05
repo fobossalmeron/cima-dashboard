@@ -15,10 +15,7 @@ import {
 } from 'recharts'
 import { CoolerSalesChartData } from './sampling.types'
 
-const COLORS = [
-  '#0088FE', // Azul para "Con cooler"
-  '#FF8042', // Naranja para "Sin cooler"
-]
+const COLORS = ['#0088FE', '#FF8042']
 
 /**
  * Componente que muestra un gráfico de barras con las ventas totales de demos separadas por cooler.
@@ -29,12 +26,22 @@ const COLORS = [
  */
 
 export function CoolerSalesChart({ data }: { data: CoolerSalesChartData[] }) {
-  // Filtrar datos que tengan ventas mayor a 0
-  const filteredData = data.filter((item) => item.ventas > 0)
-
-  // Si no hay datos válidos, no renderizar el componente
-  if (filteredData.length === 0) {
-    return null
+  // Si no hay datos, mostrar mensaje
+  if (data.length === 0) {
+    return (
+      <Card className="lg:col-span-1 md:col-span-2 col-span-1">
+        <CardHeader>
+          <CardTitle>Coolers - Ventas durante demos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center">
+            <p className="text-muted-foreground text-sm">
+              No se encontraron datos de ventas
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   // Personalización del tooltip
@@ -65,9 +72,12 @@ export function CoolerSalesChart({ data }: { data: CoolerSalesChartData[] }) {
     return null
   }
 
-  // Función personalizada para renderizar las etiquetas dentro de las barras
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const renderCustomLabel = (props: any) => {
+  const renderCustomLabel = (props: {
+    x?: string | number
+    y?: string | number
+    width?: string | number
+    value?: string | number
+  }) => {
     const { x, y, width, value } = props
 
     // Convertir a números si es necesario
@@ -90,14 +100,14 @@ export function CoolerSalesChart({ data }: { data: CoolerSalesChartData[] }) {
   }
 
   return (
-    <Card className="lg:col-span-1 md:col-span-1 col-span-1">
+    <Card className="lg:col-span-1 md:col-span-2 col-span-1">
       <CardHeader>
         <CardTitle>Coolers - Ventas durante demos</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart
-            data={filteredData}
+            data={data}
             margin={{
               top: 20,
               right: 30,
@@ -114,7 +124,7 @@ export function CoolerSalesChart({ data }: { data: CoolerSalesChartData[] }) {
             />
             <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="ventas" radius={[4, 4, 0, 0]} name="Ventas">
-              {filteredData.map((entry, index) => (
+              {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}

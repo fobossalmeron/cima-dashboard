@@ -11,7 +11,6 @@ import {
   ResponsiveContainer,
   LabelList,
 } from 'recharts'
-import { useMemo } from 'react'
 import { POPTypesChartData } from './sampling.types'
 
 /**
@@ -23,24 +22,35 @@ import { POPTypesChartData } from './sampling.types'
  */
 
 export function POPTypesChart({ data }: { data: POPTypesChartData[] }) {
-  // Calcular el total y los porcentajes para cada tipo y ordenar de mayor a menor
-  const dataWithPercentages = useMemo(() => {
-    const total = data.reduce((sum, item) => sum + item.quantity, 0)
+  // Si no hay datos, mostrar mensaje
+  if (data.length === 0) {
+    return (
+      <Card className="md:col-span-2 col-span-1">
+        <CardHeader>
+          <CardTitle>
+            Material POP - Tipos de material POP en puntos de venta
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center">
+            <p className="text-muted-foreground text-sm">
+              No se encontraron datos de tipos de material POP
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
-    // Crear array con porcentajes
-    const dataWithPercentagesArray = data.map((item) => ({
+  // Calcular el total y los porcentajes para cada tipo y ordenar de mayor a menor
+  const total = data.reduce((sum, item) => sum + item.quantity, 0)
+
+  const dataWithPercentages = data
+    .map((item) => ({
       ...item,
       percentage: total > 0 ? Math.round((item.quantity / total) * 100) : 0,
     }))
-
-    // Ordenar de mayor a menor por cantidad
-    return dataWithPercentagesArray.sort((a, b) => b.quantity - a.quantity)
-  }, [data])
-
-  // Si no hay datos válidos, no renderizar el componente
-  if (dataWithPercentages.length === 0) {
-    return null
-  }
+    .sort((a, b) => b.quantity - a.quantity)
 
   return (
     <Card className="md:col-span-2 col-span-1">

@@ -17,7 +17,7 @@ import { CoolerTypesChartData } from './sampling.types'
 /**
  * Componente que muestra un gráfico de barras con los tipos de cooler y sus cantidades.
  *
- * @param {{data: {type: string, quantity: number}[]}} props
+ * @param {CoolerTypesChartData[]} data - Datos del gráfico
  * @property {string} type - Tipo de cooler (ej. "Vertical", "Horizontal", "Portátil")
  * @property {number} quantity - Cantidad de coolers de este tipo
  */
@@ -37,9 +37,22 @@ export function CoolerTypesChart({ data }: { data: CoolerTypesChartData[] }) {
     return dataWithPercentagesArray.sort((a, b) => b.quantity - a.quantity)
   }, [data])
 
-  // Si no hay datos válidos, no renderizar el componente
-  if (dataWithPercentages.length === 0) {
-    return null
+  // Si no hay datos, mostrar mensaje
+  if (data.length === 0) {
+    return (
+      <Card className="md:col-span-2 col-span-1">
+        <CardHeader>
+          <CardTitle>Coolers - Tipos de cooler en puntos de venta</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center">
+            <p className="text-muted-foreground text-sm">
+              No se encontraron datos de tipos de cooler
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (

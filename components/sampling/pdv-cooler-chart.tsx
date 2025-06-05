@@ -12,10 +12,7 @@ import {
 } from 'recharts'
 import { PDVCoolerChartData } from './sampling.types'
 
-const COLORS = [
-  '#0088FE', // Azul para "Con cooler"
-  '#FF8042', // Naranja para "Sin cooler"
-]
+const COLORS = ['#0088FE', '#FF8042']
 
 /**
  * Componente que muestra un gráfico circular con la distribución de puntos de venta con cooler o sin cooler.
@@ -26,18 +23,25 @@ const COLORS = [
  */
 
 export function PDVCoolerChart({ data }: { data: PDVCoolerChartData[] }) {
-  // Filtrar datos que tengan cantidad mayor a 0
-  const filteredData = data.filter((item) => item.quantity > 0)
+  const totalPdv = data.reduce((sum, item) => sum + item.quantity, 0)
 
-  // Si no hay datos válidos, no renderizar el componente
-  if (filteredData.length === 0) {
-    return null
+  // Si no hay datos o el total es 0, mostrar mensaje
+  if (data.length === 0 || totalPdv === 0) {
+    return (
+      <Card className="lg:col-span-1 md:col-span-2 col-span-1">
+        <CardHeader>
+          <CardTitle>Coolers - Puntos de venta con cooler</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[260px] flex items-center justify-center">
+            <p className="text-muted-foreground text-sm">
+              No se encontraron datos de coolers
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
-
-  const calculatedTotalPdv = filteredData.reduce(
-    (sum, item) => sum + item.quantity,
-    0,
-  )
 
   // Personalización del tooltip
   interface CustomTooltipProps {
@@ -55,9 +59,7 @@ export function PDVCoolerChart({ data }: { data: PDVCoolerChartData[] }) {
       const currentData = payload[0].payload
 
       // Encontrar el índice del elemento en el array de datos
-      const dataIndex = filteredData.findIndex(
-        (item) => item.type === currentData.type,
-      )
+      const dataIndex = data.findIndex((item) => item.type === currentData.type)
       const colorIndex = dataIndex >= 0 ? dataIndex % COLORS.length : 0
       const color = COLORS[colorIndex]
 
@@ -82,7 +84,7 @@ export function PDVCoolerChart({ data }: { data: PDVCoolerChartData[] }) {
         <ResponsiveContainer width="100%" height={260}>
           <PieChart>
             <Pie
-              data={filteredData}
+              data={data}
               cx="50%"
               cy="50%"
               innerRadius={60}
@@ -93,7 +95,7 @@ export function PDVCoolerChart({ data }: { data: PDVCoolerChartData[] }) {
               label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
               className="font-semibold"
             >
-              {filteredData.map((entry, index) => (
+              {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
@@ -114,7 +116,7 @@ export function PDVCoolerChart({ data }: { data: PDVCoolerChartData[] }) {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {calculatedTotalPdv}
+                          {totalPdv}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
@@ -133,7 +135,7 @@ export function PDVCoolerChart({ data }: { data: PDVCoolerChartData[] }) {
           </PieChart>
         </ResponsiveContainer>
         <div className="flex flex-wrap justify-center gap-3 gap-y-1">
-          {filteredData.map((entry, index) => (
+          {data.map((entry, index) => (
             <div
               key={`legend-${index}`}
               className="flex items-center gap-2"

@@ -24,10 +24,9 @@ import { CoolerImageData } from './sampling.types'
 
 export function CoolerImages({ data }: { data: CoolerImageData[] }) {
   const [currentPage, setCurrentPage] = useState(1)
-  const imagesPerPage = 2 // Solo 2 imágenes en desktop como solicitado
+  const imagesPerPage = 2
   const totalPages = Math.ceil(data.length / imagesPerPage)
 
-  // Calcular las imágenes a mostrar en la página actual
   const startIndex = (currentPage - 1) * imagesPerPage
   const currentImages = data.slice(startIndex, startIndex + imagesPerPage)
 
