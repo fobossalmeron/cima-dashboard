@@ -10,7 +10,7 @@ import { PromoterImages } from '@/components/sampling/promoter-images'
 import { Giveaways } from '@/components/sampling/giveaways'
 import { PDVCoolerChart } from '@/components/sampling/pdv-cooler-chart'
 import { CoolerSalesChart } from '@/components/sampling/cooler-sales-chart'
-import { CoolerTypesChart } from '@/components/sampling/cooler-types-chart'
+import { CoolerSizesChart } from '@/components/sampling/cooler-sizes-chart'
 import { CoolerImages } from '@/components/sampling/cooler-images'
 import { PDVPOPChart } from '@/components/sampling/pdv-pop-chart'
 import { POPTypesChart } from '@/components/sampling/pop-types-chart'
@@ -69,11 +69,10 @@ export default function Demos() {
     { type: 'Sin cooler' as const, ventas: 87500 },
   ]
 
-  // Datos de ejemplo para el gráfico de tipos de cooler (reemplazar con datos reales cuando estén disponibles)
-  const coolerTypesData = [
-    { type: 'Vertical', quantity: 28 },
-    { type: 'Horizontal', quantity: 15 },
-    { type: 'Portátil', quantity: 12 },
+  // Datos de ejemplo para el gráfico de tamaños de cooler (reemplazar con datos reales cuando estén disponibles)
+  const coolerSizesData = [
+    { size: 'Grande', quantity: 28 },
+    { size: 'Pequeño', quantity: 12 },
   ]
 
   // Datos de ejemplo para las imágenes de coolers (reemplazar con datos reales cuando estén disponibles)
@@ -107,7 +106,10 @@ export default function Demos() {
     { type: 'Cintillo', quantity: 18 },
     { type: 'Dangler', quantity: 12 },
     { type: 'Preciador', quantity: 8 },
-    { type: 'Banner', quantity: 5 },
+    { type: 'Cooler Sticker', quantity: 7 },
+    { type: 'Poster', quantity: 6 },
+    { type: 'Pallet Wrap', quantity: 5 },
+    { type: 'Cabezote', quantity: 4 },
   ]
 
   // Datos de ejemplo para las imágenes de POP (reemplazar con datos reales cuando estén disponibles)
@@ -154,7 +156,7 @@ export default function Demos() {
             <ActivationsHistoryTable data={activationsHistory} />
           </div>
           <PDVCoolerChart data={coolerData} />
-          <CoolerTypesChart data={coolerTypesData} />
+          <CoolerSizesChart data={coolerSizesData} />
           <div className="md:col-span-2 lg:col-span-2 print:col-span-3">
             <CoolerImages data={coolerImagesData} />
           </div>

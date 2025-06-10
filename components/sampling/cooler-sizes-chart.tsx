@@ -12,18 +12,18 @@ import {
   LabelList,
 } from 'recharts'
 import { useMemo } from 'react'
-import { CoolerTypesChartData } from './sampling.types'
+import { CoolerSizesChartData } from './sampling.types'
 
 /**
- * Componente que muestra un gráfico de barras con los tipos de cooler y sus cantidades.
+ * Componente que muestra un gráfico de barras con los tamaños de cooler y sus cantidades.
  *
- * @param {CoolerTypesChartData[]} data - Datos del gráfico
- * @property {string} type - Tipo de cooler (ej. "Vertical", "Horizontal", "Portátil")
- * @property {number} quantity - Cantidad de coolers de este tipo
+ * @param {CoolerSizesChartData[]} data - Datos del gráfico
+ * @property {string} size - Tamaño de cooler (ej. "Pequeño", "Grande")
+ * @property {number} quantity - Cantidad de coolers de este tamaño
  */
 
-export function CoolerTypesChart({ data }: { data: CoolerTypesChartData[] }) {
-  // Calcular el total y los porcentajes para cada tipo y ordenar de mayor a menor
+export function CoolerSizesChart({ data }: { data: CoolerSizesChartData[] }) {
+  // Calcular el total y los porcentajes para cada tamaño y ordenar de mayor a menor
   const dataWithPercentages = useMemo(() => {
     const total = data.reduce((sum, item) => sum + item.quantity, 0)
 
@@ -42,12 +42,12 @@ export function CoolerTypesChart({ data }: { data: CoolerTypesChartData[] }) {
     return (
       <Card className="md:col-span-2 col-span-1">
         <CardHeader>
-          <CardTitle>Coolers - Tipos de cooler en puntos de venta</CardTitle>
+          <CardTitle>Coolers - Tamaños de cooler en puntos de venta</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px] flex items-center justify-center">
             <p className="text-muted-foreground text-sm">
-              No se encontraron datos de tipos de cooler
+              No se encontraron datos de tamaños de cooler
             </p>
           </div>
         </CardContent>
@@ -58,7 +58,7 @@ export function CoolerTypesChart({ data }: { data: CoolerTypesChartData[] }) {
   return (
     <Card className="md:col-span-2 col-span-1">
       <CardHeader>
-        <CardTitle>Coolers - Tipos de cooler en puntos de venta</CardTitle>
+        <CardTitle>Coolers - Tamaños de cooler en puntos de venta</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <ResponsiveContainer width="100%" height={300}>
@@ -70,7 +70,7 @@ export function CoolerTypesChart({ data }: { data: CoolerTypesChartData[] }) {
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
-              dataKey="type"
+              dataKey="size"
               className="text-xs"
               interval={0}
               height={60}
@@ -101,10 +101,10 @@ export function CoolerTypesChart({ data }: { data: CoolerTypesChartData[] }) {
             <Tooltip
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
-                  const { type, quantity, percentage } = payload[0].payload
+                  const { size, quantity, percentage } = payload[0].payload
                   return (
                     <div className="bg-background border border-border p-3 rounded-lg shadow-lg">
-                      <p className="text-base font-medium">{type}</p>
+                      <p className="text-base font-medium">{size}</p>
                       <p
                         className="text-base"
                         style={{ color: payload[0].color }}

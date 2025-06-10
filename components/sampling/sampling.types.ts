@@ -58,8 +58,8 @@ export interface CoolerSalesChartData {
   ventas: number
 }
 
-export interface CoolerTypesChartData {
-  type: string
+export interface CoolerSizesChartData {
+  size: string
   quantity: number
 }
 
