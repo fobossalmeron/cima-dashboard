@@ -7,7 +7,7 @@ Este documento describe las nuevas gráficas agregadas al dashboard para el aná
 ### Coolers
 
 1. **PDV con/sin Cooler** - Gráfico de dona que muestra la distribución de puntos de venta con y sin cooler.
-2. **Tipos de Cooler** - Gráfico de barras que muestra los diferentes tipos de cooler (Vertical, Horizontal, Portátil)
+2. **Tamaños de Cooler** - Gráfico de barras que muestra los diferentes tamaños de cooler (Pequeño, Grande)
 3. **Ventas por Cooler** - Comparación de ventas entre PDV con y sin cooler
 4. **Imágenes de Coolers** - Galería de imágenes de coolers en puntos de venta
 
