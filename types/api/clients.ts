@@ -5,7 +5,6 @@ import {
   Brand,
   Client,
   ConsumptionMoment,
-  Dashboard,
   Ethnicity,
   Flavor,
   FormSubmission,
@@ -32,9 +31,9 @@ import {
   SamplingTraffic,
   SubBrand,
   SubBrandTemplate,
-  SyncLog,
 } from '@prisma/client'
 import { QuestionOptionWithRelations } from './form-template'
+import { DashboardWithRelations } from '../prisma'
 
 export interface CreateClientRequest {
   name: string
@@ -117,12 +116,6 @@ export interface ActivatedBrandWithRelations extends ActivatedBrand {
 
 export interface ProductSaleWithRelations extends ProductSale {
   product: ProductWithRelations
-}
-
-export interface DashboardWithRelations extends Dashboard {
-  template: FormTemplateWithRelations
-  submissions: SubmissionWithRelations[]
-  syncLogs: SyncLog[]
 }
 
 export interface ClientWithRelations extends Client {

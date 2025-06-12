@@ -1,4 +1,4 @@
-import { DashboardWithRelations } from '@/types/api/clients'
+import { DashboardWithRelations } from '@/types/prisma'
 import {
   PDVTypeChartData,
   ProductLocationInPDVChartData,
@@ -6,6 +6,12 @@ import {
   ProductStatusInPDVChartData,
   OldAndNewActivationsChartData,
   PDVProductImagesData,
+  CoolerData,
+  CoolerSalesData,
+  CoolerTypesData,
+  PopData,
+  PopTypesRecord,
+  CoolerImageData,
 } from '@/components/product/product.types'
 import { MONTHS } from './months'
 import { PhotoTypesEnum } from '@/enums/photos-fields'
@@ -185,6 +191,150 @@ export function getPDVProductImages(
           locationName: submission.location?.name ?? '',
           address: submission.location?.address ?? '',
           url: photo.url,
+        }))
+    })
+    .flat()
+}
+
+export function getCoolerData(dashboard: DashboardWithRelations): CoolerData {
+  const coolerCounts = dashboard.submissions.reduce(
+    (acc: Record<string, number>, submission) => {
+      const hasCooler = submission.coolersInPDV
+      const coolerType = hasCooler ? 'Con cooler' : 'Sin cooler'
+
+      acc[coolerType]++
+
+      return acc
+    },
+    {
+      'Con cooler': 0,
+      'Sin cooler': 0,
+    },
+  )
+
+  return Object.entries(coolerCounts).map(([type, quantity]) => ({
+    type: type as 'Con cooler' | 'Sin cooler',
+    quantity,
+  }))
+}
+
+export function getCoolerSalesData(
+  dashboard: DashboardWithRelations,
+): CoolerSalesData {
+  const coolerSales = dashboard.submissions.reduce(
+    (acc: Record<string, number>, submission) => {
+      const hasCooler = submission.coolersInPDV
+      const coolerType = hasCooler ? 'Con cooler' : 'Sin cooler'
+      acc[coolerType] += submission.productSales.reduce(
+        (acc, sale) => acc + sale.price,
+        0,
+      )
+      return acc
+    },
+    {
+      'Con cooler': 0,
+      'Sin cooler': 0,
+    },
+  )
+
+  return Object.entries(coolerSales).map(([type, quantity]) => ({
+    type: type as 'Con cooler' | 'Sin cooler',
+    ventas: quantity,
+  }))
+}
+
+export function getCoolerTypesData(
+  dashboard: DashboardWithRelations,
+): CoolerTypesData[] {
+  const coolerTypes = dashboard.submissions.reduce(
+    (acc: Record<string, number>, submission) => {
+      const coolerType = submission.coolerSize?.description
+      if (!coolerType) return acc
+      if (!acc[coolerType]) {
+        acc[coolerType] = 0
+      }
+      acc[coolerType]++
+      return acc
+    },
+    {},
+  )
+
+  return Object.entries(coolerTypes).map(([type, quantity]) => ({
+    type,
+    quantity,
+  }))
+}
+
+export function getPopData(dashboard: DashboardWithRelations): PopData {
+  const popData = dashboard.submissions.reduce(
+    (acc: Record<string, number>, submission) => {
+      const hasPop = submission.popInPDV
+      const popType = hasPop ? 'Con POP' : 'Sin POP'
+      if (!acc[popType]) {
+        acc[popType] = 0
+      }
+      acc[popType]++
+      return acc
+    },
+    {
+      'Con POP': 0,
+      'Sin POP': 0,
+    },
+  )
+
+  return Object.entries(popData).map(([type, quantity]) => ({
+    type: type as 'Con POP' | 'Sin POP',
+    quantity,
+  }))
+}
+
+export function getPopTypesData(
+  dashboard: DashboardWithRelations,
+): PopTypesRecord[] {
+  const popTypes = dashboard.submissions.reduce(
+    (acc: Record<string, number>, submission) => {
+      const popType = submission.popType?.description
+      if (!popType) return acc
+      if (!acc[popType]) {
+        acc[popType] = 0
+      }
+      acc[popType]++
+      return acc
+    },
+    {},
+  )
+
+  return Object.entries(popTypes).map(([type, quantity]) => ({
+    type,
+    quantity,
+  }))
+}
+
+export function getCoolersImagesData(
+  dashboard: DashboardWithRelations,
+): CoolerImageData[] {
+  return dashboard.submissions
+    .map((submission) => {
+      return submission.photos
+        .filter((photo) => photo.type.slug === PhotoTypesEnum.COOLER)
+        .map((photo) => ({
+          url: photo.url,
+          name: submission.representative?.name ?? '',
+        }))
+    })
+    .flat()
+}
+
+export function getPopsImagesData(
+  dashboard: DashboardWithRelations,
+): CoolerImageData[] {
+  return dashboard.submissions
+    .map((submission) => {
+      return submission.photos
+        .filter((photo) => photo.type.slug === PhotoTypesEnum.POP)
+        .map((photo) => ({
+          url: photo.url,
+          name: submission.representative?.name ?? '',
         }))
     })
     .flat()

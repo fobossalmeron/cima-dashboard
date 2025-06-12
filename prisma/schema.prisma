@@ -420,6 +420,10 @@ model FormSubmission {
   productInPromotion Boolean  @default(false) @map("product_in_promotion")
   riskZone           Boolean  @default(false) @map("risk_zone")
   firstActivation    Boolean  @default(false) @map("first_activation")
+  coolersInPDV       Boolean  @default(false) @map("coolers_in_pdv")
+  coolerSizeId       String?  @map("cooler_size_id")
+  popInPDV           Boolean  @default(false) @map("pop_in_pdv")
+  popTypeId          String?  @map("pop_type_id")
 
   // Relations
   answers                    Answer[]
@@ -434,6 +438,8 @@ model FormSubmission {
   sampling                   Sampling?
   photos                     Photo[]
   giveawayProducts           GiveawayProduct[]
+  coolerSize                 CoolerSize?                 @relation(fields: [coolerSizeId], references: [id])
+  popType                    PopType?                    @relation(fields: [popTypeId], references: [id])
 
   @@unique([dashboardId, locationId, representativeId, submittedAt])
   @@index([locationId])
@@ -662,6 +668,26 @@ model GiveawayProduct {
   @@index([giveawayProductTypeId])
   @@index([submissionId])
   @@map("giveaway_products")
+}
+
+model CoolerSize {
+  id          String @id @default(cuid())
+  slug        String @unique
+  description String
+
+  submissions FormSubmission[]
+
+  @@map("cooler_sizes")
+}
+
+model PopType {
+  id          String @id @default(cuid())
+  slug        String @unique
+  description String
+
+  submissions FormSubmission[]
+
+  @@map("pop_types")
 }
 
 model SyncLog {

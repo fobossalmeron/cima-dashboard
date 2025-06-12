@@ -22,9 +22,26 @@ import {
   getPromoterImagesData,
   getTrafficDuringActivationChartData,
 } from '@/lib/utils/dashboard-data/samplings'
-import { getOldAndNewActivationsChartData } from '@/lib/utils/dashboard-data/products'
+import {
+  getCoolerData,
+  getCoolerSalesData,
+  getCoolersImagesData,
+  getCoolerTypesData,
+  getOldAndNewActivationsChartData,
+  getPopData,
+  getPopTypesData,
+  getPopsImagesData,
+} from '@/lib/utils/dashboard-data/products'
 import { useClientContext } from '@/lib/context/ClientContext'
 import { useCatalogContext } from '@/lib/context/CatalogContext'
+import {
+  CoolerData,
+  CoolerImageData,
+  CoolerSalesData,
+  CoolerTypesData,
+  PopData,
+  PopTypesRecord,
+} from '@/components/product/product.types'
 
 /**
  * VELOCITY POR HORA
@@ -58,77 +75,26 @@ export default function Demos() {
     getOldAndNewActivationsChartData(dashboardData)
 
   // Datos de ejemplo para el gráfico de cooler (reemplazar con datos reales cuando estén disponibles)
-  const coolerData = [
-    { type: 'Con cooler' as const, quantity: 45 },
-    { type: 'Sin cooler' as const, quantity: 23 },
-  ]
+  const coolerData: CoolerData = getCoolerData(dashboardData)
 
   // Datos de ejemplo para el gráfico de ventas por cooler (reemplazar con datos reales cuando estén disponibles)
-  const coolerSalesData = [
-    { type: 'Con cooler' as const, ventas: 125000 },
-    { type: 'Sin cooler' as const, ventas: 87500 },
-  ]
+  const coolerSalesData: CoolerSalesData = getCoolerSalesData(dashboardData)
 
   // Datos de ejemplo para el gráfico de tipos de cooler (reemplazar con datos reales cuando estén disponibles)
-  const coolerTypesData = [
-    { type: 'Vertical', quantity: 28 },
-    { type: 'Horizontal', quantity: 15 },
-    { type: 'Portátil', quantity: 12 },
-  ]
+  const coolerTypesData: CoolerTypesData[] = getCoolerTypesData(dashboardData)
 
   // Datos de ejemplo para las imágenes de coolers (reemplazar con datos reales cuando estén disponibles)
-  const coolerImagesData = [
-    {
-      url: '/assets/dummy/pdv1.jpg',
-      name: 'Cooler Vertical - Supermercado Central',
-    },
-    {
-      url: '/assets/dummy/pdv2.jpg',
-      name: 'Cooler Horizontal - Tienda Express',
-    },
-    {
-      url: '/assets/dummy/pdv3.jpg',
-      name: 'Cooler Portátil - Evento Especial',
-    },
-    {
-      url: '/assets/dummy/pdv4.jpg',
-      name: 'Cooler de Mesa - Oficina',
-    },
-  ]
+  const coolerImagesData: CoolerImageData[] =
+    getCoolersImagesData(dashboardData)
 
   // Datos de ejemplo para el gráfico de POP (reemplazar con datos reales cuando estén disponibles)
-  const popData = [
-    { type: 'Con POP' as const, quantity: 32 },
-    { type: 'Sin POP' as const, quantity: 36 },
-  ]
+  const popData: PopData = getPopData(dashboardData)
 
   // Datos de ejemplo para el gráfico de tipos de POP (reemplazar con datos reales cuando estén disponibles)
-  const popTypesData = [
-    { type: 'Cintillo', quantity: 18 },
-    { type: 'Dangler', quantity: 12 },
-    { type: 'Preciador', quantity: 8 },
-    { type: 'Banner', quantity: 5 },
-  ]
+  const popTypesData: PopTypesRecord[] = getPopTypesData(dashboardData)
 
   // Datos de ejemplo para las imágenes de POP (reemplazar con datos reales cuando estén disponibles)
-  const popImagesData = [
-    {
-      url: '/assets/dummy/pdv1.jpg',
-      name: 'Cintillo promocional - Supermercado Central',
-    },
-    {
-      url: '/assets/dummy/pdv2.jpg',
-      name: 'Dangler de producto - Tienda Express',
-    },
-    {
-      url: '/assets/dummy/pdv3.jpg',
-      name: 'Preciador especial - Evento Promocional',
-    },
-    {
-      url: '/assets/dummy/pdv4.jpg',
-      name: 'Banner de marca - Punto de venta',
-    },
-  ]
+  const popImagesData: CoolerImageData[] = getPopsImagesData(dashboardData)
 
   return (
     <div className="space-y-6">

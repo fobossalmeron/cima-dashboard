@@ -3,6 +3,8 @@ export enum PhotosFieldsEnum {
   PROMOTOR = '2. FOTO DE LA PROMOTORA con la Mesa de Activación',
   CLIENTS = 'FOTO DE CLIENTES',
   OTHER = 'Foto',
+  COOLER = 'Foto del Cooler',
+  POP = 'Foto Material POP',
 }
 
 export enum PhotoTypesEnum {
@@ -10,4 +12,6 @@ export enum PhotoTypesEnum {
   PROMOTOR = 'promotor',
   CLIENT = 'client',
   OTHER = 'other',
+  COOLER = 'cooler',
+  POP = 'pop',
 }

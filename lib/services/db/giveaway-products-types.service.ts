@@ -23,7 +23,7 @@ export class GiveawayProductsTypesService {
     }
 
     const giveawayProductTypes =
-      await GiveawayProductTypesRepository.getGiveawayProductTypes()
+      await GiveawayProductTypesRepository.getGiveawayProductTypes(dashboard.id)
 
     return giveawayProductTypes.map((option) => ({
       value: slugify(option.slug),

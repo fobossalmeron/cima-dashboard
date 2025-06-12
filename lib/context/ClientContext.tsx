@@ -2,7 +2,7 @@
 
 import { createContext, useContext, ReactNode, useState } from 'react'
 import { Client } from '@prisma/client'
-import { DashboardWithRelations } from '@/types/api/clients'
+import { DashboardWithRelations } from '@/types/prisma'
 import { DashboardFilters } from '@/types/services'
 
 interface ClientContextType {

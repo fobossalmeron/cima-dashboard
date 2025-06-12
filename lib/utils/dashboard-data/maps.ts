@@ -1,5 +1,5 @@
 import { MapsData } from '@/components/general/general.types'
-import { DashboardWithRelations } from '@/types/api/clients'
+import { DashboardWithRelations } from '@/types/prisma'
 
 export function getMapsData(dashboard?: DashboardWithRelations): MapsData {
   if (!dashboard?.submissions) {

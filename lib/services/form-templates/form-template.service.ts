@@ -9,7 +9,6 @@ import {
   Prisma,
   QuestionGroup,
   Dashboard,
-  QuestionAttachment,
 } from '@prisma/client'
 import {
   DashboardCreateParams,
@@ -22,10 +21,13 @@ import {
   FormTemplateUpdateQuestionsResponse,
   FormTemplateWithQuestionsAndOptions,
 } from '@/types/api/form-template'
-import { QuestionWithRelations } from '@/types/api/clients'
-import { QuestionOptionWithRelations } from '@/types/api'
+import { QuestionWithRelations } from '@/types/prisma'
 import { withTransaction } from '@/prisma/prisma'
 import { FormTemplateWithDashboardsCount } from '@/types/services/form-template.types'
+import { Log } from '@/lib/utils/log'
+import crypto from 'crypto'
+import { CoolersService } from './coolers.service'
+import { PopService } from './pop.service'
 
 export class FormTemplateService {
   static async getAll(): Promise<FormTemplate[]> {
@@ -396,121 +398,248 @@ export class FormTemplateService {
     }
   }
 
+  private static async createOrUpdateCatalogs(
+    questions: QuestionWithRelations[],
+    tx: Prisma.TransactionClient,
+  ): Promise<void> {
+    await CoolersService.syncSizes(questions, tx)
+    await PopService.syncTypes(questions, tx)
+  }
+
   private static async createOrUpdateQuestions(
     questions: FormTemplateQuestion[],
     formTemplateId: string,
     tx: Prisma.TransactionClient,
   ): Promise<QuestionWithRelations[]> {
-    return await Promise.all(
+    const questionsWithRelations = await Promise.all(
       questions.map(async (question) => {
+        Log.debug(
+          `Creating or updating question ${question.Name} with id ${question.Id}`,
+        )
+
         // Primero creamos o actualizamos la pregunta
-        const questionData = {
+        let questionData:
+          | Prisma.QuestionCreateInput
+          | Prisma.QuestionUpdateInput = {
           id: question.Id,
           sortOrder: question.SortOrder,
           type: FormTemplateService.getQuestionType(question.Type),
-          name: question.Name.trim(),
+          name: question.Name.trim()
+            .replace(/^[-_]+|[-_]+$/g, '')
+            .trim(),
           isMandatory: question.IsMandatory,
           isAutoFill: question.IsAutoFill,
-          questionGroupId: question.QuestionGroupId,
           forImageRecognition: question.ForImageRecognition ?? false,
-          formTemplateId,
+          formTemplate: {
+            connect: {
+              id: formTemplateId,
+            },
+          },
         }
-        const { id: questionId, ...rest } = questionData
 
-        const createdQuestion = await tx.question.upsert({
-          where: { id: questionId, formTemplateId },
-          update: rest,
-          create: questionData,
-        })
+        if (question.QuestionGroupId) {
+          // Verificar si el grupo existe antes de conectarlo
+          const groupExists = await tx.questionGroup.findUnique({
+            where: { id: question.QuestionGroupId },
+          })
 
-        let options: QuestionOptionWithRelations[] = []
-        let triggers: QuestionTrigger[] = []
-        let attachments: QuestionAttachment[] = []
-        // Si hay opciones, las creamos
-        if (question.Options && question.Options.length > 0) {
-          options = await Promise.all(
-            question.Options.map(async (option) => {
-              const optionData = {
-                id: option.Id,
-                questionId: createdQuestion.id,
-                value: option.Value,
-                sortOrder: option.SortOrder,
-              }
-              const { id: optionId, ...rest } = optionData
-              const createdOption = await tx.questionOption.upsert({
-                where: { id: optionId, questionId: createdQuestion.id },
-                update: rest,
-                create: optionData,
-              })
+          if (groupExists) {
+            questionData = {
+              ...questionData,
+              questionGroup: {
+                connect: {
+                  id: question.QuestionGroupId,
+                },
+              },
+            }
+          } else {
+            // Si el grupo no existe, no incluimos la relación
+            delete questionData.questionGroup
+          }
+        } else {
+          // Si no hay QuestionGroupId, no incluimos la relación
+          delete questionData.questionGroup
+        }
 
-              let localTriggers: QuestionTrigger[] = []
+        try {
+          const { id: questionId, ...rest } = questionData
 
-              // Si la pregunta tiene triggers, los creamos
-              if (question.Triggers) {
-                const questionTriggers = question.Triggers.filter(
-                  (trigger) => trigger.QuestionValue === option.Id,
-                )
-                if (questionTriggers.length > 0) {
-                  localTriggers = await Promise.all(
-                    questionTriggers.map(async (trigger) => {
-                      const triggerData = {
-                        questionId: createdQuestion.id,
-                        optionId: createdOption.id,
-                        groupId: trigger.GroupId,
-                      }
-                      const { groupId, optionId, questionId } = triggerData
-                      const triggerExists = await tx.questionTrigger.findFirst({
-                        where: { groupId, optionId, questionId },
-                      })
-                      if (triggerExists) {
-                        return triggerExists
-                      }
-                      return tx.questionTrigger.create({
-                        data: triggerData,
-                      })
-                    }),
-                  )
+          const createdQuestion = await tx.question.upsert({
+            where: { id: questionId as string, formTemplateId },
+            update: rest,
+            create: questionData as Prisma.QuestionCreateInput,
+            include: {
+              options: {
+                include: {
+                  triggers: true,
+                },
+              },
+              triggers: {
+                include: {
+                  option: true,
+                  group: {
+                    include: {
+                      questions: true,
+                    },
+                  },
+                },
+              },
+              attachments: true,
+              questionGroup: {
+                include: {
+                  questions: true,
+                },
+              },
+            },
+          })
+
+          // Si hay opciones, las creamos
+          if (question.Options && question.Options.length > 0) {
+            await Promise.all(
+              question.Options.map(async (option) => {
+                const optionData = {
+                  id: option.Id,
+                  questionId: createdQuestion.id,
+                  value: option.Value,
+                  sortOrder: option.SortOrder,
                 }
-                triggers = [...triggers, ...localTriggers]
-              }
+                const { id: optionId, ...rest } = optionData
+                await tx.questionOption.upsert({
+                  where: { id: optionId, questionId: createdQuestion.id },
+                  update: rest,
+                  create: optionData,
+                })
+              }),
+            )
+          }
 
-              return {
-                ...createdOption,
-                triggers: localTriggers,
-              }
-            }),
+          // Si hay triggers, los creamos
+          if (question.Triggers) {
+            await Promise.all(
+              question.Triggers.map(async (trigger) => {
+                // Verificar que el grupo existe
+                const groupExists = await tx.questionGroup.findUnique({
+                  where: { id: trigger.GroupId },
+                })
+
+                if (!groupExists) {
+                  Log.warn(
+                    `Group ${trigger.GroupId} not found, skipping trigger creation`,
+                  )
+                  return
+                }
+
+                // Verificar que la opción existe
+                const optionExists = await tx.questionOption.findUnique({
+                  where: { id: trigger.QuestionValue },
+                })
+
+                if (!optionExists) {
+                  Log.warn(
+                    `Option ${trigger.QuestionValue} not found, skipping trigger creation`,
+                  )
+                  return
+                }
+
+                const triggerData = {
+                  questionId: createdQuestion.id,
+                  optionId: trigger.QuestionValue,
+                  groupId: trigger.GroupId,
+                }
+                const { groupId, optionId, questionId } = triggerData
+                const triggerExists = await tx.questionTrigger.findFirst({
+                  where: { groupId, optionId, questionId },
+                })
+                if (!triggerExists) {
+                  await tx.questionTrigger.create({
+                    data: triggerData,
+                  })
+                }
+              }),
+            )
+          }
+
+          // Si hay attachments, los creamos
+          if (question.Attachments && question.Attachments.length > 0) {
+            await Promise.all(
+              question.Attachments.filter(
+                (attachment) =>
+                  attachment.url && attachment.type && attachment.name,
+              ).map(async (attachment) => {
+                const attachmentData = {
+                  id: attachment.id || crypto.randomUUID(),
+                  questionId: createdQuestion.id,
+                  url: attachment.url,
+                  type: attachment.type,
+                  name: attachment.name,
+                }
+                const { id: attachmentId, ...rest } = attachmentData
+                await tx.questionAttachment.upsert({
+                  where: { id: attachmentId },
+                  update: rest,
+                  create: attachmentData,
+                })
+              }),
+            )
+          }
+
+          // Obtenemos la pregunta actualizada con todas sus relaciones
+          return (await tx.question.findUnique({
+            where: { id: createdQuestion.id },
+            include: {
+              options: {
+                include: {
+                  triggers: true,
+                },
+              },
+              triggers: {
+                include: {
+                  option: true,
+                  group: {
+                    include: {
+                      questions: true,
+                    },
+                  },
+                },
+              },
+              attachments: true,
+              questionGroup: {
+                include: {
+                  questions: true,
+                },
+              },
+            },
+          })) as QuestionWithRelations
+        } catch (error) {
+          Log.error(
+            `Error creating or updating question ${question.Name} with id ${question.Id}`,
+            {
+              error: error as Error,
+              errorMessage: (error as Error).message,
+              errorStack: (error as Error).stack,
+              questionData,
+            },
           )
-        }
-
-        // Si hay attachments, los creamos
-        if (question.Attachments && question.Attachments.length > 0) {
-          attachments = await Promise.all(
-            question.Attachments.map(async (attachment) => {
-              const attachmentData = {
-                id: attachment.id,
-                questionId: createdQuestion.id,
-                url: attachment.url,
-                type: attachment.type,
-                name: attachment.name,
-              }
-              const { id: attachmentId, ...rest } = attachmentData
-              return await tx.questionAttachment.upsert({
-                where: { id: attachmentId },
-                update: rest,
-                create: attachmentData,
-              })
-            }),
-          )
-        }
-
-        return {
-          ...createdQuestion,
-          options,
-          triggers,
-          attachments,
+          throw error
         }
       }),
     )
+
+    try {
+      // Syncronize catalogs
+      await this.createOrUpdateCatalogs(questionsWithRelations, tx)
+      await CoolersService.syncPhotoType(tx)
+      await PopService.syncPhotoType(tx)
+    } catch (error) {
+      Log.error(
+        `Error syncing catalogs for questions ${questionsWithRelations
+          .map((q) => q.name)
+          .join(', ')}`,
+        { error: error as Error },
+      )
+    }
+
+    return questionsWithRelations
   }
 
   static async createFromTemplate(

@@ -9,7 +9,7 @@ import {
   TrafficDuringActivationChartData,
 } from '@/components/sampling/sampling.types'
 import { PhotoTypesEnum } from '@/enums/photos-fields'
-import { DashboardWithRelations } from '@/types/api/clients'
+import { DashboardWithRelations } from '@/types/prisma'
 import { toUTC } from '../date'
 import { GiveawayProductData, GroupedGiveawayData } from '@/types/api'
 import { Option } from '@/types'

@@ -1,4 +1,5 @@
 export * from './brands.service'
+export * from './coolers.service'
 export * from './flavor.service'
 export * from './flavors.service'
 export * from './form-template.service'

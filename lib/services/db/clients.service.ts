@@ -3,10 +3,10 @@ import { Client, Prisma } from '@prisma/client'
 import {
   CreateClientRequest,
   ClientWithRelations,
-  DashboardWithRelations,
   CreateClientResponse,
 } from '@/types/api/clients'
 import { withTransaction } from '@/prisma/prisma'
+import { DashboardWithRelations } from '@/types/prisma'
 
 export class ClientsService {
   static async getAll(): Promise<Client[]> {
@@ -133,6 +133,20 @@ export class ClientsService {
             giveawayProducts: {
               include: {
                 giveawayProductType: true,
+              },
+            },
+            coolerSize: {
+              select: {
+                id: true,
+                slug: true,
+                description: true,
+              },
+            },
+            popType: {
+              select: {
+                id: true,
+                slug: true,
+                description: true,
               },
             },
           },

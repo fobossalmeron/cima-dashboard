@@ -96,6 +96,7 @@ export class RepslyApiService {
     })
 
     if (!response.ok) {
+      console.log('Error al obtener el formulario:', response)
       throw new Error(`Error al obtener el formulario: ${response.statusText}`)
     }
 

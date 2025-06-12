@@ -1,10 +1,10 @@
 import { TotalSalesByBrandData } from '@/components/sales/sales.types'
 import { getPresentationName } from '@/lib/constants/regex'
 import {
-  DashboardWithRelations,
   ProductSaleWithRelations,
   ProductWithRelations,
 } from '@/types/api/clients'
+import { DashboardWithRelations } from '@/types/prisma'
 
 export function salesBySubBrand(
   dashboard: DashboardWithRelations,

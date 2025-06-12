@@ -18,6 +18,12 @@ export class PhotosService {
     const otherPhotoValues = Object.entries(row).filter(([key]) =>
       key.includes(PhotosFieldsEnum.OTHER),
     )
+    const coolerPhotosValues = Object.entries(row).filter(([key]) =>
+      key.includes(PhotosFieldsEnum.COOLER),
+    )
+    const popPhotosValues = Object.entries(row).filter(([key]) =>
+      key.includes(PhotosFieldsEnum.POP),
+    )
 
     const types = (await PhotoTypeRepository.getAll()).reduce((acc, type) => {
       acc[type.slug] = type.id
@@ -132,6 +138,69 @@ export class PhotosService {
       }),
     )
 
-    return [productPhoto, promotorPhoto, ...clientsPhotos, ...otherPhotos]
+    await PhotoRepository.deleteBySubmissionAndType(
+      submissionId,
+      types[PhotoTypesEnum.COOLER],
+      tx,
+    )
+
+    const coolerPhotos = await Promise.all(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      coolerPhotosValues.map(async ([_, value]) => {
+        return await PhotoRepository.create(
+          {
+            url: value?.toString() ?? '',
+            type: {
+              connect: {
+                id: types[PhotoTypesEnum.COOLER],
+              },
+            },
+            submission: {
+              connect: {
+                id: submissionId,
+              },
+            },
+          },
+          tx,
+        )
+      }),
+    )
+
+    await PhotoRepository.deleteBySubmissionAndType(
+      submissionId,
+      types[PhotoTypesEnum.POP],
+      tx,
+    )
+
+    const popPhotos = await Promise.all(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      popPhotosValues.map(async ([_, value]) => {
+        return await PhotoRepository.create(
+          {
+            url: value?.toString() ?? '',
+            type: {
+              connect: {
+                id: types[PhotoTypesEnum.POP],
+              },
+            },
+            submission: {
+              connect: {
+                id: submissionId,
+              },
+            },
+          },
+          tx,
+        )
+      }),
+    )
+
+    return [
+      productPhoto,
+      promotorPhoto,
+      ...clientsPhotos,
+      ...otherPhotos,
+      ...coolerPhotos,
+      ...popPhotos,
+    ]
   }
 }
