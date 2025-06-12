@@ -1,9 +1,12 @@
 import { prisma } from '@/lib/prisma'
 import { Dashboard, Prisma, SyncJobStatus, SyncStatus } from '@prisma/client'
-import { DashboardWithClientAndTemplate, DashboardWithLogs } from '@/types/api'
+import {
+  DashboardWithClientAndTemplate,
+  DashboardWithLogs,
+  DashboardWithRelations,
+} from '@/types/prisma'
 import { SubmissionService } from './submission.service'
 import { DashboardFilters } from '@/types/services/dashboard.types'
-import { DashboardWithRelations } from '@/types/api/clients'
 
 export class DashboardService {
   static async getAll(): Promise<DashboardWithClientAndTemplate[]> {
@@ -163,6 +166,20 @@ export class DashboardService {
             giveawayProducts: {
               include: {
                 giveawayProductType: true,
+              },
+            },
+            coolerSize: {
+              select: {
+                id: true,
+                slug: true,
+                description: true,
+              },
+            },
+            popType: {
+              select: {
+                id: true,
+                slug: true,
+                description: true,
               },
             },
           },

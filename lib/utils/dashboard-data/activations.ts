@@ -1,5 +1,5 @@
 import { ActivationSalesChartData } from '@/components/general/general.types'
-import { DashboardWithRelations } from '@/types/api/clients'
+import { DashboardWithRelations } from '@/types/prisma'
 import { MONTHS } from './months'
 
 export const getChartData = (

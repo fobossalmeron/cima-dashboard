@@ -1,5 +1,5 @@
 import { KpisData } from '@/components/general/general.types'
-import { DashboardWithRelations } from '@/types/api/clients'
+import { DashboardWithRelations } from '@/types/prisma'
 import {
   getNetPromoterScoreChartData,
   getRealNetPromoterScores,

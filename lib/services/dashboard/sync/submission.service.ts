@@ -21,10 +21,16 @@ import {
   ProcessSubmissionParams,
   ProcessSubmissionResult,
 } from '@/types/services'
-import { DataFieldSearchType, DataFieldsEnum } from '@/enums/data-fields'
+import { DataFieldsEnum } from '@/enums/data-fields'
 import { Log } from '@/lib/utils/log'
 import { ProductLocationService } from './product-location.service'
 import { GiveawayService } from './giveaway.service'
+import { QuestionsUtils } from '@/lib/utils/questions-utils'
+import {
+  CoolersQuestionsEnum,
+  CoolersQuestionsValues,
+} from '@/enums/coolers-questions'
+import { PopQuestionsEnum, PopQuestionsValues } from '@/enums/pop-questions'
 
 export class SubmissionSyncService {
   private static async processSubmission(
@@ -72,16 +78,41 @@ export class SubmissionSyncService {
       row[DataFieldsEnum.RISK_ZONE]?.toString()?.toLowerCase() === 'Yes'
 
     const firstActivation =
-      Object.entries(row).find(([key]) => {
-        const { tags, searchType } =
-          DataFieldsTagsValues[DataFieldsEnum.FIRST_ACTIVATION]
-        switch (searchType) {
-          case DataFieldSearchType.OR:
-            return tags.some((tag) => key.includes(tag))
-          case DataFieldSearchType.AND:
-            return tags.every((tag) => key.includes(tag))
-        }
-      })?.[1] === 'Yes'
+      QuestionsUtils.searchQuestionInRow(
+        row,
+        DataFieldsTagsValues[DataFieldsEnum.FIRST_ACTIVATION].tags,
+        DataFieldsTagsValues[DataFieldsEnum.FIRST_ACTIVATION].searchType,
+      ) === 'Yes'
+
+    const coolerInPDV =
+      QuestionsUtils.searchQuestionInRow(
+        row,
+        CoolersQuestionsValues[CoolersQuestionsEnum.ENTRY_COLUMN].tags,
+        CoolersQuestionsValues[CoolersQuestionsEnum.ENTRY_COLUMN].searchType,
+      ) === 'Yes'
+
+    const coolerType = coolerInPDV
+      ? QuestionsUtils.searchQuestionInRow(
+          row,
+          CoolersQuestionsValues[CoolersQuestionsEnum.TYPE_COLUMN].tags,
+          CoolersQuestionsValues[CoolersQuestionsEnum.TYPE_COLUMN].searchType,
+        )
+      : null
+
+    const popInPDV =
+      QuestionsUtils.searchQuestionInRow(
+        row,
+        PopQuestionsValues[PopQuestionsEnum.ENTRY_COLUMN].tags,
+        PopQuestionsValues[PopQuestionsEnum.ENTRY_COLUMN].searchType,
+      ) === 'Yes'
+
+    const popType = popInPDV
+      ? QuestionsUtils.searchQuestionInRow(
+          row,
+          PopQuestionsValues[PopQuestionsEnum.TYPE_COLUMN].tags,
+          PopQuestionsValues[PopQuestionsEnum.TYPE_COLUMN].searchType,
+        )
+      : null
 
     const submissionData = {
       ...data,
@@ -104,6 +135,10 @@ export class SubmissionSyncService {
       samplesDelivered,
       riskZone,
       firstActivation,
+      coolerInPDV,
+      coolerType,
+      popInPDV,
+      popType,
     }
 
     const { dashboardId, locationId, representativeId } = data

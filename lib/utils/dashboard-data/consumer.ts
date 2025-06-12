@@ -10,7 +10,7 @@ import {
   RealNetPromoterScoresResult,
 } from '@/components/consumer/consumer.types'
 import { PhotoTypesEnum } from '@/enums/photos-fields'
-import { DashboardWithRelations } from '@/types/api/clients'
+import { DashboardWithRelations } from '@/types/prisma'
 
 export function getAgeDistributionChartData(
   dashboard: DashboardWithRelations,

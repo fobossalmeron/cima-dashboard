@@ -48,3 +48,39 @@ export interface GiveawayData {
   quantity: number
 }
 
+export interface PDVCoolerChartData {
+  type: 'Con cooler' | 'Sin cooler'
+  quantity: number
+}
+
+export interface CoolerSalesChartData {
+  type: 'Con cooler' | 'Sin cooler'
+  ventas: number
+}
+
+export interface CoolerTypesChartData {
+  type: string
+  quantity: number
+}
+
+export interface CoolerImageData {
+  url: string
+  name: string
+}
+
+// Material POP types
+export interface PDVPOPChartData {
+  type: 'Con POP' | 'Sin POP'
+  quantity: number
+}
+
+export interface POPTypesChartData {
+  type: string
+  quantity: number
+}
+
+export interface POPImageData {
+  url: string
+  name: string
+}
+

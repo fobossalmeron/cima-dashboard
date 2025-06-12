@@ -1,5 +1,5 @@
 import { Ambassador } from '@/components/ambassadors/ambassadors.types'
-import { DashboardWithRelations } from '@/types/api/clients'
+import { DashboardWithRelations } from '@/types/prisma'
 
 export function getAmbassadorsData(
   dashboard: DashboardWithRelations,

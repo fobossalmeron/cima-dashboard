@@ -8,6 +8,13 @@ import { ActivationsHistoryTable } from '@/components/sampling/activations-histo
 import { OldAndNewActivationsChart } from '@/components/sampling/old-and-new-activations-chart'
 import { PromoterImages } from '@/components/sampling/promoter-images'
 import { Giveaways } from '@/components/sampling/giveaways'
+import { PDVCoolerChart } from '@/components/sampling/pdv-cooler-chart'
+import { CoolerSalesChart } from '@/components/sampling/cooler-sales-chart'
+import { CoolerTypesChart } from '@/components/sampling/cooler-types-chart'
+import { CoolerImages } from '@/components/sampling/cooler-images'
+import { PDVPOPChart } from '@/components/sampling/pdv-pop-chart'
+import { POPTypesChart } from '@/components/sampling/pop-types-chart'
+import { POPImages } from '@/components/sampling/pop-images'
 import {
   getActivationsHistory,
   getGiveawayProductsData,
@@ -15,9 +22,26 @@ import {
   getPromoterImagesData,
   getTrafficDuringActivationChartData,
 } from '@/lib/utils/dashboard-data/samplings'
-import { getOldAndNewActivationsChartData } from '@/lib/utils/dashboard-data/products'
+import {
+  getCoolerData,
+  getCoolerSalesData,
+  getCoolersImagesData,
+  getCoolerTypesData,
+  getOldAndNewActivationsChartData,
+  getPopData,
+  getPopTypesData,
+  getPopsImagesData,
+} from '@/lib/utils/dashboard-data/products'
 import { useClientContext } from '@/lib/context/ClientContext'
 import { useCatalogContext } from '@/lib/context/CatalogContext'
+import {
+  CoolerData,
+  CoolerImageData,
+  CoolerSalesData,
+  CoolerTypesData,
+  PopData,
+  PopTypesRecord,
+} from '@/components/product/product.types'
 
 /**
  * VELOCITY POR HORA
@@ -50,6 +74,28 @@ export default function Demos() {
   const oldAndNewActivationsChartData =
     getOldAndNewActivationsChartData(dashboardData)
 
+  // Datos de ejemplo para el gráfico de cooler (reemplazar con datos reales cuando estén disponibles)
+  const coolerData: CoolerData = getCoolerData(dashboardData)
+
+  // Datos de ejemplo para el gráfico de ventas por cooler (reemplazar con datos reales cuando estén disponibles)
+  const coolerSalesData: CoolerSalesData = getCoolerSalesData(dashboardData)
+
+  // Datos de ejemplo para el gráfico de tipos de cooler (reemplazar con datos reales cuando estén disponibles)
+  const coolerTypesData: CoolerTypesData[] = getCoolerTypesData(dashboardData)
+
+  // Datos de ejemplo para las imágenes de coolers (reemplazar con datos reales cuando estén disponibles)
+  const coolerImagesData: CoolerImageData[] =
+    getCoolersImagesData(dashboardData)
+
+  // Datos de ejemplo para el gráfico de POP (reemplazar con datos reales cuando estén disponibles)
+  const popData: PopData = getPopData(dashboardData)
+
+  // Datos de ejemplo para el gráfico de tipos de POP (reemplazar con datos reales cuando estén disponibles)
+  const popTypesData: PopTypesRecord[] = getPopTypesData(dashboardData)
+
+  // Datos de ejemplo para las imágenes de POP (reemplazar con datos reales cuando estén disponibles)
+  const popImagesData: CoolerImageData[] = getPopsImagesData(dashboardData)
+
   return (
     <div className="space-y-6">
       <Header title="Demos" />
@@ -72,6 +118,17 @@ export default function Demos() {
           </div>
           <div className="md:col-span-2 lg:col-span-3 print:col-span-3">
             <ActivationsHistoryTable data={activationsHistory} />
+          </div>
+          <PDVCoolerChart data={coolerData} />
+          <CoolerTypesChart data={coolerTypesData} />
+          <div className="md:col-span-2 lg:col-span-2 print:col-span-3">
+            <CoolerImages data={coolerImagesData} />
+          </div>
+          <CoolerSalesChart data={coolerSalesData} />
+          <PDVPOPChart data={popData} />
+          <POPTypesChart data={popTypesData} />
+          <div className="md:col-span-2 lg:col-span-2 print:col-span-3">
+            <POPImages data={popImagesData} />
           </div>
         </div>
       </Content>
