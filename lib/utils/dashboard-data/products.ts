@@ -226,7 +226,7 @@ export function getCoolerSalesData(
       const hasCooler = submission.coolersInPDV
       const coolerType = hasCooler ? 'Con cooler' : 'Sin cooler'
       acc[coolerType] += submission.productSales.reduce(
-        (acc, sale) => acc + sale.price,
+        (acc, sale) => acc + sale.price * sale.quantity,
         0,
       )
       return acc
