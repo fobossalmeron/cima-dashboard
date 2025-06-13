@@ -29,7 +29,7 @@ export function CoolerSalesChart({ data }: { data: CoolerSalesChartData[] }) {
   // Si no hay datos, mostrar mensaje
   if (data.length === 0) {
     return (
-      <Card className="lg:col-span-1 md:col-span-2 col-span-1">
+      <Card className="lg:col-span-1 md:col-span-2 col-span-1 print:col-span-1">
         <CardHeader>
           <CardTitle>Coolers - Ventas durante demos</CardTitle>
         </CardHeader>
@@ -80,6 +80,9 @@ export function CoolerSalesChart({ data }: { data: CoolerSalesChartData[] }) {
   }) => {
     const { x, y, width, value } = props
 
+    // Si el valor es 0 o no está definido, no mostrar la etiqueta
+    if (!value || Number(value) === 0) return null
+
     // Convertir a números si es necesario
     const xPos = typeof x === 'string' ? parseFloat(x) : x || 0
     const yPos = typeof y === 'string' ? parseFloat(y) : y || 0
@@ -100,7 +103,7 @@ export function CoolerSalesChart({ data }: { data: CoolerSalesChartData[] }) {
   }
 
   return (
-    <Card className="lg:col-span-1 md:col-span-2 col-span-1">
+    <Card className="lg:col-span-1 md:col-span-2 col-span-1 print:col-span-1">
       <CardHeader>
         <CardTitle>Coolers - Ventas durante demos</CardTitle>
       </CardHeader>

@@ -42,12 +42,12 @@ export function CoolerTypesChart({ data }: { data: CoolerTypesChartData[] }) {
     return (
       <Card className="md:col-span-2 col-span-1">
         <CardHeader>
-          <CardTitle>Coolers - Tipos de cooler en puntos de venta</CardTitle>
+          <CardTitle>Coolers - Tamaños de cooler en puntos de venta</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px] flex items-center justify-center">
             <p className="text-muted-foreground text-sm">
-              No se encontraron datos de tipos de cooler
+              No se encontraron datos de tamaños de cooler
             </p>
           </div>
         </CardContent>
@@ -58,7 +58,7 @@ export function CoolerTypesChart({ data }: { data: CoolerTypesChartData[] }) {
   return (
     <Card className="md:col-span-2 col-span-1">
       <CardHeader>
-        <CardTitle>Coolers - Tipos de cooler en puntos de venta</CardTitle>
+        <CardTitle>Coolers - Tamaños de cooler en puntos de venta</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <ResponsiveContainer width="100%" height={300}>

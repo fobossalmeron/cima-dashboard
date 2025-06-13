@@ -101,7 +101,7 @@ export default function Demos() {
       <Header title="Demos" />
       <Content>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 print:grid-cols-3 gap-6">
-          <div className="lg:col-span-1 md:col-span-2">
+          <div className="lg:col-span-1 md:col-span-2 print:col-span-1">
             <TrafficDuringActivationChart
               data={trafficDuringActivationChartData}
             />
@@ -121,7 +121,7 @@ export default function Demos() {
           </div>
           <PDVCoolerChart data={coolerData} />
           <CoolerTypesChart data={coolerTypesData} />
-          <div className="md:col-span-2 lg:col-span-2 print:col-span-3">
+          <div className="md:col-span-2 lg:col-span-2 print:col-span-2">
             <CoolerImages data={coolerImagesData} />
           </div>
           <CoolerSalesChart data={coolerSalesData} />

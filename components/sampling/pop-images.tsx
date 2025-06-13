@@ -62,7 +62,7 @@ export function POPImages({ data }: { data: POPImageData[] }) {
                 </div>
               ))
             ) : (
-              <div className="h-[300px] flex items-center justify-center">
+              <div className="h-[300px] flex items-center justify-center col-span-1 md:col-span-2">
                 <p className="text-muted-foreground text-sm">
                   No se encontraron imágenes de material POP
                 </p>

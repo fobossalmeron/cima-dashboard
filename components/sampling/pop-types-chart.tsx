@@ -25,7 +25,7 @@ export function POPTypesChart({ data }: { data: POPTypesChartData[] }) {
   // Si no hay datos, mostrar mensaje
   if (data.length === 0) {
     return (
-      <Card className="md:col-span-2 col-span-1">
+      <Card className="md:col-span-2 col-span-1 print:col-span-2">
         <CardHeader>
           <CardTitle>
             Material POP - Tipos de material POP en puntos de venta
@@ -53,7 +53,7 @@ export function POPTypesChart({ data }: { data: POPTypesChartData[] }) {
     .sort((a, b) => b.quantity - a.quantity)
 
   return (
-    <Card className="md:col-span-2 col-span-1">
+    <Card className="md:col-span-2 col-span-1 print:col-span-2">
       <CardHeader>
         <CardTitle>
           Material POP - Tipos de material POP en puntos de venta

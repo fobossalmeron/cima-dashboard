@@ -28,7 +28,7 @@ export function PDVCoolerChart({ data }: { data: PDVCoolerChartData[] }) {
   // Si no hay datos o el total es 0, mostrar mensaje
   if (data.length === 0 || totalPdv === 0) {
     return (
-      <Card className="lg:col-span-1 md:col-span-2 col-span-1">
+      <Card className="lg:col-span-1 md:col-span-2 col-span-1 print:col-span-1">
         <CardHeader>
           <CardTitle>Coolers - Puntos de venta con cooler</CardTitle>
         </CardHeader>
@@ -76,7 +76,7 @@ export function PDVCoolerChart({ data }: { data: PDVCoolerChartData[] }) {
   }
 
   return (
-    <Card className="lg:col-span-1 md:col-span-2 col-span-1">
+    <Card className="lg:col-span-1 md:col-span-2 col-span-1 print:col-span-1">
       <CardHeader>
         <CardTitle>Coolers - Puntos de venta con cooler</CardTitle>
       </CardHeader>
