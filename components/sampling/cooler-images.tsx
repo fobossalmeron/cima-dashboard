@@ -61,7 +61,7 @@ export function CoolerImages({ data }: { data: CoolerImageData[] }) {
                 </div>
               ))
             ) : (
-              <div className="relative aspect-video bg-muted rounded-lg flex items-center justify-center">
+              <div className="h-[300px] flex items-center justify-center">
                 <p className="text-muted-foreground text-sm">
                   No se encontraron imágenes de coolers
                 </p>
