@@ -9,6 +9,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import {
+  Accordion,
+  AccordionItem,
+  AccordionContent,
+} from '@/components/ui/accordion'
+import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
@@ -117,7 +122,10 @@ const columns: ColumnDef<ActivationsHistoryTableData>[] = [
  * @property {number} sales - Ventas totales durante la activación
  * @property {number} velocity - Velocidad de ventas (ventas / 4 horas que dura la activación)
  * @property {number} conversionRate - Tasa de conversión (ventas / visitas)
+ * @property {string} comment - Comentario de inventario en PDV
  */
+
+const dummyComment = `10 cajas antes, 5 después. Sin acceso a bodega.`
 
 export function ActivationsHistoryTable({
   data,
@@ -126,6 +134,7 @@ export function ActivationsHistoryTable({
 }) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [currentPage, setCurrentPage] = useState(1)
+  const [expandedRow, setExpandedRow] = useState<string | null>(null)
   const pageSize = 10
 
   const table = useReactTable({
@@ -145,6 +154,10 @@ export function ActivationsHistoryTable({
   })
 
   const totalPages = Math.ceil(data.length / pageSize)
+
+  const handleRowClick = (rowId: string) => {
+    setExpandedRow(expandedRow === rowId ? null : rowId)
+  }
 
   return (
     <Card className="w-full">
@@ -175,19 +188,43 @@ export function ActivationsHistoryTable({
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
+                  <>
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && 'selected'}
+                      onClick={() => handleRowClick(row.id)}
+                      className="cursor-pointer hover:bg-muted/50"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                    {expandedRow === row.id && (
+                      <TableRow>
+                        <TableCell colSpan={columns.length} className="p-0">
+                          <Accordion type="single" value="open" collapsible>
+                            <AccordionItem value="open" className="border-0">
+                              <AccordionContent className="p-0">
+                                <div className="p-4 px-2 text-sm">
+                                  <div className="font-medium text-muted-foreground mb-2">
+                                    Comentario de inventario en PDV
+                                  </div>
+                                  <div className="text-foreground p-0">
+                                    {dummyComment || 'Sin comentarios'}
+                                  </div>
+                                </div>
+                              </AccordionContent>
+                            </AccordionItem>
+                          </Accordion>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </>
                 ))
               ) : (
                 <TableRow>

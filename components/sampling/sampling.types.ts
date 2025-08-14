@@ -36,6 +36,7 @@ export interface ActivationsHistoryTableData {
   sales: number
   velocity: number
   conversionRate: number
+  comment?: string
 }
 
 export interface PromoterImageData {
